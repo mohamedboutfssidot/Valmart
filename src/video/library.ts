@@ -43,16 +43,18 @@ export function folderFor(s: Stream): string {
  * Second choice: /videos/<id>.mp4. A live without a file keeps the placeholder.
  */
 async function autoLink() {
+  // lives already given a clip by library.json (written at build time) need no search at all
   await Promise.all(STREAMS.filter((s) => !s.video).map(async (s) => {
     const base = folderFor(s)
     const candidates = [`${base}/video.mp4`, `${base}/video.webm`, `${s.id}.mp4`, `${s.id}.webm`]
-    for (const file of candidates) {
+    // all candidates at once (not one after the other), and each live shows its clip as soon as it is found
+    await Promise.all(candidates.map(async (file) => {
       const url = clipUrl(file)
       try {
-        const r = await fetch(url, { method: 'HEAD', cache: 'no-cache' })
-        if (r.ok && (r.headers.get('content-type') ?? '').startsWith('video/')) { s.video = url; return }
-      } catch { /* no file: try the next one */ }
-    }
+        const r = await fetch(url, { method: 'HEAD' })
+        if (r.ok && (r.headers.get('content-type') ?? '').startsWith('video/') && !s.video) { s.video = url; useLib.setState((st) => ({ n: st.n + 1 })) }
+      } catch { /* no file */ }
+    }))
   }))
 }
 
@@ -77,6 +79,9 @@ export async function loadLibrary(): Promise<Library> {
     }
   } catch { /* no library: fine */ }
   // looking for clip files happens in the background: the app opens at once, the clips appear when found
-  void autoLink().catch(() => undefined).finally(() => useLib.setState((st) => ({ n: st.n + 1 })))
+  // on the published site the build already listed every clip in library.json: no file-by-file search needed
+  const published = Object.keys(lib.attach).length > 0 && !/^(localhost|127\.|192\.168\.)/.test(window.location.hostname)
+  if (published) useLib.setState((st) => ({ n: st.n + 1 }))
+  else void autoLink().catch(() => undefined).finally(() => useLib.setState((st) => ({ n: st.n + 1 })))
   return lib
 }

@@ -35,7 +35,7 @@ function ClipPlayer({ clip, onMissing, fit }: { clip: string; onMissing: () => v
     const r = el.play()
     if (r) r.then(() => useSound.setState({ blocked: false })).catch(() => { el.muted = true; useSound.setState({ blocked: on }); void el.play().catch(() => undefined) })
   }, [clip, on, tick])
-  return <video ref={ref} key={clip} className={`absolute inset-0 h-full w-full ${fit}`} src={clip} autoPlay loop playsInline muted onError={onMissing} />
+  return <video ref={ref} key={clip} className={`absolute inset-0 h-full w-full ${fit}`} src={clip} autoPlay loop playsInline muted preload="auto" onError={onMissing} />
 }
 
 /**
@@ -85,7 +85,7 @@ export function VideoSlot({ stream, src, mediaStream, sound = false, audio = fal
         player
           ? (audio
             ? <ClipPlayer clip={clip} fit={fitCls} onMissing={() => setMissing(clip)} />
-            : <video key={clip} className={`absolute inset-0 h-full w-full ${fitCls}`} src={clip} autoPlay muted loop playsInline onError={() => setMissing(clip)} />)
+            : <video key={clip} className={`absolute inset-0 h-full w-full ${fitCls}`} src={clip} autoPlay muted loop playsInline preload="auto" onError={() => setMissing(clip)} />)
           : <video key={clip} className="absolute inset-0 h-full w-full object-cover" src={`${clip}#t=0.1`} preload="metadata" muted playsInline aria-hidden="true" onError={() => setMissing(clip)} />
       ) : (
         <svg className="absolute inset-0 h-full w-full" viewBox="0 0 160 90" preserveAspectRatio="xMidYMax slice" aria-hidden="true">

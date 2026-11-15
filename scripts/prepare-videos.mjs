@@ -6,6 +6,7 @@
 import { spawnSync } from 'node:child_process'
 import { copyFileSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs'
 import { join, relative, dirname } from 'node:path'
+import { writeLibraryAttach } from './scan-videos.mjs'
 
 const ROOT = 'public/videos'
 const BACKUP = 'videos-originaux'
@@ -39,8 +40,9 @@ for (const f of files) {
   let done = false
   for (const crf of [28, 31, 34, 37]) {
     rmSync(out, { force: true })
-    const r = run('ffmpeg', ['-y', '-ss', start.toFixed(2), '-i', src, '-t', len.toFixed(2), '-vf', 'scale=-2:720', '-c:v', 'libx264', '-crf', String(crf), '-preset', 'slow',
-      '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart', out])
+    const r = run('ffmpeg', ['-y', '-ss', start.toFixed(2), '-i', src, '-t', len.toFixed(2), '-vf', 'fps=30,scale=-2:720,format=yuv420p', '-fps_mode', 'cfr', '-c:v', 'libx264', '-profile:v', 'main', '-level', '3.1',
+      '-crf', String(crf), '-maxrate', '1600k', '-bufsize', '3200k', '-g', '60', '-keyint_min', '60', '-sc_threshold', '0', '-preset', 'slow',
+      '-af', 'aresample=async=1:first_pts=0', '-c:a', 'aac', '-ar', '48000', '-ac', '2', '-b:a', '96k', '-movflags', '+faststart', out])
     if (r.status !== 0) { console.log(`✗ ${rel} : ffmpeg a échoué`); break }
     if (mb(out) <= MAX_MB) { done = true; break }
   }
@@ -52,3 +54,4 @@ for (const f of files) {
   ok++
 }
 console.log(`\n${ok}/${files.length} vidéos prêtes. Originaux gardés dans ${BACKUP}/`)
+console.log(`library.json mis à jour (${writeLibraryAttach()} clips).`)

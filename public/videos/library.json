@@ -1,1 +1,12 @@
-{ "lives": [], "attach": {} }
+{
+  "lives": [],
+  "attach": {
+    "s7": "brazil/rio-de-janeiro/s7-carnival-rehearsal-in-lapa/video.mp4",
+    "s1": "france/paris/s1-sunset-walk-from-the-seine/video.mp4",
+    "s5": "italy/rome/s5-hidden-courtyards-behind-the-pantheon/video.mp4",
+    "s3": "japan/tokyo/s3-shibuya-after-midnight/video.mp4",
+    "s4": "morocco/marrakech/s4-jemaa-el-fna-evening-market/video.mp4",
+    "s6": "turkiye/istanbul/s6-ferry-ride-and-the-spice/video.mp4",
+    "s2": "united-states/new-york/s2-central-park-you-pick-the/video.mp4"
+  }
+}
