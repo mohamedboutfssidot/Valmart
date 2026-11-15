@@ -1,14 +1,17 @@
 // Prépare les vidéos des lives : coupe un extrait AU MILIEU, 720p, avec le son, et garde chaque fichier sous 24 Mo
 // (Cloudflare Pages refuse plus de 25 Mo par fichier).
 //   npm run videos:prepare            -> traite public/videos/**/video.mp4
-//   npm run videos:prepare -- 40      -> extraits de 40 s au lieu de 30 s
+//   node scripts/prepare-videos.mjs 40            -> extraits de 40 s au lieu de 30 s
+//   node scripts/prepare-videos.mjs 30 nouveaux   -> traite TOUS les fichiers vidéo (peu importe leur nom) de public/videos/nouveaux/
 // Les fichiers d'origine sont copiés d'abord dans  videos-originaux/  (hors du site, jamais envoyé sur GitHub).
 import { spawnSync } from 'node:child_process'
 import { copyFileSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs'
 import { join, relative, dirname } from 'node:path'
 import { writeLibraryAttach } from './scan-videos.mjs'
 
-const ROOT = 'public/videos'
+const SUB = process.argv[3] || ''                 // sous-dossier de public/videos à traiter (tous les noms de fichiers)
+const ROOT = SUB ? join('public/videos', SUB) : 'public/videos'
+const VROOT = 'public/videos'
 const BACKUP = 'videos-originaux'
 const CLIP = Number(process.argv[2]) || 30       // durée de l'extrait en secondes
 const MAX_MB = 24
@@ -20,7 +23,7 @@ if (run('ffmpeg', ['-version']).error) {
 }
 
 const files = []
-const walk = (d) => { for (const e of readdirSync(d, { withFileTypes: true })) { const p = join(d, e.name); if (e.isDirectory()) walk(p); else if (/^video\.(mp4|mov|webm)$/i.test(e.name)) files.push(p) } }
+const walk = (d) => { for (const e of readdirSync(d, { withFileTypes: true })) { const p = join(d, e.name); if (e.isDirectory()) walk(p); else if (SUB ? /\.(mp4|mov|webm|m4v)$/i.test(e.name) && !/\.tmp\.mp4$/i.test(e.name) : /^video\.(mp4|mov|webm)$/i.test(e.name)) files.push(p) } }
 if (!existsSync(ROOT)) { console.error(`Dossier ${ROOT} introuvable : lance la commande depuis la racine du projet.`); process.exit(1) }
 walk(ROOT)
 if (!files.length) { console.log('Aucun fichier video.mp4 trouvé dans', ROOT); process.exit(0) }
@@ -28,7 +31,7 @@ if (!files.length) { console.log('Aucun fichier video.mp4 trouvé dans', ROOT); 
 const mb = (f) => statSync(f).size / 1048576
 let ok = 0
 for (const f of files) {
-  const rel = relative(ROOT, f)
+  const rel = relative(VROOT, f)
   const backup = join(BACKUP, rel)
   if (!existsSync(backup)) { mkdirSync(dirname(backup), { recursive: true }); copyFileSync(f, backup) }
   const src = backup                                   // on part toujours de l'original
@@ -36,7 +39,8 @@ for (const f of files) {
   if (!dur) { console.log(`✗ ${rel} : durée illisible, ignoré`); continue }
   const len = Math.min(CLIP, dur)
   const start = Math.max(0, (dur - len) / 2)           // extrait pris au MILIEU
-  const out = join(dirname(f), 'video.tmp.mp4')
+  const final = f.replace(/\.[^./\\]+$/, '') + '.mp4'
+  const out = final.replace(/\.mp4$/, '.tmp.mp4')
   let done = false
   for (const crf of [28, 31, 34, 37]) {
     rmSync(out, { force: true })
@@ -47,9 +51,8 @@ for (const f of files) {
     if (mb(out) <= MAX_MB) { done = true; break }
   }
   if (!done) { rmSync(out, { force: true }); console.log(`✗ ${rel} : toujours > ${MAX_MB} Mo, essaie un extrait plus court (npm run videos:prepare -- 20)`); continue }
-  const final = join(dirname(f), 'video.mp4')
   rmSync(final, { force: true }); renameSync(out, final)
-  if (!/\.mp4$/i.test(f)) rmSync(f, { force: true })
+  if (final !== f) rmSync(f, { force: true })
   console.log(`✓ ${rel} : ${dur.toFixed(0)} s -> extrait ${len.toFixed(0)} s (à partir de ${start.toFixed(0)} s), ${mb(final).toFixed(1)} Mo`)
   ok++
 }
