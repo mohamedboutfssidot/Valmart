@@ -1,0 +1,48 @@
+{
+  "name": "valmart-demo",
+  "private": true,
+  "version": "0.8.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "build:mobile": "tsc --noEmit && VITE_APP=mobile vite build --outDir dist-mobile",
+    "build:site": "tsc --noEmit && vite build --mode site",
+    "artifact": "node scripts/make-artifact.mjs",
+    "build:pages": "node scripts/build-pages.mjs",
+    "dev:all": "node scripts/dev.mjs",
+    "dev:https": "node scripts/dev.mjs --https",
+    "worker": "node scripts/local-worker.mjs",
+    "videos": "node scripts/make-videos.mjs",
+    "video-folders": "node scripts/make-video-folders.mjs"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "d3-geo": "^3.1.1",
+    "framer-motion": "^14.1.0",
+    "livekit-client": "^2.23.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@types/d3-geo": "^3.1.1",
+    "@types/geojson": "^7946.0.16",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/topojson-client": "^3.1.5",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "autoprefixer": "^10.6.1",
+    "postcss": "^8.5.29",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vite-plugin-singlefile": "^2.3.3"
+  }
+}

@@ -1,0 +1,9 @@
+Live s1
+Titre : Sunset walk from the Seine to the Eiffel Tower
+Lieu : Pont de l’Alma, Paris (France)
+Categorie : Travel Guide
+Langue du host : English
+
+Mets ici le clip de ce live et nomme-le :  video.mp4   (ou video.webm)
+Il est relie au live automatiquement, avec le son. Recharge la page.
+Clip conseille : 20 a 40 secondes, 5 a 8 Mo, avec une piste audio.

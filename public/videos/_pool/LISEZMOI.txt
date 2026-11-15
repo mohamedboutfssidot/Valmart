@@ -1,0 +1,3 @@
+Clips generiques : ils sont donnes aux lives qui n'ont pas de clip a eux.
+Mets ici 3 a 5 clips de marche en ville.
+Puis lance : npm run videos

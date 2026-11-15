@@ -1,0 +1,23 @@
+VIDEOS DES LIVES : rien à régler dans l'app.
+
+Chaque live a son dossier : <pays>/<ville>/<id>-<titre>/
+Mets le clip dedans et nomme-le  video.mp4  (ou video.webm). C'est tout : le live le trouve tout seul, avec le son.
+
+  france/paris/s1-sunset-walk-from-the-seine/video.mp4
+  united-states/new-york/s2-central-park-you-pick-the/video.mp4
+  japan/tokyo/s3-shibuya-after-midnight/video.mp4
+  morocco/marrakech/s4-jemaa-el-fna-evening-market/video.mp4
+  italy/rome/s5-hidden-courtyards-behind-the-pantheon/video.mp4
+  turkiye/istanbul/s6-ferry-ride-and-the-spice/video.mp4
+  brazil/rio-de-janeiro/s7-carnival-rehearsal-in-lapa/video.mp4
+  japan/kyoto/s8-quiet-morning-in-gion/video.mp4
+
+Un live sans fichier garde l'emplacement « Video placement ».
+Chaque dossier contient un LISEZMOI.txt avec le titre et le lieu du live.
+Dossiers manquants : npm run video-folders
+
+Clip conseillé, avec le son (20 à 40 s, environ 5 à 8 Mo) :
+  ffmpeg -i entree.mp4 -vf "scale=-2:720" -c:v libx264 -crf 28 -preset slow -c:a aac -b:a 96k -movflags +faststart video.mp4
+
+Le son : actif par défaut. Si le navigateur le bloque (avant le premier clic sur la page), le clip démarre
+sans son et le bouton « Sound off · tap for sound » apparaît : un clic suffit.

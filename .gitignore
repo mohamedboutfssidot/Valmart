@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-mobile
+dist-pages
+*.zip
+*.log
+.env
+.env.*
+.dev.vars
+# Serveur LiveKit : contient des secrets, ne jamais le mettre sur GitHub
+worker/
+
+public/videos/**/*.mp4
+public/videos/**/*.webm
+public/videos/**/*.mov
