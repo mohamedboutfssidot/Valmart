@@ -10,6 +10,6 @@ dist-pages
 # Serveur LiveKit : contient des secrets, ne jamais le mettre sur GitHub
 worker/
 
-public/videos/**/*.mp4
-public/videos/**/*.webm
-public/videos/**/*.mov
+
+
+videos-originaux/
