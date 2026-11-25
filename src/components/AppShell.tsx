@@ -1,6 +1,7 @@
 import { CatE3 } from '../live/e3d'
 import { Fragment, useEffect, useState } from 'react'
 import { planOf } from '../data/plans'
+import ReqNotif from './ReqNotif'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Avatar, Logo, LogoAdaptive } from './ui'
 import { CATEGORIES, STREAMS, slugOf } from '../data/mock'
@@ -32,27 +33,23 @@ const GROUPS: { title?: string; items: Item[] }[] = [
     { to: '/app', label: 'Discover', d: I.discover, end: true },
     { to: '/app/events', label: 'Events', d: I.events },
     { to: '/app/replays', label: 'Replays', d: I.replay },
-    { to: '/app/trips', label: 'My trips', d: I.trips },
     { to: '/app/requests', label: 'Trip requests', d: I.ask },
   ] },
   { title: 'Circle', items: [
     { to: '/app/group', label: 'Group', d: I.people },
-    { to: '/app/following', label: 'Following', d: I.bell },
   ] },
   { title: 'Studio', items: [
     { to: '/studio', label: 'Host tools', d: I.studio },
   ] },
   { title: 'Account', items: [
-    { to: '/app/wallet', label: 'Wallet', d: I.wallet },
-    { to: '/app/plan', label: 'Plan', d: I.gem },
-    { to: '/app/settings', label: 'Settings', d: I.user },
+    { to: '/app/settings', label: 'Profile', d: I.user },
   ] },
 ]
 const TABS: Item[] = [
   { to: '/app', label: 'Discover', d: I.discover, end: true },
   { to: '/app/events', label: 'Events', d: I.events },
   { to: '/app/group', label: 'Circle', d: I.people },
-  { to: '/app/trips', label: 'My trips', d: I.trips },
+  { to: '/app/requests', label: 'Requests', d: I.ask },
   { to: '/app/settings', label: 'Me', d: I.user },
 ]
 
@@ -131,6 +128,7 @@ export function AppShell() {
         <main key={pathname} className={`page-enter mx-auto w-full flex-1 px-4 pb-28 pt-6 transition-[max-width] duration-300 sm:px-6 md:pb-16 md:pt-10 lg:px-8 ${rail ? 'max-w-[1180px] 2xl:max-w-[1480px]' : 'max-w-[1400px] 2xl:max-w-[1680px]'}`}>
           <Outlet />
         </main>
+        <ReqNotif />
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-ink-900/95 backdrop-blur md:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} aria-label="Tabs">

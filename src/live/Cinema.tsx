@@ -2,14 +2,14 @@
 // Stay here / Move on, Look here, and the active tool as one thin bar at the bottom.
 import { Gesture } from './theme'
 import { createPortal } from 'react-dom'
-import { ClosedCaptioning, DeviceRotate, DotsThreeVertical, Lightning, SpeakerHigh, SpeakerSimpleHigh, SpeakerSimpleSlash, SpeakerSlash, SquaresFour, TextAa, X } from '@phosphor-icons/react'
+import { ClosedCaptioning, DeviceRotate, Lightning, SpeakerSimpleHigh, SpeakerSimpleSlash, SquaresFour, X } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Stream } from '../data/mock'
 import { LiveBadge } from '../components/ui'
 import { VideoSlot } from '../components/VideoSlot'
 import { describe, type ToolEngine } from './useToolEngine'
 import { PaceChips, PinLayer, VideoEffects } from './ui'
-import { VoiceBadge, speak, stopSpeaking, useVoice } from './tts'
+import { VoiceBadge } from './tts'
 import { toggleSound, useSound } from '../video/sound'
 
 function CinemaTool({ e, big, compact = false }: { e: ToolEngine; big: boolean; compact?: boolean }) {
@@ -83,7 +83,7 @@ type CC = { on: boolean; toggle: () => void; size: 'S' | 'M' | 'L'; cycle: () =>
 function Group({ label, children, className = '' }: { label: string; children: ReactNode; className?: string }) {
   return (
     <div className={`flex flex-col gap-1 ${className}`} role="group" aria-label={label}>
-      <span className="px-1 text-[10px] font-bold uppercase tracking-wider text-white/55">{label}</span>
+      {label && <span className="px-1 text-[10px] font-bold uppercase tracking-wider text-white/55">{label}</span>}
       <div className="flex items-center gap-2">{children}</div>
     </div>
   )
@@ -117,8 +117,6 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
     return () => { try { so.unlock?.() } catch { /* ignore */ } }
   }, [compact])
   const rotated = !!compact && sideways && portrait
-  const voiceOn = useVoice((s) => s.viewer)
-  const setVoice = useVoice((s) => s.setViewer)
   const sndOn = useSound((s) => s.on && !s.blocked)
 
   const wake = useCallback(() => {
@@ -158,7 +156,7 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
   const shown = ui || look || chatOpen || more || pan || !!eng.active
   const fade = `transition-opacity duration-300 ${shown ? 'opacity-100' : 'pointer-events-none opacity-0'}`
   const btnBase = `lt-btn !border-white/30 !bg-black/75 !text-white backdrop-blur-md ${big ? '!text-base' : '!text-[13px]'}`
-  const btn = `${btnBase} ${compact ? '!h-10 !w-10 !min-w-0 !justify-center !gap-0 !rounded-full !p-0 !text-[10px] !font-semibold !leading-none' : ''}`
+  const btn = `${btnBase} !h-10 !w-10 !min-w-0 !justify-center !gap-0 !rounded-full !p-0 !text-[10px] !font-semibold !leading-none`
 
   const view = (
     <div ref={root} className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[60] overflow-hidden bg-black ${shown ? '' : 'cursor-none'}`} onMouseMove={wake} onClick={wake} role="dialog" aria-label="Full screen" aria-modal="true">
@@ -190,21 +188,19 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
         <div className={`items-center rounded-2xl border border-white/15 bg-black/55 p-1.5 backdrop-blur-md ${compact ? 'mx-auto flex w-fit max-w-full items-center justify-center gap-1.5 !rounded-full !p-1' : 'flex flex-wrap gap-2.5'} ${fade}`}>
           {!compact && (
             <div className="flex w-full flex-wrap items-end gap-x-5 gap-y-2 px-1.5 py-0.5">
-              <Group label="Steer">
-                <PaceChips e={eng} compact={!big} onVideo />
-                <button type="button" aria-pressed={look} aria-label="Look here" title="Look here (P)" onClick={() => setLook((x) => !x)} className={`${btn} ${look ? 'is-on' : ''}`}><Gesture name="look" size={15} />Look here</button>
+              <Group label="">
+                <PaceChips e={eng} compact={!big} onVideo iconOnly />
+                <button type="button" aria-pressed={look} aria-label="Look here" title="Look here (P)" onClick={() => setLook((x) => !x)} className={`${btn} ${look ? 'is-on' : ''}`}><Gesture name="look" size={20} /></button>
               </Group>
               <span className="hidden h-10 w-px self-end bg-white/15 sm:block" aria-hidden="true" />
-              <Group label="Captions and sound">
-                {cc && <button type="button" aria-pressed={cc.on} onClick={cc.toggle} title="Captions on or off" aria-label="Captions" data-testid="cine-cc" className={`${btn} ${cc.on ? 'is-on' : ''}`}><ClosedCaptioning size={17} weight={cc.on ? 'fill' : 'regular'} />Captions</button>}
-                {cc && <button type="button" onClick={cc.cycle} disabled={!cc.on} title={`Caption size: ${cc.size}`} aria-label="Caption size" data-testid="cine-cc-size" className={`${btn} disabled:opacity-40`}><TextAa size={17} />Size {cc.size}</button>}
-                <button type="button" aria-pressed={voiceOn} onClick={() => { setVoice(!voiceOn); if (voiceOn) stopSpeaking(); else speak('Voice on. I will read the captions.') }} title="Read captions aloud" aria-label="Read captions aloud" data-testid="cine-read" className={`${btn} ${voiceOn ? 'is-on' : ''}`}>{voiceOn ? <SpeakerHigh size={17} weight="fill" /> : <SpeakerSlash size={17} />}Read aloud</button>
-                <button type="button" aria-pressed={sndOn} onClick={toggleSound} title="Video sound on or off" aria-label="Sound" data-testid="cine-sound" className={`${btn} ${sndOn ? 'is-on' : ''}`}>{sndOn ? <SpeakerSimpleHigh size={17} weight="fill" /> : <SpeakerSimpleSlash size={17} />}Sound {sndOn ? 'on' : 'off'}</button>
+              <Group label="">
+                {cc && <button type="button" aria-pressed={cc.on} onClick={cc.toggle} title="Captions" aria-label="Captions" data-testid="cine-cc" className={`${btn} ${cc.on ? 'is-on' : ''}`}><ClosedCaptioning size={20} weight={cc.on ? 'fill' : 'regular'} /></button>}
+                <button type="button" aria-pressed={sndOn} onClick={toggleSound} title={sndOn ? 'Sound on' : 'Sound off'} aria-label="Sound" data-testid="cine-sound" className={`${btn} ${sndOn ? 'is-on' : ''}`}>{sndOn ? <SpeakerSimpleHigh size={20} weight="fill" /> : <SpeakerSimpleSlash size={20} />}</button>
               </Group>
-              <Group label="Open" className="ml-auto">
+              <Group label="" className="ml-auto">
                 {extra}
-                {panels && <button type="button" aria-pressed={pan} onClick={() => { setPan((x) => !x); setMore(false) }} className={`${btn} ${pan ? 'is-on' : ''}`} aria-label="Panels" title="Panels (M)" data-testid="cinema-panels"><SquaresFour size={17} weight="duotone" />Panels</button>}
-                <button type="button" aria-pressed={chatOpen} aria-label="Chat" title="Chat (C)" onClick={() => setChatOpen((x) => !x)} className={`${btn} ${chatOpen ? 'is-on' : ''}`}><Gesture name="chat" size={15} />Chat</button>
+                {panels && <button type="button" aria-pressed={pan} onClick={() => { setPan((x) => !x); setMore(false) }} className={`${btn} ${pan ? 'is-on' : ''}`} aria-label="Panels" title="Panels (M)" data-testid="cinema-panels"><SquaresFour size={20} weight="duotone" /></button>}
+                <button type="button" aria-pressed={chatOpen} aria-label="Chat" title="Chat (C)" onClick={() => setChatOpen((x) => !x)} className={`${btn} ${chatOpen ? 'is-on' : ''}`}><Gesture name="chat" size={20} /></button>
               </Group>
             </div>
           )}

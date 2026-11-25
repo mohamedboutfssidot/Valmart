@@ -21,17 +21,20 @@ import { ToolManager } from '../live/manage'
 import { CameraScreen, HostModePicker, OneButton, WalkingSwitch, useSuggestion, type HostMode } from '../live/director'
 import { useResultVoice, VoiceBadge } from '../live/tts'
 import { usePrefs } from './prefs'
+import { Logo } from '../components/ui'
+import { pendingCategory } from './Categories'
+import { FiltersSheet, countFilters, noFilters, type ExploreFilters } from './Filters'
 
 const money = (v: number) => `${v < 0 ? '−' : ''}$${Math.abs(v).toFixed(2)}`
 const when = (t: number) => new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 
-export function Page({ title, sub, children, right, bar }: { title: string; sub?: string; children: React.ReactNode; right?: React.ReactNode; bar?: React.ReactNode }) {
+export function Page({ title, sub, children, right, bar }: { title: React.ReactNode; sub?: string; children: React.ReactNode; right?: React.ReactNode; bar?: React.ReactNode }) {
   return (
     <div className="no-scrollbar absolute inset-0 overflow-y-auto overscroll-contain">
       <header className="sticky top-0 z-10 bg-ink-900/95 pt-14 backdrop-blur">
         <div className="flex items-end justify-between gap-3 px-5 pb-3">
-          <div className="min-w-0"><h1 className="font-display text-[28px] font-extrabold leading-none">{title}</h1>{sub && <p className="mt-1.5 text-sm text-fg-muted">{sub}</p>}</div>
+          <div className="min-w-0"><h1 className="vm-ptitle font-display text-[26px] font-extrabold leading-none">{title}</h1>{sub && <p className="mt-1.5 text-sm text-fg-muted">{sub}</p>}</div>
           {right}
         </div>
         {bar}
@@ -58,27 +61,31 @@ function Row({ s, onWatch }: { s: Stream; onWatch: (id: string) => void }) {
 }
 
 export function Explore({ onWatch, onRooms, onLive }: { onWatch: (id: string) => void; onRooms?: () => void; onLive?: (room: string) => void }) {
-  const [searching, setSearching] = useState(false); const [q, setQ] = useState(''); const [cat, setCat] = useState<string | null>(null); const [ev, setEv] = useState<EventItem | null>(null); const [rp, setRp] = useState<string | null>(null)
+  const { followHosts } = useExtra(); const [q, setQ] = useState(''); const [cat, setCat] = useState<string | null>(() => { const c = pendingCategory.value; pendingCategory.value = null; return c }); const [f, setF] = useState<ExploreFilters>(noFilters); const [fOpen, setFOpen] = useState(false); const [ev, setEv] = useState<EventItem | null>(null); const [rp, setRp] = useState<string | null>(null)
   const list = useMemo(() => {
     const t = q.trim().toLowerCase()
-    return STREAMS.filter((s) => (!cat || s.category === cat) && (!t || `${s.title} ${cityOf(s.cityId).name} ${cityOf(s.cityId).country} ${s.category}`.toLowerCase().includes(t))).sort((a, b) => b.viewers - a.viewers)
-  }, [q, cat])
+    const c = cat ?? f.category
+    return STREAMS.filter((s) => (!c || s.category === c) && (!f.city || s.cityId === f.city) && (!f.following || followHosts.includes(s.hostId)) && (!t || `${s.title} ${cityOf(s.cityId).name} ${cityOf(s.cityId).country} ${s.category}`.toLowerCase().includes(t)))
+      .sort((a, b) => f.sort === 'newest' ? a.startedMinAgo - b.startedMinAgo : b.viewers - a.viewers)
+  }, [q, cat, f, followHosts])
+  const active = !!(q || cat || f.following || f.city || f.category)
   return (
     <>
-    <Page title="Explore"
-      right={<div className="flex shrink-0 items-center gap-2">
-        <button type="button" aria-label="Search" aria-pressed={searching} onClick={() => { setSearching((v) => !v); if (searching) setQ('') }} className={`flex h-9 w-9 items-center justify-center rounded-full active:scale-90 ${searching ? 'bg-sky text-ink-950' : 'bg-ink-700 text-fg'}`} data-testid="search-toggle"><Icon name="explore" size={18} /></button>
-        {onRooms && <button type="button" onClick={onRooms} data-testid="open-rooms" className="shrink-0 rounded-pill bg-sun px-3.5 py-2 text-xs font-bold text-ink-950 active:scale-95">Go live</button>}
-      </div>}
+    <Page title={<Logo className="vm-logo h-5" />}
+      right={onRooms ? <button type="button" onClick={onRooms} data-testid="open-rooms" className="shrink-0 rounded-pill bg-sun px-4 py-2 text-sm font-extrabold text-ink-950 active:scale-95">Go live</button> : undefined}
       bar={<div className="flex flex-col gap-2.5 pb-3">
-        {searching && <label className="mx-5 flex items-center gap-2.5 rounded-pill bg-ink-700 px-4 py-2.5 text-fg-muted focus-within:ring-2 focus-within:ring-sky"><span className="sr-only">Search</span>
-          <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search a city, place or topic" className="min-w-0 flex-1 bg-transparent text-[15px] text-fg placeholder:text-fg-muted focus:outline-none" /></label>}
+        <div className="flex items-center gap-2 px-5">
+          <label className="vm-msearch" data-testid="m-search"><Icon name="explore" size={16} /><span className="sr-only">Search</span>
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search cities, hosts, topics" data-testid="m-search-input" /></label>
+          <button type="button" onClick={() => setFOpen(true)} aria-label="Filters" data-testid="m-filters" className="vm-mfilter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>{countFilters(f) > 0 && <span className="vm-mbadge">{countFilters(f)}</span>}</button>
+        </div>
         <div className="no-scrollbar flex gap-2 overflow-x-auto px-5" role="tablist" aria-label="Categories">
-          {[null, ...CATEGORIES].map((c) => <button key={c ?? 'all'} role="tab" aria-selected={cat === c} type="button" onClick={() => setCat(c)} className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-[13px] font-semibold transition active:scale-95 ${cat === c ? 'bg-fg text-ink-900' : 'bg-ink-700 text-fg'}`}>{c && <CatE3 c={c} size={16} />}{c ?? 'All'}</button>)}
+          <button type="button" aria-pressed={f.following} onClick={() => setF({ ...f, following: !f.following })} data-testid="chip-following" className={`vm-mchip ${f.following ? 'vm-mchip-on' : ''}`}>Following</button>
+          {[null, ...CATEGORIES].map((c) => <button key={c ?? 'all'} role="tab" aria-selected={cat === c} type="button" onClick={() => setCat(c)} className={`vm-mchip ${cat === c ? 'vm-mchip-on' : ''}`}>{c && <CatE3 c={c} size={16} />}{c ?? 'All'}</button>)}
         </div>
       </div>}>
-      {!q && !cat && onLive && <LiveNowList mobile empty={false} onOpen={(l) => onLive(l.room)} />}
-      {!q && !cat && (
+      {!active && onLive && <LiveNowList mobile empty={false} onOpen={(l) => onLive(l.room)} />}
+      {!active && (
         <section className="flex flex-col gap-3">
           <h2 className="font-display text-lg font-bold">Cities</h2>
           <div className="no-scrollbar -mx-5 flex gap-3 overflow-x-auto px-5">
@@ -95,18 +102,18 @@ export function Explore({ onWatch, onRooms, onLive }: { onWatch: (id: string) =>
           </div>
         </section>
       )}
-      {!q && !cat && (
+      {!active && (
         <section className="flex flex-col gap-3" data-testid="m-replays">
           <h2 className="font-display text-lg font-bold">Replays <span className="text-sm font-medium text-fg-muted">last 48 hours</span></h2>
           <ReplayRow onOpen={setRp} />
         </section>
       )}
       <section className="flex flex-col gap-4">
-        <h2 className="font-display text-lg font-bold">{q || cat ? `${list.length} results` : 'Live now'}</h2>
+        <h2 className="font-display text-lg font-bold">{active ? `${list.length} results` : 'Live now'}</h2>
         {list.map((s) => <Row key={s.id} s={s} onWatch={onWatch} />)}
         {list.length === 0 && <p className="py-6 text-center text-fg-muted">Nothing matches. Try another city or topic.</p>}
       </section>
-      {!q && !cat && (
+      {!active && (
         <section className="flex flex-col gap-3">
           <h2 className="font-display text-lg font-bold">Upcoming events</h2>
           <div className="no-scrollbar -mx-5 flex gap-3 overflow-x-auto px-5">
@@ -127,6 +134,7 @@ export function Explore({ onWatch, onRooms, onLive }: { onWatch: (id: string) =>
       )}
     </Page>
     {ev && <EventSheet e={ev} onClose={() => setEv(null)} />}
+    {fOpen && <FiltersSheet f={f} onChange={setF} onClose={() => setFOpen(false)} results={list.length} />}
     {rp && <ReplayOverlay id={rp} onClose={() => setRp(null)} />}
     </>
   )

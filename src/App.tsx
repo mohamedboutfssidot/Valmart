@@ -12,10 +12,7 @@ import Watch from './pages/public/Watch'
 import Discover from './pages/app/Discover'
 import City from './pages/app/City'
 import Live from './pages/app/Live'
-import Wallet from './pages/app/Wallet'
-import Trips from './pages/app/Trips'
-import Plan from './pages/app/Plan'
-import Settings from './pages/app/Settings'
+import Profile from './pages/app/Profile'
 import { StudioShell } from './components/StudioShell'
 import GoLive from './pages/studio/GoLive'
 import Earnings from './pages/studio/Earnings'
@@ -32,7 +29,7 @@ import Sync from './pages/dev/Sync'
 import Library from './pages/dev/Library'
 import { RoomHub, RoomPage } from './pages/room/RoomPages'
 import { AppRequests, StudioRequests } from './pages/app/Requests'
-import { AppFollowing, AppGroup, HostPage, StudioInsights, StudioPrep, StudioProfile, StudioSafety, StudioSchedule, StudioTeam } from './pages/app/Community'
+import { AppGroup, HostPage, StudioInsights, StudioPrep, StudioProfile, StudioSafety, StudioSchedule, StudioTeam } from './pages/app/Community'
 
 export default function App() {
   return (
@@ -55,18 +52,18 @@ export default function App() {
             <Route path="room/:code" element={<RoomPage embedded />} />
             <Route path="requests" element={<AppRequests />} />
             <Route path="group" element={<AppGroup />} />
-            <Route path="following" element={<AppFollowing />} />
+            <Route path="following" element={<Navigate to="/app?following=1" replace />} />
             <Route path="host/:id" element={<HostPage />} />
-            <Route path="wallet" element={<Wallet />} />
-            <Route path="trips" element={<Trips />} />
+            <Route path="wallet" element={<Profile tab="wallet" />} />
+            <Route path="trips" element={<Navigate to="/app/events" replace />} />
             <Route path="events" element={<Events />} />
             <Route path="events/:id" element={<EventDetail />} />
             <Route path="replays" element={<ReplaysPage />} />
             <Route path="replay/:id" element={<ReplayWatch />} />
-            <Route path="plan" element={<Plan />} />
+            <Route path="plan" element={<Profile tab="plan" />} />
             <Route path="categories" element={<CategoriesIndex />} />
             <Route path="category/:slug" element={<CategoryPage />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="settings" element={<Profile tab="profile" />} />
           </Route>
           <Route path="studio" element={<RequireAuth><StudioShell /></RequireAuth>}>
             <Route index element={<Overview />} />

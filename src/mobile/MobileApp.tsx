@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useDemo } from '../store'
 import { Logo } from '../components/ui'
 import { Watch } from './Watch'
-import { Events, Following, Hub } from './Hub'
+import { Events, Hub } from './Hub'
+import { CategoriesTab } from './Categories'
+import '../mobile-extra.css'
 import { STREAMS, streamById } from '../data/mock'
 import { Explore } from './Screens'
 import { Me } from './Settings'
@@ -12,7 +14,7 @@ import { Icon } from './icons'
 import { AuthScreen, Onboarding, Splash, TrialSheet } from './Onboarding'
 import { MobileRooms } from './Rooms'
 
-type Tab = 'explore' | 'following' | 'events' | 'hub' | 'studio' | 'me'
+type Tab = 'explore' | 'categories' | 'events' | 'hub' | 'studio' | 'me'
 
 export default function MobileApp() {
   const user = useDemo((s) => s.user)
@@ -33,9 +35,9 @@ export default function MobileApp() {
   const stream = watching ? streamById(watching) ?? STREAMS[0] : null
 
   const tabs: [Tab, string, Parameters<typeof Icon>[0]['name']][] = [
-    ['explore', 'Explore', 'live'], ['following', 'Following', 'bell'],
+    ['explore', 'Explore', 'live'], ['categories', 'Categories', 'explore'],
     user?.isHost ? ['studio', 'Studio', 'studio'] : ['events', 'Events', 'calendar'],
-    ['hub', 'Circle', 'users'], ['me', 'Me', 'me'],
+    ['hub', 'More', 'users'], ['me', 'Profile', 'me'],
   ]
   const current = tabs.some(([k]) => k === tab) ? tab : 'explore'
   const idx = tabs.findIndex(([k]) => k === current)
@@ -62,14 +64,14 @@ export default function MobileApp() {
           ) : (
             <div key={current} className={`${dir} absolute inset-0`}>
               {current === 'explore' && <Explore onWatch={watch} onRooms={() => { setRoomCode(undefined); setRooms(true) }} onLive={(r) => { setRoomCode(r); setRooms(true) }} />}
-              {current === 'following' && <Following onWatch={watch} />}
+              {current === 'categories' && <CategoriesTab onPick={() => setTab('explore')} />}
               {current === 'events' && <Events />}
               {current === 'hub' && <Hub onWatch={watch} />}
               {current === 'studio' && <StudioTab />}
               {current === 'me' && <Me onTrial={() => setOffer(true)} onRooms={() => { setRoomCode(undefined); setRooms(true) }} />}
             </div>
           )}
-          {user && stream && <Watch key={stream.id} stream={stream} onClose={() => setWatching(null)} onTrial={() => setOffer(true)} />}
+          {user && stream && <Watch key={stream.id} stream={stream} onClose={() => setWatching(null)} onSwitch={watch} onTrial={() => setOffer(true)} />}
           {user && offer && <TrialSheet onClose={() => setOffer(false)} />}
           {user && rooms && <MobileRooms key={roomCode ?? 'entry'} initialRoom={roomCode} onClose={() => setRooms(false)} />}
         </div>

@@ -19,6 +19,8 @@ import { useToolEngine } from '../live/useToolEngine'
 import { useMode } from '../live/store'
 import { PinLayer, VideoEffects, GiftToast } from '../live/ui'
 import { NowTool } from '../live/Dock'
+import { Landscape } from './Landscape'
+import { MobileGroupBar } from './GroupBar'
 import { Cinema } from '../live/Cinema'
 import { speak } from '../live/tts'
 import { ReportButton } from '../features/kit'
@@ -45,7 +47,7 @@ function CaptionMenu({ needs, up = false, onVideo = true }: { needs: boolean; up
   )
 }
 
-export function Watch({ stream, onClose, onTrial }: { stream: Stream; onClose: () => void; onTrial: () => void }) {
+export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; onClose: () => void; onTrial: () => void; onSwitch?: (id: string) => void }) {
   const host = hostOf(stream.hostId)
   const city = cityOf(stream.cityId)
   const sim = useLiveSim(city.id, host.name)
@@ -53,10 +55,9 @@ export function Watch({ stream, onClose, onTrial }: { stream: Stream; onClose: (
   const { followHosts, toggleHost } = useExtra()
   const [mode, setMode] = useMode('mobile')
   const [toast, setToast] = useState<string | null>(null)
-  const eng = useToolEngine({ seedKey: stream.id, category: stream.category, role: 'viewer', mode, onSave: () => saveMoment() })
+  const eng = useToolEngine({ seedKey: stream.id, category: stream.category, role: 'viewer', mode })
   const [look, setLook] = useState(false)
   const [looks, setLooks] = useState(0)
-  const saveMoment = () => setToast(addMoment(stream.id) ? 'Saved to My trips' : `${planOf(plan).name} keeps ${planOf(plan).saved} moments. Upgrade for more.`)
   const toggleLook = () => { if (!look && looks >= planOf(plan).looks) return setToast(planOf(plan).looks === 0 ? 'Look here starts with Plus (5 per live).' : `${planOf(plan).name}: ${planOf(plan).looks} Look here per live. Upgrade for more.`); setLook((v) => !v) }
   const [cinema, setCinema] = useState(false)
   const pf = usePrefs((s) => s.p)
@@ -111,11 +112,11 @@ export function Watch({ stream, onClose, onTrial }: { stream: Stream; onClose: (
         <div className="min-w-0 flex-1"><h1 className="truncate text-[15px] font-semibold leading-tight">{stream.title}</h1><p className="truncate text-xs text-fg-muted">{host.name}, {city.name}, {formatCount(stream.viewers)} watching</p></div>
         <button type="button" aria-pressed={following} onClick={() => toggleHost(host.id)} className={`rounded-pill px-3.5 py-1.5 text-[13px] font-bold active:scale-95 ${following ? 'bg-ink-700 text-fg' : 'bg-fg text-ink-900'}`} data-testid="watch-follow">{following ? 'Following' : 'Follow'}</button>
       </div>
-      <div className="grid shrink-0 grid-cols-5 gap-1 px-2.5 py-2.5" aria-label="Steer the walk" role="group">
+      <MobileGroupBar streamId={stream.id} streamTitle={stream.title} onJoin={(id) => onSwitch?.(id)} onBrowse={onClose} />
+      <div className="grid shrink-0 grid-cols-4 gap-1 px-2.5 py-2.5" aria-label="Steer the walk" role="group">
         <button type="button" className="lt-btn lt-stack" aria-pressed={eng.mineStay === 'stay'} onClick={() => eng.setPace('stay')}><span className="lt-fill !inset-x-0 !top-auto !h-1 rounded-b" style={{ width: `${stayPct}%` }} /><Gesture name="stay" size={20} /><span>Stay <b>{stayPct}%</b></span></button>
         <button type="button" className="lt-btn lt-stack" aria-pressed={eng.mineStay === 'move'} onClick={() => eng.setPace('move')}><span className="lt-fill !inset-x-0 !top-auto !h-1 rounded-b" style={{ width: `${100 - stayPct}%` }} /><Gesture name="move" size={20} /><span>Move <b>{100 - stayPct}%</b></span></button>
         <button type="button" className="lt-btn lt-stack" aria-pressed={look} onClick={toggleLook}><Gesture name="look" size={20} /><span>Look</span></button>
-        <button type="button" className="lt-btn lt-stack" onClick={saveMoment}><Gesture name="save" size={20} /><span>Save</span></button>
         <button type="button" className="lt-btn lt-stack is-hot" onClick={() => setCinema(true)} data-testid="m-cinema"><Gesture name="cinema" size={20} /><span>Full</span></button>
       </div>
 
@@ -123,12 +124,12 @@ export function Watch({ stream, onClose, onTrial }: { stream: Stream; onClose: (
         <ChatPanel msgs={sim.msgs} selfName="You" coins={coins} onGift={onGift} onSend={(x) => sim.send(x, 'You')} locked={eng.chatLock} off={chatOff} className="min-h-0 flex-1 !rounded-none !border-0 !bg-transparent" />
       </div>
       {cinema && (
-        <Cinema
+        <Landscape><Cinema
           contained compact extra={<CaptionMenu needs={needs} up />} stream={stream} eng={eng} viewers={formatCount(stream.viewers)} hostName={host.name} onExit={() => setCinema(false)}
           bursts={<GiftToast bursts={sim.bursts} />}
           captions={pf.captions ? <p key={cap} className={`fade-in max-w-[90%] rounded-lg bg-ink-950/75 px-3 py-1.5 text-center font-medium backdrop-blur ${pf.captionSize === 'S' ? 'text-[12px]' : pf.captionSize === 'L' ? 'text-[17px]' : 'text-[14px]'}`}>{needs && !translate ? line.orig : line.en}</p> : null}
           chat={<ChatPanel msgs={sim.msgs} selfName="You" coins={coins} onGift={onGift} onSend={(x) => sim.send(x, 'You')} locked={eng.chatLock} off={chatOff} className="!h-full !rounded-none !border-0" />}
-        />
+        /></Landscape>
       )}
       {toast && <div className="pop-in absolute left-1/2 top-24 z-40 -translate-x-1/2 rounded-pill bg-ink-950/90 px-4 py-2 text-sm font-semibold text-fg backdrop-blur">{toast}</div>}
       {recap && <LiveRecap title={stream.title} host={host.name} minutes={Math.round((Date.now() - t0.current) / 60000)} gifts={giftN} moments={saved} onStay={() => setRecap(false)} onLeave={onClose} />}

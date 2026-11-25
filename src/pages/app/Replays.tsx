@@ -12,14 +12,24 @@ export function ReplaysPage() {
   const user = useDemo((s) => s.user)
   const all = useOpenReplays()
   const [cat, setCat] = useState<Category | 'All'>('All')
-  const list = all.filter((r) => cat === 'All' || r.category === cat)
+  const [sort, setSort] = useState<'new' | 'soon' | 'views'>('new')
+  const left = (r: (typeof all)[number]) => 48 - (Date.now() - r.endedAt) / 36e5
+  const ending = all.filter((r) => left(r) < 6).length
+  const list = all
+    .filter((r) => cat === 'All' || r.category === cat)
+    .sort((a, b) => (sort === 'soon' ? left(a) - left(b) : sort === 'views' ? b.views - a.views : b.endedAt - a.endedAt))
   const cats = CATEGORIES.filter((c) => all.some((r) => r.category === c))
   return (
     <div className="flex flex-col gap-7">
       <header>
         <h1 className="text-3xl font-extrabold sm:text-4xl">Replays</h1>
-        <p className="text-fg-muted">Missed a live? Watch it again for 48 hours after it ended.</p>
+        <p className="text-fg-muted">Missed a live? Watch it again for 48 hours after it ended.{ending > 0 && <> <button type="button" onClick={() => setSort('soon')} className="font-semibold text-sun-soft underline">{ending} {ending === 1 ? 'replay ends' : 'replays end'} within 6 hours</button></>}</p>
       </header>
+      <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Sort replays">
+        <span className="text-sm text-fg-muted">Sort by</span>
+        {([['new', 'Newest'], ['soon', 'Ending soon'], ['views', 'Most watched']] as const).map(([k, l]) => <Chip key={k} active={sort === k} onClick={() => setSort(k)}>{l}</Chip>)}
+        <span className="ml-auto text-sm text-fg-muted tabular-nums">{list.length} replays</span>
+      </div>
       <div className="scroll-x flex gap-2" role="tablist" aria-label="Replay categories">
         <Chip active={cat === 'All'} onClick={() => setCat('All')}>All</Chip>
         {cats.map((c) => <Chip key={c} active={cat === c} onClick={() => setCat(c)}><span className="inline-flex items-center gap-1.5"><CatE3 c={c} size={16} />{c}</span></Chip>)}

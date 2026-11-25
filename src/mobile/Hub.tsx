@@ -2,7 +2,8 @@
 import { useState } from 'react'
 import { useDemo } from '../store'
 import { Icon } from './icons'
-import { EventsList, Page, Trips } from './Screens'
+import { EventsList, Page } from './Screens'
+import { MobileTickets } from './Tickets'
 import { ExtraPage, Sub } from './Settings'
 import { HostProfileView } from '../features/Viewer'
 import { useExtra } from '../extra'
@@ -20,7 +21,6 @@ const VIEWER: { title: string; items: [string, string, string, Name][] }[] = [
     ['requests', 'Trip requests', 'Ask a local, with a budget', 'route'],
   ] },
   { title: 'Keep', items: [
-    ['trips', 'My trips', 'Moments, tickets, places seen', 'trips'],
     ['guide', 'How it works', 'Every function, explained', 'help'],
   ] },
 ]
@@ -40,7 +40,7 @@ function Tile({ k, label, detail, icon, onOpen }: { k: string; label: string; de
 }
 
 export function Events() {
-  return <Page title="Events" sub="Walks with seats"><EventsList /></Page>
+  return <Page title="Events" sub="Walks with seats"><MobileTickets /><EventsList /></Page>
 }
 
 export function Following({ onWatch }: { onWatch: (id: string) => void }) {
@@ -144,7 +144,7 @@ export function Hub({ onWatch }: { onWatch: (id: string) => void }) {
   const [open, setOpen] = useState<string | null>(null)
   return (
     <>
-      <Page title="Circle" sub="Your people, plans and keepsakes">
+      <Page title="More" sub="Groups, requests and guides">
         {VIEWER.map((g) => (
           <section key={g.title} className="flex flex-col gap-2.5"><h2 className="text-xs font-semibold uppercase tracking-wider text-fg-muted">{g.title}</h2>
             <div className="grid gap-2.5">{g.items.map(([k, l, d, i]) => <Tile key={k} k={k} label={l} detail={d} icon={i} onOpen={setOpen} />)}</div></section>
@@ -154,8 +154,7 @@ export function Hub({ onWatch }: { onWatch: (id: string) => void }) {
             <div className="grid gap-2.5">{HOST.map(([k, l, d, i]) => <Tile key={k} k={k} label={l} detail={d} icon={i} onOpen={setOpen} />)}</div></section>
         )}
       </Page>
-      {open === 'trips' && <div className="slide-in absolute inset-0 z-20 bg-ink-900"><Trips onWatch={onWatch} /><button type="button" onClick={() => setOpen(null)} aria-label="Back" className="absolute right-4 top-[52px] z-20 flex items-center gap-1 rounded-pill bg-ink-800 px-3 py-1.5 text-sm font-semibold text-fg-muted"><Icon name="back" size={16} />Close</button></div>}
-      {open && open !== 'trips' && <ExtraPage k={open} onBack={() => setOpen(null)} />}
+      {open && <ExtraPage k={open} onBack={() => setOpen(null)} />}
     </>
   )
 }

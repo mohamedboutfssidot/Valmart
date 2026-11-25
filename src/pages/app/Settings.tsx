@@ -27,7 +27,7 @@ export default function Settings() {
   if (!user) return null
   const toggle = (c: Category) => patchUser({ interests: user.interests.includes(c) ? user.interests.filter((x) => x !== c) : [...user.interests, c] })
   const toggleLang = (l: string) => patchUser({ languages: user.languages.includes(l) ? user.languages.filter((x) => x !== l) : [...user.languages, l] })
-  const stats: [string, string][] = [['Lives visited', String(st.visited)], ['Countries', String(st.countries)], ['Moments saved', String(st.moments)], ['Gifts sent', String(st.gifts)]]
+  const stats: [string, string][] = [['Lives visited', String(st.visited)], ['Countries', String(st.countries)], ['Gifts sent', String(st.gifts)]]
   const complete = Math.round(([name.trim(), bio.trim(), user.languages.length, user.interests.length].filter(Boolean).length / 4) * 100)
 
   return (
@@ -45,7 +45,7 @@ export default function Settings() {
             </div>
           </div>
           {user.bio ? <p className="mt-4 max-w-[60ch]">{user.bio}</p> : <p className="mt-4 text-sm text-fg-muted">Add a short bio below so hosts know who you are.</p>}
-          <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {stats.map(([k, v]) => <div key={k} className="rounded-2xl bg-ink-900 p-3"><dt className="text-xs text-fg-muted">{k}</dt><dd className="font-display text-2xl font-extrabold tabular-nums">{v}</dd></div>)}
           </dl>
         </div>

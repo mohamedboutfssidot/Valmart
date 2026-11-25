@@ -47,7 +47,7 @@ export function JournalView() {
               <button type="button" className={primary} data-testid="journal-copy" onClick={() => { navigator.clipboard?.writeText(link).catch(() => {}); setCopied(true) }}>{copied ? 'Copied' : 'Copy link'}</button></div>
           </div>
         </>
-      ) : <Empty>Use “Save this moment” in a live and your places appear here. {visited.length ? `You have visited ${visited.length} live${visited.length > 1 ? 's' : ''} so far.` : ''}</Empty>}
+      ) : <Empty>Places from lives you watch appear here. {visited.length ? `You have visited ${visited.length} live${visited.length > 1 ? 's' : ''} so far.` : ''}</Empty>}
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { EVENTS, eventById } from '../../data/events'
 import { STREAMS, cityOf, hostOf } from '../../data/mock'
 import { Avatar, Button } from '../../components/ui'
 import { useDemo } from '../../store'
+import { MyTickets } from './MyTickets'
 import { VideoSlot } from '../../components/VideoSlot'
 
 const artFor = (cityId: string) => STREAMS.find((s) => s.cityId === cityId) ?? STREAMS[0]
@@ -13,13 +14,13 @@ export function Events() {
     <div className="flex flex-col gap-10">
       <header className="flex max-w-[62ch] flex-col gap-3">
         <h1 className="text-4xl font-extrabold sm:text-5xl">Events</h1>
-        <p className="text-lg text-fg-muted">Scheduled live walks with a host and limited seats. Some are co-hosted by brands.</p>
+        <p className="text-lg text-fg-muted">Scheduled live events with a host. Some are co-hosted by brands.</p>
       </header>
+      <MyTickets />
       <div className="grid gap-x-5 gap-y-9 sm:grid-cols-2">
         {EVENTS.map((e) => {
           const city = cityOf(e.cityId)
           const host = hostOf(e.hostId)
-          const left = e.seats - e.taken
           return (
             <Link key={e.id} to={`/app/events/${e.id}`} className="group flex min-w-0 flex-col gap-3">
               <VideoSlot stream={artFor(e.cityId)} showLabel={false} className="rounded-card ring-1 ring-line transition group-hover:ring-sky">
@@ -30,13 +31,13 @@ export function Events() {
               <div className="min-w-0">
                 <h2 className="font-display text-xl font-bold leading-snug">{e.title}</h2>
                 <p className="mt-0.5 text-sm text-sun-soft">{e.when}</p>
-                <p className="mt-1 flex items-center gap-2 text-sm text-fg-muted"><Avatar name={host.name} size={22} />{host.name}<span>{left} of {e.seats} seats left</span></p>
+                <p className="mt-1 flex items-center gap-2 text-sm text-fg-muted"><Avatar name={host.name} size={22} />{host.name}</p>
               </div>
             </Link>
           )
         })}
       </div>
-      <p className="text-sm text-fg-muted">Dates, prices and seat counts are samples for the demo.</p>
+      <p className="text-sm text-fg-muted">Dates and prices are samples for the demo.</p>
     </div>
   )
 }
@@ -85,7 +86,6 @@ export function EventDetail() {
   }
   const city = cityOf(e.cityId)
   const host = hostOf(e.hostId)
-  const left = e.seats - e.taken - (reserved ? qty : 0)
   const ref = `VM-${e.id.toUpperCase()}-${(e.price * 137 + qty * 41).toString(36).toUpperCase()}`
 
   return (
@@ -104,38 +104,34 @@ export function EventDetail() {
       <aside className="flex h-fit min-w-0 flex-col gap-5 rounded-card border border-line bg-ink-800 p-5 sm:p-6 lg:sticky lg:top-24">
         {reserved ? (
           <>
-            <h2 className="font-display text-xl font-bold">Seats reserved</h2>
+            <h2 className="font-display text-xl font-bold">Tickets booked</h2>
             <div className="flex items-center gap-4">
               <TicketCode seed={reserved} />
               <div className="min-w-0">
                 <p className="text-sm text-fg-muted">Booking reference</p>
                 <p className="font-display text-lg font-bold tabular-nums">{reserved}</p>
-                <p className="mt-1 text-sm text-fg-muted">{qty} {qty === 1 ? 'seat' : 'seats'} for {e.title}</p>
+                <p className="mt-1 text-sm text-fg-muted">{qty} {qty === 1 ? 'ticket' : 'tickets'} for {e.title}</p>
               </div>
             </div>
             <p className="text-sm text-fg-muted">Saved in My trips. Demo only, no payment was taken.</p>
             <div className="flex flex-wrap gap-2.5">
               <Button to="/app/trips">My tickets</Button>
               <Button to="/app/events" variant="ghost">More events</Button>
-              <Button variant="ghost" onClick={() => setReserved(null)}>Change seats</Button>
+              <Button variant="ghost" onClick={() => setReserved(null)}>Change tickets</Button>
             </div>
           </>
         ) : (
           <>
             <div className="flex items-baseline justify-between">
-              <h2 className="font-display text-xl font-bold">Get seats</h2>
+              <h2 className="font-display text-xl font-bold">Get tickets</h2>
               <span className="font-display text-2xl font-extrabold tabular-nums">${e.price}</span>
             </div>
-            <div>
-              <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-ink-700"><div className="h-full rounded-full bg-sun" style={{ width: `${(e.taken / e.seats) * 100}%` }} /></div>
-              <p className="text-sm text-fg-muted">{left} of {e.seats} seats left</p>
-            </div>
             <div className="flex items-center justify-between">
-              <span>Seats</span>
+              <span>Tickets</span>
               <div className="flex items-center gap-3">
-                <button type="button" aria-label="Fewer seats" onClick={() => setQty((q) => Math.max(1, q - 1))} className="h-9 w-9 rounded-full border border-line text-lg hover:bg-ink-700">−</button>
+                <button type="button" aria-label="Fewer tickets" onClick={() => setQty((q) => Math.max(1, q - 1))} className="h-9 w-9 rounded-full border border-line text-lg hover:bg-ink-700">−</button>
                 <span className="w-5 text-center font-display text-lg font-bold tabular-nums">{qty}</span>
-                <button type="button" aria-label="More seats" onClick={() => setQty((q) => Math.min(4, q + 1))} className="h-9 w-9 rounded-full border border-line text-lg hover:bg-ink-700">+</button>
+                <button type="button" aria-label="More tickets" onClick={() => setQty((q) => Math.min(4, q + 1))} className="h-9 w-9 rounded-full border border-line text-lg hover:bg-ink-700">+</button>
               </div>
             </div>
             <div className="flex items-center justify-between border-t border-line pt-4">

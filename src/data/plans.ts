@@ -35,7 +35,6 @@ const num = (n: number) => (n === Infinity ? 'Unlimited' : n === 0 ? 'Off' : Str
 export const ROWS: [string, (p: Plan) => string][] = [
   ['Video quality', (p) => p.quality],
   ['Look here, per live', (p) => num(p.looks)],
-  ['Saved moments', (p) => num(p.saved)],
   ['People in a group', (p) => String(p.group)],
   ['Viewer polls, per live', (p) => String(p.polls)],
   ['Open trip requests', (p) => String(p.requests)],
