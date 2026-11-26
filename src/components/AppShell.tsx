@@ -1,11 +1,9 @@
-import { CatE3 } from '../live/e3d'
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { planOf } from '../data/plans'
 import ReqNotif from './ReqNotif'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Avatar, Logo, LogoAdaptive } from './ui'
-import { CATEGORIES, STREAMS, slugOf } from '../data/mock'
-import { ThemeToggle } from '../theme'
+import { STREAMS, formatCount, hostOf } from '../data/mock'
 import { AvatarMenu } from './AvatarMenu'
 import { RailBackdrop, RailButton, railClass, useRail } from './useRail'
 import { useDemo } from '../store'
@@ -28,30 +26,29 @@ const I = {
   replay: 'M3 12a9 9 0 1 0 3-6.7M3 4v5h5M10 9v6l5-3z',
   user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 9a8 8 0 0 1 16 0',
 }
-const GROUPS: { title?: string; items: Item[] }[] = [
-  { items: [
-    { to: '/app', label: 'Discover', d: I.discover, end: true },
-    { to: '/app/events', label: 'Events', d: I.events },
-    { to: '/app/replays', label: 'Replays', d: I.replay },
-    { to: '/app/requests', label: 'Trip requests', d: I.ask },
-  ] },
-  { title: 'Circle', items: [
-    { to: '/app/group', label: 'Group', d: I.people },
-  ] },
-  { title: 'Studio', items: [
-    { to: '/studio', label: 'Host tools', d: I.studio },
-  ] },
-  { title: 'Account', items: [
-    { to: '/app/settings', label: 'Profile', d: I.user },
-  ] },
+const MAIN: Item[] = [
+  { to: '/app', label: 'Home', d: I.discover, end: true },
+  { to: '/app/live', label: 'Browse', d: I.events, end: true },
+  { to: '/app/events', label: 'Events', d: I.events },
+  { to: '/app/requests', label: 'Trip requests', d: I.ask },
+]
+const MORE: Item[] = [
+  { to: '/app/replays', label: 'Replays', d: I.replay },
+  { to: '/app/group', label: 'Group', d: I.people },
+  { to: '/app/categories', label: 'Categories', d: I.tag },
+  { to: '/app/settings', label: 'Profile', d: I.user },
+  { to: '/studio', label: 'Host tools', d: I.studio, host: true },
 ]
 const TABS: Item[] = [
-  { to: '/app', label: 'Discover', d: I.discover, end: true },
+  { to: '/app', label: 'Explore', d: I.discover, end: true },
+  { to: '/app/live', label: 'Live', d: I.events },
   { to: '/app/events', label: 'Events', d: I.events },
-  { to: '/app/group', label: 'Circle', d: I.people },
-  { to: '/app/requests', label: 'Requests', d: I.ask },
-  { to: '/app/settings', label: 'Me', d: I.user },
+  { to: '/app/settings', label: 'Profile', d: I.user },
 ]
+
+const SideLink = ({ it }: { it: Item }) => (
+  <NavLink to={it.to} end={it.end} title={it.label} className={({ isActive }) => `side-link flex items-center gap-3.5 rounded-md px-3 py-2.5 text-[15px] font-semibold ${isActive ? 'bg-ink-700 text-fg' : 'text-fg hover:bg-ink-800'}`}><Icon d={it.d} /><span>{it.label}</span></NavLink>
+)
 
 const Icon = ({ d }: { d: string }) => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d} /></svg>
@@ -64,43 +61,33 @@ export function AppShell() {
     const [cats, setCats] = useState(() => { try { return localStorage.getItem('valmart-cats') === 'open' } catch { return false } })
   useEffect(() => { try { localStorage.setItem('valmart-cats', cats ? 'open' : 'closed') } catch { /* ignore */ } }, [cats])
   const { pathname } = useLocation()
+  const live = pathname.startsWith('/app/live/')
+  const [q, setQ] = useState('')
   const { open: rail, toggle: toggleRail, close: closeRail, small } = useRail('valmart-rail', pathname)
   if (!user) return null
 
   return (
     <div className="yt flex min-h-screen flex-col bg-ink-900 text-fg md:flex-row">
       <RailBackdrop show={small && rail} onClose={closeRail} />
-      <aside className={`border-r border-line bg-ink-900 ${railClass(rail, small, 'sticky top-0 h-screen w-[232px] shrink-0')}`} data-testid="rail" aria-hidden={small && !rail}>
+      <aside className={`border-r border-line bg-ink-900 ${railClass(rail, small, 'sticky top-0 h-screen w-[256px] shrink-0')}`} data-testid="rail" aria-hidden={small && !rail}>
         <Link to="/app" aria-label="Valmart app" className="flex h-16 items-center px-5"><Logo className="h-7" /><span className="hidden h-8 w-8 rounded-xl bg-sky text-center font-display text-lg font-extrabold leading-8 text-white">V</span></Link>
-        <nav className="flex flex-1 flex-col gap-4 overflow-y-auto px-3 pb-4" aria-label="App">
-          {GROUPS.map((g, i) => (
-            <Fragment key={i}>
-            <div className="flex flex-col gap-0.5">
-              {g.title && <p className="px-3 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-fg-muted">{g.title}</p>}
-              {g.items.filter((it) => !it.host || user.isHost).map((it) => (
-                <NavLink key={it.to} to={it.to} end={it.end} title={it.label} className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors ${isActive ? 'bg-ink-700 text-fg' : 'text-fg-muted hover:bg-ink-800 hover:text-fg'}`}>
-                  <Icon d={it.d} /><span className="">{it.label}</span>
-                </NavLink>
-              ))}
-            </div>
-            {i === 0 && (<div className="flex flex-col gap-0.5">
-            <div className="flex items-center gap-1"><NavLink to="/app/categories" end className={({ isActive }) => `flex flex-1 items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors ${isActive ? 'bg-ink-700 text-fg' : 'text-fg-muted hover:bg-ink-800 hover:text-fg'}`}>
-              <Icon d={I.tag} /><span className="">Categories</span>
-            </NavLink>
-            <button type="button" onClick={() => setCats((v) => !v)} aria-expanded={cats} aria-label={cats ? 'Hide categories' : 'Show categories'} data-testid="cats-toggle" className=" flex h-8 w-8 items-center justify-center rounded-full text-fg-muted transition hover:bg-ink-800"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${cats ? 'rotate-180' : ''}`} aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></button></div>
-            {cats && <ul className=" ml-5 flex flex-col gap-0.5 border-l border-line pl-2">
-              {CATEGORIES.map((c) => (
-                <li key={c}>
-                  <NavLink to={`/app/category/${slugOf(c)}`} className={({ isActive }) => `flex items-center justify-between gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${isActive ? 'bg-ink-700 text-fg' : 'text-fg-muted hover:bg-ink-800 hover:text-fg'}`}>
-                    <span className="flex min-w-0 items-center gap-2"><CatE3 c={c} size={18} /><span className="truncate">{c}</span></span>
-                    <span className="text-xs tabular-nums opacity-70">{STREAMS.filter((s) => s.category === c).length}</span>
-                  </NavLink>
-                </li>
-              ))}
-            </ul>}
-          </div>)}
-            </Fragment>
-          ))}
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-2.5 pb-4" aria-label="App">
+          {MAIN.map((it) => <SideLink key={it.to} it={it} />)}
+          <div className="my-2 border-t border-line" />
+          <p className="px-3 pb-1 text-[15px] font-bold">Recommended</p>
+          {[...STREAMS].sort((a, b) => b.viewers - a.viewers).slice(0, 8).map((s) => {
+            const h = hostOf(s.hostId)
+            return (
+              <NavLink key={s.id} to={`/app/live/${s.id}`} data-testid="rec-row" className={({ isActive }) => `side-link flex items-center gap-3 rounded-md px-3 py-1.5 hover:bg-ink-800 ${isActive ? 'bg-ink-800' : ''}`}>
+                <Avatar name={h.name} size={32} />
+                <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{h.name}</span><span className="block truncate text-xs text-fg-muted">{s.category}</span></span>
+                <span className="flex shrink-0 items-center gap-1.5 text-xs font-semibold tabular-nums"><span className="live-dot" />{formatCount(s.viewers)}</span>
+              </NavLink>
+            )
+          })}
+          <div className="my-2 border-t border-line" />
+          <button type="button" onClick={() => setCats((v) => !v)} aria-expanded={cats} data-testid="cats-toggle" className="side-link flex items-center justify-between rounded-md px-3 py-2 text-left text-[15px] font-bold hover:bg-ink-800">More<span aria-hidden="true" className={`transition-transform ${cats ? 'rotate-180' : ''}`}>⌄</span></button>
+          {cats && MORE.filter((it) => !it.host || user.isHost).map((it) => <SideLink key={it.to} it={it} />)}
         </nav>
         <div className="border-t border-line p-3">
           <div className="flex items-center gap-3 px-2 py-2">
@@ -115,24 +102,27 @@ export function AppShell() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky z-30 flex h-16 items-center justify-between gap-3 border-b border-line bg-ink-900/90 px-4 backdrop-blur sm:px-6" style={{ top: 'env(safe-area-inset-top, 0px)' }}>
-          <div className="flex items-center gap-3"><RailButton open={rail} onClick={toggleRail} />{(small || !rail) && <Link to="/app" aria-label="Valmart app"><LogoAdaptive className="h-6" /></Link>}<p className="hidden text-sm text-fg-muted sm:block">Hi {user.name.split(' ')[0]}</p></div>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <ThemeToggle />
-            <Link to="/app/wallet" className="inline-flex items-center gap-2 rounded-pill border border-line px-3 py-1.5 text-sm font-semibold tabular-nums hover:bg-ink-800" aria-label={`${coins} coins, open wallet`}>
-              <span className="h-2.5 w-2.5 rounded-full bg-sun" aria-hidden="true" />{coins.toLocaleString('en-US')}
-            </Link>
+        <header className="sticky z-30 flex h-[60px] items-center justify-between gap-2 border-b border-line bg-ink-900/95 px-3 backdrop-blur sm:gap-4 sm:px-4" style={{ top: 'env(safe-area-inset-top, 0px)' }}>
+          <div className="flex shrink-0 items-center gap-2"><RailButton open={rail} onClick={toggleRail} />{(small || !rail) && <Link to="/app" aria-label="Valmart app" className="px-1"><LogoAdaptive className="h-6" /></Link>}</div>
+          <form role="search" onSubmit={(e) => { e.preventDefault(); const t = q.trim(); nav(t ? `/app?q=${encodeURIComponent(t)}` : '/app') }} className="mx-auto hidden h-10 w-[300px] min-w-0 flex-none items-center gap-2 rounded-md border border-line bg-ink-900 px-3 transition-colors focus-within:border-sky hover:border-fg-muted sm:flex">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0 text-fg-muted" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="M16 16l5 5" /></svg>
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search" aria-label="Search Valmart" data-testid="top-search" className="!outline-none !shadow-none h-full min-w-0 flex-1 bg-transparent text-[15px] placeholder:text-fg-muted" />
+          </form>
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <Link to="/app" aria-label="Search" className="grid h-9 w-9 place-items-center rounded-full hover:bg-ink-700 sm:hidden"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="M16 16l5 5" /></svg></Link>
+            {user.isHost && <Link to="/studio/live" className="hidden items-center gap-1.5 rounded-pill bg-ink-700 px-3.5 py-2 text-sm font-semibold hover:bg-line sm:inline-flex"><span className="h-2 w-2 rounded-full bg-sun" aria-hidden="true" />Go live</Link>}
+            <Link to="/app/wallet" className="inline-flex items-center gap-2 rounded-pill bg-ink-700 px-3 py-1.5 text-sm font-semibold tabular-nums hover:bg-line" aria-label={`${coins} coins, open wallet`}><span className="h-2.5 w-2.5 rounded-full bg-sun" aria-hidden="true" />{coins.toLocaleString('en-US')}</Link>
             <AvatarMenu />
           </div>
         </header>
-        <main key={pathname} className={`page-enter mx-auto w-full flex-1 px-4 pb-28 pt-6 transition-[max-width] duration-300 sm:px-6 md:pb-16 md:pt-10 lg:px-8 ${rail ? 'max-w-[1180px] 2xl:max-w-[1480px]' : 'max-w-[1400px] 2xl:max-w-[1680px]'}`}>
+        <main key={pathname} className={`page-enter mx-auto w-full flex-1 transition-[max-width] duration-300 ${live ? 'max-w-none pb-16 md:pb-0' : 'px-4 pb-28 pt-6 sm:px-6 md:pb-16 md:pt-8 lg:px-8'} ${live ? '' : rail ? 'max-w-[1180px] 2xl:max-w-[1480px]' : 'max-w-[1400px] 2xl:max-w-[1680px]'}`}>
           <Outlet />
         </main>
         <ReqNotif />
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-ink-900/95 backdrop-blur md:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} aria-label="Tabs">
-        <ul className="mx-auto grid max-w-[560px] grid-cols-5">
+        <ul className="mx-auto grid max-w-[560px] grid-cols-4">
           {TABS.map((t) => (
             <li key={t.to}>
               <NavLink to={t.to} end={t.end} className={({ isActive }) => `flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium ${isActive ? 'text-sky' : 'text-fg-muted'}`}>

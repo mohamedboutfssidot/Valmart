@@ -47,7 +47,7 @@ export default function MobileApp() {
   const reduce = usePrefs((st) => st.p.reduceMotion)
 
   return (
-    <div className="yt flex min-h-[100dvh] items-center justify-center gap-14 bg-[color:var(--stage)] sm:p-4">
+    <div className="yt vm-phone flex min-h-[100dvh] items-center justify-center gap-14 bg-[color:var(--stage)] sm:p-4">
       <aside className="hidden max-w-[300px] flex-col gap-3 lg:flex">
         <Logo className="h-8" />
         <h1 className="font-display text-3xl font-extrabold leading-tight">Valmart mobile</h1>

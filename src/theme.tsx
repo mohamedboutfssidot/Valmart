@@ -1,9 +1,9 @@
-// Light is the default look (Voyage). Dark is an option, remembered in this browser.
+// Dark is the default look. Light is an option, remembered in this browser.
 import { create } from 'zustand'
 
 type Theme = 'light' | 'dark'
 const KEY = 'valmart-theme'
-const read = (): Theme => { try { return localStorage.getItem(KEY) === 'dark' ? 'dark' : 'light' } catch { return 'light' } }
+const read = (): Theme => { try { return localStorage.getItem(KEY) === 'light' ? 'light' : 'dark' } catch { return 'dark' } }
 const apply = (t: Theme) => { document.documentElement.dataset.theme = t }
 
 export const useTheme = create<{ theme: Theme; set: (t: Theme) => void }>((set) => ({

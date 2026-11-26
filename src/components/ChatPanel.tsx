@@ -31,7 +31,7 @@ function Row({ m }: { m: Msg }) {
   )
 }
 
-export function ChatPanel({ msgs, onSend, selfName, onGift, coins, className = '', placeholder = 'Say something', locked: lockedIn = 0, off = false }: {
+export function ChatPanel({ msgs, onSend, selfName, onGift, coins, className = '', placeholder = 'Send a message', locked: lockedIn = 0, off = false }: {
   msgs: Msg[]; onSend: (t: string) => void; selfName: string
   onGift?: (g: Gift) => string | null; coins?: number; className?: string; placeholder?: string; locked?: number; off?: boolean
 }) {
@@ -131,7 +131,7 @@ export function ChatPanel({ msgs, onSend, selfName, onGift, coins, className = '
 
       {locked > 0 && <p className="fade-in border-t border-line bg-ink-900 px-4 py-2 text-center text-xs font-semibold text-sun-soft">{off ? 'Chat is off' : `Chat paused by the host · ${locked}s`}</p>}
       <form
-        className="flex gap-2 border-t border-line p-3"
+        className="flex flex-wrap items-center gap-2 border-t border-line p-3"
         onSubmit={(e) => { e.preventDefault(); if (locked > 0) return; onSend(text); setText('') }}
       >
         <label htmlFor="chat-input" className="sr-only">Message</label>
@@ -142,11 +142,11 @@ export function ChatPanel({ msgs, onSend, selfName, onGift, coins, className = '
           placeholder={locked > 0 ? 'Chat is paused' : placeholder}
           disabled={locked > 0}
           maxLength={160}
-          className="min-w-0 flex-1 rounded-pill border border-line bg-ink-900 px-4 py-2 text-[15px] placeholder:text-fg-muted focus:border-sky focus:outline-none"
+          className="min-w-0 basis-full rounded-md border border-line bg-ink-900 px-3.5 py-2.5 text-[15px] placeholder:text-fg-muted focus:border-sky focus:outline-none"
         />
         {onGift && <button type="button" aria-pressed={giftOpen} onClick={() => { setTab('gift'); setGiftOpen((v) => !v) }} className={`lt-btn shrink-0 ${giftOpen ? 'is-hot' : ''}`} data-testid="gift-btn"><Gesture name="gift" size={17} />Gift</button>}
         {onGift && <button type="button" onClick={() => { setTab('poll'); setGiftOpen(true) }} className="lt-btn shrink-0" data-testid="poll-btn">Poll</button>}
-        <button type="submit" className="lt-btn is-on"><Gesture name="send" size={16} />Send</button>
+        <button type="submit" className="ml-auto rounded-md bg-sky px-5 py-2 text-sm font-bold text-ink-950 transition hover:bg-sky-soft active:scale-95">Chat</button>
       </form>
     </section>
   )

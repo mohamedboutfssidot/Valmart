@@ -48,6 +48,7 @@ export default function App() {
           <Route path="app" element={<RequireAuth><AppShell /></RequireAuth>}>
             <Route index element={<Discover />} />
             <Route path="city/:id" element={<City />} />
+            <Route path="live" element={<Discover liveOnly />} />
             <Route path="live/:id" element={<Live />} />
             <Route path="room/:code" element={<RoomPage embedded />} />
             <Route path="requests" element={<AppRequests />} />

@@ -119,7 +119,7 @@ function LiveRoom({ stream }: { stream: Stream }) {
         {!theater && <Hints className="left-4 top-16 max-sm:!relative max-sm:!left-auto max-sm:!top-auto max-sm:mx-auto" />}
         <VideoSlot stream={stream} player={!cinema} audio fit={theater ? 'contain' : 'cover'} className={`lt-ambilight !rounded-none ${theater ? 'lg:col-span-2 lg:!aspect-auto lg:h-[min(76vh,calc((min(100vw,1500px)-4rem)*0.5625))]' : ''}`}>
           {blocks.steer && <SteerRing stream={stream} />}
-          <LiveStrip stream={stream} viewers={formatCount(stream.viewers)} className="absolute left-4 top-14 z-10" />
+          <LiveStrip stream={stream} className="absolute left-4 top-14 z-10" />
           <div className="absolute left-4 top-4 z-10 flex flex-wrap items-center gap-2">
             <LiveBadge viewers={formatCount(stream.viewers)} />
             <span className={`rounded-pill px-2.5 py-1 text-xs font-semibold backdrop-blur ${isPremium ? 'bg-sky text-ink-950' : 'bg-ink-950/75 text-fg-muted'}`}>{qualityLabel(quality, plan)}</span>
