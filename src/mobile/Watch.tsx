@@ -19,6 +19,7 @@ import { useToolEngine } from '../live/useToolEngine'
 import { useMode } from '../live/store'
 import { PinLayer, VideoEffects, GiftToast } from '../live/ui'
 import { NowTool } from '../live/Dock'
+import { PaceSignal } from '../live/Steer'
 import { Landscape } from './Landscape'
 import { MobileGroupBar } from './GroupBar'
 import { Cinema } from '../live/Cinema'
@@ -112,6 +113,7 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
         <div className="min-w-0 flex-1"><h1 className="truncate text-[15px] font-semibold leading-tight">{stream.title}</h1><p className="truncate text-xs text-fg-muted">{host.name}, {city.name}, {formatCount(stream.viewers)} watching</p></div>
         <button type="button" aria-pressed={following} onClick={() => toggleHost(host.id)} className={`rounded-pill px-3.5 py-1.5 text-[13px] font-bold active:scale-95 ${following ? 'bg-ink-700 text-fg' : 'bg-fg text-ink-900'}`} data-testid="watch-follow">{following ? 'Following' : 'Follow'}</button>
       </div>
+      <PaceSignal stay={eng.stay} className="mx-3 mb-1 !py-2" />
       <MobileGroupBar streamId={stream.id} streamTitle={stream.title} onJoin={(id) => onSwitch?.(id)} onBrowse={onClose} />
       <div className="grid shrink-0 grid-cols-4 gap-1 px-2.5 py-2.5" aria-label="Steer the walk" role="group">
         <button type="button" className="lt-btn lt-stack" aria-pressed={eng.mineStay === 'stay'} onClick={() => eng.setPace('stay')}><span className="lt-fill !inset-x-0 !top-auto !h-1 rounded-b" style={{ width: `${stayPct}%` }} /><Gesture name="stay" size={20} /><span>Stay <b>{stayPct}%</b></span></button>

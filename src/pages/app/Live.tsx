@@ -11,6 +11,7 @@ import { useDemo } from '../../store'
 import { Avatar, Button, LiveBadge } from '../../components/ui'
 import { VideoSlot } from '../../components/VideoSlot'
 import { Hints } from '../../live/Hints'
+import { LiveStrip, PaceSignal, SteerRing } from '../../live/Steer'
 import { ChatPanel } from '../../components/ChatPanel'
 import { useToolEngine } from '../../live/useToolEngine'
 import { useMode } from '../../live/store'
@@ -117,6 +118,8 @@ function LiveRoom({ stream }: { stream: Stream }) {
       <div className={`relative flex min-w-0 flex-col gap-3 ${theater ? 'lg:contents' : ''}`}>
         {!theater && <Hints className="left-4 top-16 max-sm:!relative max-sm:!left-auto max-sm:!top-auto max-sm:mx-auto" />}
         <VideoSlot stream={stream} player={!cinema} audio fit={theater ? 'contain' : 'cover'} className={`lt-ambilight !rounded-none ${theater ? 'lg:col-span-2 lg:!aspect-auto lg:h-[min(76vh,calc((min(100vw,1500px)-4rem)*0.5625))]' : ''}`}>
+          {blocks.steer && <SteerRing stream={stream} />}
+          <LiveStrip stream={stream} viewers={formatCount(stream.viewers)} className="absolute left-4 top-14 z-10" />
           <div className="absolute left-4 top-4 z-10 flex flex-wrap items-center gap-2">
             <LiveBadge viewers={formatCount(stream.viewers)} />
             <span className={`rounded-pill px-2.5 py-1 text-xs font-semibold backdrop-blur ${isPremium ? 'bg-sky text-ink-950' : 'bg-ink-950/75 text-fg-muted'}`}>{qualityLabel(quality, plan)}</span>
@@ -208,6 +211,7 @@ function LiveRoom({ stream }: { stream: Stream }) {
       <aside className={`flex min-h-0 min-w-0 flex-col gap-0 ${theater ? 'lg:col-start-2 lg:row-start-2 lg:row-span-6' : ''} lg:sticky lg:top-[60px] lg:h-[calc(100vh-60px)] lg:border-l lg:border-line lg:bg-ink-900`} aria-label="Live panel">
         <h2 className="shrink-0 border-b border-line py-3 text-center text-[15px] font-bold">Chat</h2>
         {blocks.tools && <div className="shrink-0 p-2.5"><NowTool e={eng} /></div>}
+        <PaceSignal stay={eng.stay} className="mx-2.5 mb-2" />
         {blocks.chat ? <ChatPanel msgs={sim.msgs} selfName="You" coins={coins} onGift={onGift} onSend={(x) => sim.send(x, 'You')} locked={eng.chatLock} off={chatOff} className="min-h-0 flex-1 !rounded-none !border-0 !bg-transparent max-lg:h-[460px]" /> : <button type="button" onClick={() => setBlocks({ chat: true })} className="lt-btn justify-center"><ChatCircleDots size={18} />Show the chat</button>}
       </aside>
 

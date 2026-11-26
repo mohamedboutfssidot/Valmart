@@ -12,12 +12,13 @@ export function NowTool({ e, className = '', compact = false }: { e: ToolEngine;
   const key = a ? `${a.def.id}-${e.done}` : ''
   const [open, setOpen] = useState(true)
   const [gone, setGone] = useState(false)
-  useEffect(() => { setOpen(true); setGone(false) }, [key])
+  const [dismissed, setDismissed] = useState(false)
+  useEffect(() => { setOpen(true); setGone(false); setDismissed(false) }, [key])
   const answered = !!a && !a.closed && a.mine !== null
   useEffect(() => { if (!answered) return; const t = window.setTimeout(() => setOpen(false), compact ? 1100 : 1400); return () => window.clearTimeout(t) }, [answered, key])
   const closed = !!a?.closed
   useEffect(() => { if (!closed) return; const t = window.setTimeout(() => setGone(true), compact ? 4000 : 8000); return () => window.clearTimeout(t) }, [closed, key])
-  if (!a || gone) return null
+  if (!a || gone || dismissed) return null
   // On the phone an answered tool simply goes away: the video keeps the space.
   if (compact && answered && !open) return null
   if (answered && !open) {
@@ -28,6 +29,16 @@ export function NowTool({ e, className = '', compact = false }: { e: ToolEngine;
         <span className="text-fg-muted">Answered. Result in {a.left}s</span>
         <span className="ml-auto text-sky-deep">Show</span>
       </button>
+    )
+  }
+  if (compact) {
+    return (
+      <div className="relative">
+        <ToolCard e={e} className={className} compact />
+        <button type="button" onClick={() => setDismissed(true)} aria-label="Close this tool" data-testid="tool-close" className="absolute right-1.5 top-1.5 z-10 grid h-8 w-8 place-items-center rounded-full bg-ink-700/80 text-fg active:scale-90">
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+        </button>
+      </div>
     )
   }
   return <ToolCard e={e} className={className} compact={compact} />

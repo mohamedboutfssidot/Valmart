@@ -11,23 +11,12 @@ export interface Ticket { ref: string; eventId: string; qty: number; at: number 
 export interface Moment { id: string; streamId: string; at: number }
 export interface HostEvent { id: string; title: string; cityId: string; date: string; price: number; seats: number; sold: number; at: number }
 
-/** A trip a viewer asks for: where, when, how much. Sent to one creator or open to every host in the city. */
-export interface TripRequest {
-  id: string; byId: string; byName: string; cityId: string
-  /** Name of the creator it is sent to. Empty: any host of the city, the first to accept does it. */
-  hostName: string
-  title: string; details: string; date: string; budgetUsd: number
-  status: 'open' | 'countered' | 'accepted' | 'live' | 'done' | 'cancelled'
-  acceptedBy?: string; at: number
-  /** A host asks for another price or date. The viewer accepts or declines. */
-  counter?: { usd: number; date: string; by: string }
-  /** After the trip: the viewer's mark for the host. */
-  rating?: number; review?: string
-}
+/** Request types live in the store; samples below follow them. */
+import type { TripRequest } from '../store'
 export const SAMPLE_REQUESTS: TripRequest[] = [
-  { id: 'rq1', byId: 'sample-1', byName: 'Sofia R.', cityId: 'istanbul', hostName: '', title: 'The spice market before it gets crowded', details: 'Early morning. I would like to see the stalls open and hear how the sellers talk about their goods.', date: '2026-11-14', budgetUsd: 25, status: 'open', at: 1 },
-  { id: 'rq2', byId: 'sample-2', byName: 'Class 6B, École Jean Moulin', cityId: 'paris', hostName: 'Léa Marchand', title: 'A bakery visit for our French class', details: 'Thirty minutes, slow pace, simple French please. The pupils will prepare their questions.', date: '2026-11-20', budgetUsd: 40, status: 'open', at: 2 },
-  { id: 'rq3', byId: 'sample-3', byName: 'Omar K.', cityId: 'marrakech', hostName: '', title: 'A tannery and a craft workshop', details: 'I want to understand how the leather is made and meet the people who make it.', date: '2026-11-09', budgetUsd: 30, status: 'open', at: 3 },
+  { id: 'rq1', byId: 'sample-1', byName: 'Sofia R.', cityId: 'istanbul', hostName: '', anyone: true, targets: [], title: 'The spice market before it gets crowded', details: 'Early morning. I would like to see the stalls open and hear how the sellers talk about their goods.', date: '2026-11-14', time: '07:30', budgetUsd: 25, status: 'open', responses: [], msgs: [], at: 1 },
+  { id: 'rq2', byId: 'sample-2', byName: 'Class 6B, École Jean Moulin', cityId: 'paris', hostName: 'Léa Marchand', anyone: false, targets: ['Léa Marchand'], title: 'A bakery visit for our French class', details: 'Thirty minutes, slow pace, simple French please. The pupils will prepare their questions.', date: '2026-11-20', time: '10:00', budgetUsd: 40, status: 'open', responses: [], msgs: [], at: 2 },
+  { id: 'rq3', byId: 'sample-3', byName: 'Omar K.', cityId: 'marrakech', hostName: '', anyone: true, targets: [], title: 'A tannery and a craft workshop', details: 'I want to understand how the leather is made and meet the people who make it.', date: '2026-11-09', budgetUsd: 30, unlimited: false, status: 'open', responses: [], msgs: [], at: 3 },
 ]
 
 export interface Seed {

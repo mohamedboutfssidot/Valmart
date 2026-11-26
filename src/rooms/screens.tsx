@@ -6,6 +6,7 @@ import { VideoSlot } from '../components/VideoSlot'
 import { ChatPanel } from '../components/ChatPanel'
 import { useToolEngine } from '../live/useToolEngine'
 import { useMode } from '../live/store'
+import { RoomAsks } from '../live/Steer'
 import { PaceChips, PinLayer, ToolCard, VideoEffects } from '../live/ui'
 import { ToolBuilder, ToolLauncher } from '../live/host'
 import { HostModePicker, OneButton, WalkingSwitch, useSuggestion, type HostMode } from '../live/director'
@@ -207,6 +208,7 @@ function HostLive({ r, room, role, hostMode: initial, category, surface, links: 
           </section>
         )}
         <ToolCard e={eng} variant="host" />
+        <RoomAsks category={category} />
         {walking && !team && <p className="rounded-xl border border-sun px-3.5 py-2 text-sm" data-testid="walking-note">You are moving fast. Tools wait until you slow down{motion ? ' (detected by your phone)' : ''}.</p>}
         {pending && (
           <div className="flex flex-wrap items-center gap-2 rounded-xl border border-sun bg-ink-800 px-3.5 py-2.5 text-sm" role="alert" data-testid="walk-confirm">
