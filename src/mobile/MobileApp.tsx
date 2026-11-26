@@ -34,9 +34,10 @@ export default function MobileApp() {
   const watch = (id: string) => setWatching(id)
   const stream = watching ? streamById(watching) ?? STREAMS[0] : null
 
-  const tabs: [Tab, string, Parameters<typeof Icon>[0]['name']][] = [
+  type TabDef = [Tab, string, Parameters<typeof Icon>[0]['name']]
+  const tabs: TabDef[] = [
     ['explore', 'Explore', 'live'], ['categories', 'Categories', 'explore'],
-    user?.isHost ? ['studio', 'Studio', 'studio'] : ['events', 'Events', 'calendar'],
+    ...(user?.isHost ? [['studio', 'Studio', 'studio'] as TabDef] : []),
     ['hub', 'More', 'users'], ['me', 'Profile', 'me'],
   ]
   const current = tabs.some(([k]) => k === tab) ? tab : 'explore'

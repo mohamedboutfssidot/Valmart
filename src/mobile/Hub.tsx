@@ -19,6 +19,7 @@ const VIEWER: { title: string; items: [string, string, string, Name][] }[] = [
   ] },
   { title: 'Plan', items: [
     ['requests', 'Trip requests', 'Ask a local, with a budget', 'route'],
+    ['events', 'Events', 'Tickets for live events', 'calendar'],
   ] },
   { title: 'Keep', items: [
     ['guide', 'How it works', 'Every function, explained', 'help'],
@@ -144,7 +145,7 @@ export function Hub({ onWatch }: { onWatch: (id: string) => void }) {
   const [open, setOpen] = useState<string | null>(null)
   return (
     <>
-      <Page title="More" sub="Groups, requests and guides">
+      <Page title="More" sub="Group, requests, events">
         {VIEWER.map((g) => (
           <section key={g.title} className="flex flex-col gap-2.5"><h2 className="text-xs font-semibold uppercase tracking-wider text-fg-muted">{g.title}</h2>
             <div className="grid gap-2.5">{g.items.map(([k, l, d, i]) => <Tile key={k} k={k} label={l} detail={d} icon={i} onOpen={setOpen} />)}</div></section>
@@ -154,7 +155,8 @@ export function Hub({ onWatch }: { onWatch: (id: string) => void }) {
             <div className="grid gap-2.5">{HOST.map(([k, l, d, i]) => <Tile key={k} k={k} label={l} detail={d} icon={i} onOpen={setOpen} />)}</div></section>
         )}
       </Page>
-      {open && <ExtraPage k={open} onBack={() => setOpen(null)} />}
+      {open === 'events' && <Sub title="Events" onBack={() => setOpen(null)}><div className="flex flex-col gap-5 px-5 pb-8"><MobileTickets /><EventsList /></div></Sub>}
+      {open && open !== 'events' && <ExtraPage k={open} onBack={() => setOpen(null)} />}
     </>
   )
 }

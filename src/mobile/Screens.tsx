@@ -23,7 +23,11 @@ import { useResultVoice, VoiceBadge } from '../live/tts'
 import { usePrefs } from './prefs'
 import { Logo } from '../components/ui'
 import { pendingCategory } from './Categories'
-import { FiltersSheet, countFilters, noFilters, type ExploreFilters } from './Filters'
+import { BASE_FILTERS, filterCount, filterReplays, filterStreams, useRecent, type Filters } from '../pages/app/discover/filters'
+import { FilterPanel } from '../pages/app/discover/FilterPanel'
+import { SuggestPanel } from '../pages/app/discover/Suggest'
+import { useOpenReplays } from '../features/Replays'
+import { kitFor } from '../live/tools'
 
 const money = (v: number) => `${v < 0 ? '−' : ''}$${Math.abs(v).toFixed(2)}`
 const when = (t: number) => new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
@@ -32,7 +36,7 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2,
 export function Page({ title, sub, children, right, bar }: { title: React.ReactNode; sub?: string; children: React.ReactNode; right?: React.ReactNode; bar?: React.ReactNode }) {
   return (
     <div className="no-scrollbar absolute inset-0 overflow-y-auto overscroll-contain">
-      <header className="sticky top-0 z-10 bg-ink-900/95 pt-14 backdrop-blur">
+      <header className="sticky top-0 z-10 bg-ink-900/95 pt-9 backdrop-blur">
         <div className="flex items-end justify-between gap-3 px-5 pb-3">
           <div className="min-w-0"><h1 className="vm-ptitle font-display text-[26px] font-extrabold leading-none">{title}</h1>{sub && <p className="mt-1.5 text-sm text-fg-muted">{sub}</p>}</div>
           {right}
@@ -60,81 +64,184 @@ function Row({ s, onWatch }: { s: Stream; onWatch: (id: string) => void }) {
   )
 }
 
+type Tab = 'you' | 'live' | 'replays' | 'cities' | 'events'
+
+/** One card of the Explore feed: 16:9 video, host avatar, title, meta. Plays muted while on screen. */
+function FeedCard({ s, badge, line, minutes, views, onOpen }: { s: Stream; badge: 'LIVE' | 'REPLAY'; line: string; minutes?: number; views?: number; onOpen: () => void }) {
+  const host = hostOf(s.hostId); const city = cityOf(s.cityId)
+  const ref = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(([en]) => { const v = el.querySelector('video'); if (!v) return; if (en.isIntersecting && en.intersectionRatio > 0.6) { v.muted = true; v.play().catch(() => undefined) } else v.pause() }, { threshold: [0, 0.6, 1] })
+    io.observe(el); return () => io.disconnect()
+  }, [])
+  const where = kitFor(s.category) === 'hidden' ? city.country : city.name
+  const watching = views ?? s.viewers
+  return (
+    <article className="flex flex-col gap-3 border-b border-line/60 pb-5 last:border-0" data-testid="feed-card">
+      <button type="button" ref={ref} onClick={onOpen} aria-label={`Watch ${s.title}`} className="relative block w-full overflow-hidden rounded-2xl text-left shadow-[0_6px_20px_rgba(10,25,50,.14)] transition-transform active:scale-[.985]">
+        <VideoSlot stream={s} showLabel={false} className="!aspect-video !w-full !rounded-2xl" />
+        <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/55 to-transparent" />
+        <span className="absolute left-2.5 top-2.5 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur">{s.category}</span>
+        <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1.5 text-xs font-semibold tabular-nums text-white">
+          {badge === 'LIVE' ? <><i className="live-dot" style={{ width: 7, height: 7 }} />{formatCount(watching)} watching</> : `${formatCount(watching)} views`}
+        </span>
+        {badge === 'LIVE'
+          ? <span className="absolute bottom-2.5 right-2.5 rounded-md bg-red-600 px-2 py-1 text-[11px] font-extrabold tracking-wide text-white">LIVE</span>
+          : <span className="absolute bottom-2.5 right-2.5 rounded-md bg-black/75 px-2 py-1 text-[11px] font-bold tabular-nums text-white">{minutes ?? 0}:00</span>}
+      </button>
+      <div className="flex gap-3 px-0.5">
+        <Avatar name={host.name} size={36} />
+        <button type="button" onClick={onOpen} className="min-w-0 flex-1 text-left">
+          <span className="line-clamp-2 text-[15.5px] font-semibold leading-snug text-fg">{s.title}</span>
+          <span className="mt-1 block truncate text-[13px] text-fg-muted">{host.name} · {where}</span>
+          <span className={`block truncate text-[12.5px] ${badge === 'LIVE' ? 'font-medium text-sun' : 'text-fg-muted'}`}>{line}</span>
+        </button>
+      </div>
+    </article>
+  )
+}
+
 export function Explore({ onWatch, onRooms, onLive }: { onWatch: (id: string) => void; onRooms?: () => void; onLive?: (room: string) => void }) {
-  const { followHosts } = useExtra(); const [q, setQ] = useState(''); const [cat, setCat] = useState<string | null>(() => { const c = pendingCategory.value; pendingCategory.value = null; return c }); const [f, setF] = useState<ExploreFilters>(noFilters); const [fOpen, setFOpen] = useState(false); const [ev, setEv] = useState<EventItem | null>(null); const [rp, setRp] = useState<string | null>(null)
-  const list = useMemo(() => {
-    const t = q.trim().toLowerCase()
-    const c = cat ?? f.category
-    return STREAMS.filter((s) => (!c || s.category === c) && (!f.city || s.cityId === f.city) && (!f.following || followHosts.includes(s.hostId)) && (!t || `${s.title} ${cityOf(s.cityId).name} ${cityOf(s.cityId).country} ${s.category}`.toLowerCase().includes(t)))
-      .sort((a, b) => f.sort === 'newest' ? a.startedMinAgo - b.startedMinAgo : b.viewers - a.viewers)
-  }, [q, cat, f, followHosts])
-  const active = !!(q || cat || f.following || f.city || f.category)
+  const [searching, setSearching] = useState(false); const [q, setQ] = useState(''); const [f, setF] = useState<Filters>(BASE_FILTERS); const [tab, setTab] = useState<Tab>('you')
+  const [fOpen, setFOpen] = useState(false); const [ev, setEv] = useState<EventItem | null>(null); const [rp, setRp] = useState<string | null>(null)
+  const set = (p: Partial<Filters>) => setF((x) => ({ ...x, ...p }))
+  const recent = useRecent()
+  const user = useDemo((st) => st.user); const { followHosts, followCities } = useExtra()
+  const ctx = useMemo(() => ({ interests: user?.interests ?? [], hostIds: followHosts, cityIds: followCities }), [user, followHosts, followCities])
+  const term = q.trim().toLowerCase()
+  const replays = useOpenReplays()
+  const lives = useMemo(() => { const l = filterStreams(STREAMS, f, term, ctx); return f.sort === 'best' ? [...l].sort((a, b) => b.viewers - a.viewers) : l }, [f, term, ctx])
+  const reps = useMemo(() => filterReplays(replays, f, term, ctx).sort((a, b) => a.endedAt - b.endedAt), [replays, f, term, ctx])
+  const hoursLeftOf = (r: { endedAt: number }) => Math.max(1, Math.round(48 - (Date.now() - r.endedAt) / 36e5))
+  useEffect(() => { if (pendingCategory.value) { const c = pendingCategory.value as Filters['cats'][number]; pendingCategory.value = null; setF({ ...BASE_FILTERS, cats: [c] }) } }, [])
+  const feed = useMemo(() => { const out: { key: string; kind: 'live' | 'replay'; id: string }[] = []; let i = 0; let j = 0; while (i < lives.length || j < reps.length) { for (let n = 0; n < 2 && i < lives.length; n++) out.push({ key: `l-${lives[i].id}`, kind: 'live', id: lives[i++].id }); if (j < reps.length) out.push({ key: `r-${reps[j].id}`, kind: 'replay', id: reps[j++].id }); if (out.length >= 24) break } return out }, [lives, reps])
+  const n = filterCount(f)
+  const tabs: [Tab, string, number | null][] = [['you', 'For you', null], ['live', 'Live now', lives.length], ['replays', 'Replays', reps.length], ['cities', 'Cities', CITIES.length], ['events', 'Events', EVENTS.length]]
+  const card = (it: { key: string; kind: 'live' | 'replay'; id: string }) => {
+    if (it.kind === 'live') { const st = streamById(it.id); return st ? <FeedCard key={it.key} s={st} badge="LIVE" line={`Started ${st.startedMinAgo} min ago`} onOpen={() => onWatch(st.id)} /> : null }
+    const r = replays.find((x) => x.id === it.id); const st = r && streamById(r.streamId)
+    return r && st ? <FeedCard key={it.key} s={{ ...st, title: r.title }} badge="REPLAY" views={r.views} minutes={r.minutes} line={`${hoursLeftOf(r)} h left to watch`} onOpen={() => setRp(r.id)} /> : null
+  }
+  const chips: [string, () => void][] = [
+    ...(f.type === 'all' ? [] : [[f.type === 'live' ? 'Live now' : 'Replays', () => set({ type: 'all' })] as [string, () => void]]),
+    ...(f.mine ? [['My interests', () => set({ mine: false })] as [string, () => void]] : []),
+    ...(f.following ? [['Following', () => set({ following: false })] as [string, () => void]] : []),
+    ...(f.allAges ? [['All ages', () => set({ allAges: false })] as [string, () => void]] : []),
+    ...(f.fresh ? [['Just started', () => set({ fresh: false })] as [string, () => void]] : []),
+    ...(f.quiet ? [['Small rooms', () => set({ quiet: false })] as [string, () => void]] : []),
+    ...(f.lang ? [[f.lang, () => set({ lang: null })] as [string, () => void]] : []),
+    ...f.cats.map((c) => [c, () => set({ cats: f.cats.filter((x) => x !== c) })] as [string, () => void]),
+    ...f.cities.map((c) => [cityOf(c).name, () => set({ cities: f.cities.filter((x) => x !== c) })] as [string, () => void]),
+  ]
   return (
     <>
     <Page title={<Logo className="vm-logo h-5" />}
-      right={onRooms ? <button type="button" onClick={onRooms} data-testid="open-rooms" className="shrink-0 rounded-pill bg-sun px-4 py-2 text-sm font-extrabold text-ink-950 active:scale-95">Go live</button> : undefined}
+      right={onRooms ? <button type="button" onClick={onRooms} data-testid="open-rooms" className="shrink-0 rounded-pill bg-sun px-4 py-2.5 text-sm font-extrabold text-ink-950 active:scale-95">Go live</button> : undefined}
       bar={<div className="flex flex-col gap-2.5 pb-3">
         <div className="flex items-center gap-2 px-5">
-          <label className="vm-msearch" data-testid="m-search"><Icon name="explore" size={16} /><span className="sr-only">Search</span>
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search cities, hosts, topics" data-testid="m-search-input" /></label>
-          <button type="button" onClick={() => setFOpen(true)} aria-label="Filters" data-testid="m-filters" className="vm-mfilter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>{countFilters(f) > 0 && <span className="vm-mbadge">{countFilters(f)}</span>}</button>
+          <button type="button" onClick={() => setSearching(true)} aria-label="Search" data-testid="m-search" className="flex h-12 min-w-0 flex-1 items-center gap-2.5 rounded-full border border-line bg-ink-800 px-4 text-left shadow-sm active:scale-[.99]">
+            <Icon name="explore" size={20} />
+            <span className={`min-w-0 flex-1 truncate text-[16px] ${q ? 'font-semibold text-fg' : 'text-fg-muted'}`}>{q || 'Search cities, hosts, topics'}</span>
+            {q && <span role="button" aria-label="Clear search" onClick={(e) => { e.stopPropagation(); setQ('') }} className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink-600 text-fg"><svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></span>}
+          </button>
+          <button type="button" onClick={() => setFOpen(true)} aria-label="Filters" data-testid="m-filters" className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border active:scale-90 ${n ? 'border-sky bg-sky text-ink-950' : 'border-line bg-ink-800 text-fg'}`}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>
+            {n > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-sun px-1 text-xs font-extrabold text-ink-950">{n}</span>}
+          </button>
         </div>
-        <div className="no-scrollbar flex gap-2 overflow-x-auto px-5" role="tablist" aria-label="Categories">
-          <button type="button" aria-pressed={f.following} onClick={() => setF({ ...f, following: !f.following })} data-testid="chip-following" className={`vm-mchip ${f.following ? 'vm-mchip-on' : ''}`}>Following</button>
-          {[null, ...CATEGORIES].map((c) => <button key={c ?? 'all'} role="tab" aria-selected={cat === c} type="button" onClick={() => setCat(c)} className={`vm-mchip ${cat === c ? 'vm-mchip-on' : ''}`}>{c && <CatE3 c={c} size={16} />}{c ?? 'All'}</button>)}
+        <div className="no-scrollbar flex gap-2 overflow-x-auto px-5" role="tablist" aria-label="Explore sections">
+          <button type="button" onClick={() => set({ following: !f.following })} aria-pressed={f.following} data-testid="chip-following" className={`inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-[15px] font-bold transition active:scale-95 ${f.following ? 'bg-sky text-ink-950' : 'bg-ink-800 text-fg-muted'}`}>Following</button>
+          {tabs.map(([k, label, count]) => (
+            <button key={k} role="tab" aria-selected={tab === k} type="button" onClick={() => setTab(k)} data-testid={`tab-${k}`} className={`inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-[15px] font-bold transition active:scale-95 ${tab === k ? 'bg-fg text-ink-900' : 'bg-ink-800 text-fg-muted'}`}>
+              {label}{count !== null && <span className={`text-[13px] font-semibold ${tab === k ? 'opacity-70' : 'opacity-60'}`}>{count}</span>}
+            </button>
+          ))}
         </div>
+        {n > 0 && (
+          <div className="no-scrollbar flex gap-2 overflow-x-auto px-5" aria-label="Active filters">
+            <button type="button" onClick={() => setF(BASE_FILTERS)} className="shrink-0 rounded-full border border-line px-3 py-1.5 text-sm font-bold text-sky-deep active:scale-95">Clear {n}</button>
+            {chips.map(([l, off], i) => <button key={i} type="button" onClick={off} className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-sky/15 px-3 py-1.5 text-sm font-bold text-sky-deep active:scale-95">{l}<span aria-hidden="true">✕</span></button>)}
+          </div>
+        )}
       </div>}>
-      {!active && onLive && <LiveNowList mobile empty={false} onOpen={(l) => onLive(l.room)} />}
-      {!active && (
-        <section className="flex flex-col gap-3">
-          <h2 className="font-display text-lg font-bold">Cities</h2>
-          <div className="no-scrollbar -mx-5 flex gap-3 overflow-x-auto px-5">
-            {CITIES.map((c) => {
-              const s = STREAMS.find((x) => x.cityId === c.id)!
-              return (
-                <button key={c.id} type="button" onClick={() => setQ(c.name)} className="w-[112px] shrink-0 text-left active:opacity-70">
-                  <VideoSlot stream={s} showLabel={false} className="!aspect-square rounded-2xl ring-1 ring-line" />
-                  <p className="mt-1.5 truncate text-sm font-semibold">{c.name}</p>
-                  <p className="truncate text-xs text-fg-muted">{STREAMS.filter((x) => x.cityId === c.id).length} live</p>
-                </button>
-              )
-            })}
-          </div>
+      {tab === 'you' && (
+        <section className="flex flex-col gap-7" aria-label="Recommended for you">
+          {feed.map(card)}
+          {feed.length === 0 && <p className="py-10 text-center text-[16px] text-fg-muted">Nothing matches these filters. Remove one to see more.</p>}
         </section>
       )}
-      {!active && (
-        <section className="flex flex-col gap-3" data-testid="m-replays">
-          <h2 className="font-display text-lg font-bold">Replays <span className="text-sm font-medium text-fg-muted">last 48 hours</span></h2>
-          <ReplayRow onOpen={setRp} />
+      {tab === 'live' && (
+        <section className="flex flex-col gap-7" aria-label="Live now">
+          {onLive && !q && n === 0 && <LiveNowList mobile empty={false} onOpen={(l) => onLive(l.room)} />}
+          {lives.map((st) => <FeedCard key={st.id} s={st} badge="LIVE" line={`Started ${st.startedMinAgo} min ago`} onOpen={() => onWatch(st.id)} />)}
+          {lives.length === 0 && <p className="py-10 text-center text-[16px] text-fg-muted">No live matches. Try another city or topic.</p>}
         </section>
       )}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-display text-lg font-bold">{active ? `${list.length} results` : 'Live now'}</h2>
-        {list.map((s) => <Row key={s.id} s={s} onWatch={onWatch} />)}
-        {list.length === 0 && <p className="py-6 text-center text-fg-muted">Nothing matches. Try another city or topic.</p>}
-      </section>
-      {!active && (
-        <section className="flex flex-col gap-3">
-          <h2 className="font-display text-lg font-bold">Upcoming events</h2>
-          <div className="no-scrollbar -mx-5 flex gap-3 overflow-x-auto px-5">
-            {EVENTS.map((e) => {
-              const s = STREAMS.find((x) => x.cityId === e.cityId)!
-              return (
-                <button key={e.id} type="button" onClick={() => setEv(e)} className="w-[230px] shrink-0 text-left active:opacity-70">
-                  <VideoSlot stream={s} showLabel={false} className="!aspect-[16/10] rounded-2xl ring-1 ring-line">
-                    <span className="absolute bottom-2 right-2 rounded-pill bg-ink-950/80 px-2.5 py-0.5 font-display text-sm font-bold">${e.price}</span>
-                  </VideoSlot>
-                  <p className="mt-1.5 line-clamp-1 text-[15px] font-semibold">{e.title}</p>
-                  <p className="truncate text-xs text-fg-muted">{cityOf(e.cityId).name} · {e.duration}</p>
-                </button>
-              )
-            })}
-          </div>
+      {tab === 'replays' && (
+        <section className="flex flex-col gap-7" data-testid="m-replays" aria-label="Replays">
+          <p className="text-[15px] text-fg-muted">Missed a live? Watch it again for 48 hours. The ones ending soonest come first.</p>
+          {reps.map((r) => card({ key: `r-${r.id}`, kind: 'replay', id: r.id }))}
+          {reps.length === 0 && <p className="py-10 text-center text-[16px] text-fg-muted">No replay matches these filters.</p>}
+        </section>
+      )}
+      {tab === 'cities' && (
+        <section className="grid grid-cols-2 gap-3" aria-label="Cities">
+          {CITIES.map((c) => {
+            const st = STREAMS.find((x) => x.cityId === c.id)!; const cnt = STREAMS.filter((x) => x.cityId === c.id).length
+            return (
+              <button key={c.id} type="button" onClick={() => { set({ cities: [c.id] }); setTab('you') }} className="relative overflow-hidden rounded-2xl text-left active:scale-[.97]">
+                <VideoSlot stream={st} showLabel={false} className="!aspect-square !w-full !rounded-2xl" />
+                <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" aria-hidden="true" />
+                <span className="absolute inset-x-0 bottom-0 flex flex-col p-3 text-white"><span className="font-display text-[19px] font-extrabold leading-tight">{c.name}</span><span className="text-[13px] font-bold text-[#ffc266]">{cnt} live now</span></span>
+              </button>
+            )
+          })}
+        </section>
+      )}
+      {tab === 'events' && (
+        <section className="flex flex-col gap-5" aria-label="Upcoming events">
+          {EVENTS.map((e) => {
+            const st = STREAMS.find((x) => x.cityId === e.cityId)!
+            return (
+              <button key={e.id} type="button" onClick={() => setEv(e)} className="relative block w-full overflow-hidden rounded-2xl text-left active:scale-[.985]">
+                <VideoSlot stream={st} showLabel={false} className="!aspect-[16/10] !w-full !rounded-2xl" />
+                <span className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/85 to-transparent" aria-hidden="true" />
+                <span className="absolute right-3 top-3 rounded-md bg-sun px-2.5 py-1 font-display text-base font-extrabold text-ink-950">${e.price}</span>
+                <span className="absolute inset-x-0 bottom-0 flex flex-col gap-0.5 p-4 text-white"><span className="line-clamp-2 font-display text-[19px] font-extrabold leading-tight">{e.title}</span><span className="text-[14px] text-white/85">{cityOf(e.cityId).name} · {e.duration}</span></span>
+              </button>
+            )
+          })}
         </section>
       )}
     </Page>
     {ev && <EventSheet e={ev} onClose={() => setEv(null)} />}
-    {fOpen && <FiltersSheet f={f} onChange={setF} onClose={() => setFOpen(false)} results={list.length} />}
+    {fOpen && (
+      <Sheet title="Filters" onClose={() => setFOpen(false)}>
+        <div className="flex flex-col gap-5 px-5 pb-6 pt-2">
+          <FilterPanel f={f} set={set} big />
+          <div className="sticky bottom-0 -mx-5 flex gap-3 bg-ink-900 px-5 pb-1 pt-3">
+            <button type="button" onClick={() => setF(BASE_FILTERS)} className="h-12 flex-1 rounded-pill border-2 border-line text-[16px] font-bold active:scale-95">Clear</button>
+            <button type="button" onClick={() => setFOpen(false)} className="h-12 flex-[1.4] rounded-pill bg-sky text-[16px] font-extrabold text-ink-950 active:scale-95">Show {lives.length + reps.length} results</button>
+          </div>
+        </div>
+      </Sheet>
+    )}
+    {searching && (
+      <div className="fade-in absolute inset-0 z-50 flex flex-col bg-ink-900 pt-12" role="dialog" aria-label="Search">
+        <form onSubmit={(e) => { e.preventDefault(); recent.add(q); setSearching(false) }} className="flex items-center gap-2 px-3 pb-2">
+          <button type="button" onClick={() => setSearching(false)} aria-label="Close search" className="grid h-11 w-11 shrink-0 place-items-center rounded-full active:bg-ink-800"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg></button>
+          <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-full border-2 border-sky bg-ink-800 px-4"><span className="sr-only">Search</span>
+            <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} enterKeyHint="search" placeholder="Search cities, hosts, topics" data-testid="m-search-input" className="!outline-none !shadow-none min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-fg-muted" />
+            {q && <button type="button" onClick={() => setQ('')} aria-label="Clear" className="grid h-7 w-7 place-items-center rounded-full bg-ink-600"><svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></button>}
+          </label>
+        </form>
+        <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto pb-6">
+          <SuggestPanel q={q} streams={STREAMS} big onPick={(v) => { setQ(v); recent.add(v); setSearching(false) }} onOpen={(st) => { recent.add(q); setSearching(false); onWatch(st.id) }} />
+        </div>
+      </div>
+    )}
     {rp && <ReplayOverlay id={rp} onClose={() => setRp(null)} />}
     </>
   )
