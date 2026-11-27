@@ -47,3 +47,9 @@
 .vm-phone [data-testid=request-card]{padding:14px;gap:10px}
 .vm-phone [data-testid=request-card] .ml-auto{margin-left:0;width:100%}
 .vm-phone [data-testid=request-card] .ml-auto > *{flex:1 1 auto}
+
+/* filters: smaller */
+.vm-phone .vm-filters { gap: .5rem; }
+.vm-phone .vm-filters button { font-size: 12px !important; padding: 5px 11px !important; line-height: 1.2; }
+.vm-phone .vm-filters span, .vm-phone .vm-filters legend, .vm-phone .vm-filters p { font-size: 12px; }
+.vm-phone .vm-filters .flex-wrap { gap: 6px; }

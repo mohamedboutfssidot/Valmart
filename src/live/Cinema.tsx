@@ -90,9 +90,9 @@ function Group({ label, children, className = '' }: { label: string; children: R
   )
 }
 
-export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels, bursts, contained, compact, extra, cc, onExit }: {
+export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels, bursts, contained, compact, extra, cc, overlay, onMore, onExit }: {
   stream: Stream; eng: ToolEngine; viewers: string; hostName: string
-  chat: ReactNode; captions: ReactNode; panels?: ReactNode; bursts?: ReactNode; contained?: boolean; compact?: boolean; extra?: ReactNode; cc?: CC; onExit: () => void
+  chat: ReactNode; captions: ReactNode; panels?: ReactNode; bursts?: ReactNode; contained?: boolean; compact?: boolean; extra?: ReactNode; cc?: CC; overlay?: ReactNode; onMore?: () => void; onExit: () => void
 }) {
   const root = useRef<HTMLDivElement>(null)
   const [ui, setUi] = useState(true)
@@ -175,7 +175,7 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
       <div className={`absolute inset-x-0 top-0 z-10 flex flex-wrap items-center gap-2.5 bg-gradient-to-b from-ink-950/95 via-ink-950/55 to-transparent px-4 pb-10 pt-4 ${fade}`}>
         <button type="button" onClick={onExit} aria-label="Exit full screen" title="Exit full screen" className={`${btnBase} ${compact ? '!h-11 !w-11 !justify-center !rounded-full !p-0' : ''}`}>{compact ? <X size={18} weight="bold" /> : <>Exit full screen <kbd className="ml-1 rounded bg-ink-700 px-1 text-[10px] text-fg-muted">Esc</kbd></>}</button>
         {compact && <button type="button" onClick={() => setSideways((v) => !v)} aria-pressed={sideways} aria-label="Turn the video sideways" title="Turn the video sideways" data-testid="cinema-rotate" className={`${btnBase} !h-11 !w-11 !justify-center !rounded-full !p-0 ${sideways ? 'is-on' : ''}`}><DeviceRotate size={20} /></button>}
-        <LiveBadge viewers={viewers} />
+        {!compact && <LiveBadge viewers={viewers} />}
         <span className={`min-w-0 truncate font-semibold ${big ? 'text-lg' : 'text-sm'}`}>{stream.title} · {hostName}</span>
         <span className="ml-auto hidden text-xs text-fg-muted md:inline">P look · C chat · Space pause · F full screen</span>
       </div>
@@ -212,8 +212,10 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
           <PaceChips e={eng} compact={!big} onVideo iconOnly />
           <button type="button" aria-pressed={look} aria-label="Look here" title="Look here" onClick={() => setLook((x) => !x)} className={`${btn} ${look ? 'is-on' : ''}`}><Gesture name="look" size={compact ? 18 : 15} />{!compact && <>Look here <kbd className="ml-1 rounded bg-ink-700 px-1 text-[10px] text-fg-muted">P</kbd></>}</button>
           <span className="contents">
+            <button type="button" aria-pressed={sndOn} onClick={toggleSound} title={sndOn ? 'Sound on' : 'Sound off'} aria-label="Sound" className={`${btn} ${sndOn ? 'is-on' : ''}`}>{sndOn ? <SpeakerSimpleHigh size={18} /> : <SpeakerSimpleSlash size={18} />}</button>
             {extra}
             {panels && <button type="button" aria-pressed={pan} onClick={() => { setPan((x) => !x); setMore(false) }} className={`${btn} ${pan ? 'is-on' : ''}`} aria-label="Panels" title="Panels" data-testid="cinema-panels">{compact ? <SquaresFour size={18} weight="duotone" /> : <>Panels <kbd className="ml-1 rounded bg-ink-700 px-1 text-[10px] text-fg-muted">M</kbd></>}</button>}
+            {onMore && <button type="button" aria-label="More options" title="More" data-testid="cine-more" onClick={onMore} className={btn}><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg></button>}
             <button type="button" aria-pressed={chatOpen} aria-label="Chat" title="Chat" onClick={() => setChatOpen((x) => !x)} className={`${btn} ${chatOpen ? 'is-on' : ''}`}><Gesture name="chat" size={compact ? 18 : 15} />{!compact && <>Chat <kbd className="ml-1 rounded bg-ink-700 px-1 text-[10px] text-fg-muted">C</kbd></>}</button>
           </span>
           </>}
@@ -237,6 +239,7 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
           <div className="min-h-0 flex-1">{chat}</div>
         </aside>
       )}
+      {overlay}
       </div>
     </div>
   )

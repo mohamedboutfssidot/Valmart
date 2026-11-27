@@ -114,13 +114,29 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
   }
   const chip = (on: boolean) => `shrink-0 rounded-pill px-3.5 py-2 text-[13px] font-semibold transition active:scale-95 ${on ? 'bg-sky text-ink-950' : 'bg-ink-700 text-fg'}`
 
+  const moreSheet = more && (
+        <Sheet onClose={() => setMore(false)} title="More">
+          <div className="flex flex-col gap-2 px-5 pb-6">
+            <p className="px-1 pt-2 text-xs font-semibold uppercase tracking-wider text-fg-muted">Captions</p>
+            <Row2 on={pf.captions} onClick={() => setPf('captions', !pf.captions)} icon={<ClosedCaptioning size={22} />} label="Captions" />
+            {needs && <Row2 on={pf.translate} onClick={() => setPf('translate', !pf.translate)} icon={<Translate size={22} />} label="Translate to English" />}
+            <Row2 on={pf.voiceCaptions} onClick={() => setPf('voiceCaptions', !pf.voiceCaptions)} icon={<SpeakerHigh size={22} />} label="Read aloud" />
+            <div className="flex items-center justify-between rounded-2xl bg-ink-800 px-4 py-3"><span className="font-semibold">Caption size</span>
+              <span className="flex gap-1.5">{(['S', 'M', 'L'] as const).map((z) => <button key={z} type="button" aria-pressed={pf.captionSize === z} onClick={() => setPf('captionSize', z)} className={`h-9 w-11 rounded-full text-sm font-bold ${pf.captionSize === z ? 'bg-sky text-ink-950' : 'bg-ink-700 text-fg-muted'}`}>{z}</button>)}</span></div>
+            <p className="px-1 pt-2 text-xs font-semibold uppercase tracking-wider text-fg-muted">Video</p>
+            <div className="flex items-center justify-between rounded-2xl bg-ink-800 px-4 py-3"><span className="font-semibold">Quality</span>
+              <span className="vm-qrow">{QUALITY.map(([q, v]) => { const lock = v > ({ free: 720, plus: 1080, premium: 2160 }[plan as 'free'] || 720); return <button key={q} type="button" aria-pressed={pf.quality === q} disabled={lock} title={lock ? `${q} needs ${v > 1080 ? 'Premium' : 'Plus'}` : `Video quality ${q}`} onClick={() => setPf('quality', q)} className={`vm-q ${pf.quality === q ? 'is-on' : ''}`}>{q}</button> })}</span></div>
+            <button type="button" data-testid="m-pip" onClick={pip} className="flex items-center gap-3 rounded-2xl bg-ink-800 px-4 py-3.5 text-left font-semibold active:scale-[.98]">Picture in picture<span className="ml-auto text-xs font-normal text-fg-muted">Open</span></button>
+            {pipNote && <p className="px-1 text-xs text-fg-muted" data-testid="m-pip-note">{pipNote}</p>}
+            <button type="button" data-testid="m-back" onClick={() => { setMore(false); onClose() }} className="mt-2 rounded-2xl border border-line px-4 py-3 text-center text-sm font-semibold text-fg-muted active:scale-[.98]">Back to Explore</button>
+          </div>
+        </Sheet>
+  )
+
   return (
     <LiveTheme stream={stream} plan={plan} inner="h-full" className="!absolute inset-0 z-30 overflow-hidden bg-ink-900"><div className="slide-in absolute inset-0 flex flex-col bg-ink-900/0 text-fg" data-testid="watch">
       <div className="relative shrink-0">
         <VideoSlot stream={stream} player audio soundButton={false} showLabel={false} className="!aspect-video !rounded-none">
-          <div className="absolute left-3 top-3 z-10 flex items-center gap-2"><LiveBadge viewers={formatCount(stream.viewers)} />
-            <CaptionMenu needs={needs} />
-            <button type="button" onClick={() => !isPremium && onTrial()} className="rounded-pill bg-ink-950/75 px-2.5 py-1 text-xs font-semibold backdrop-blur">{planOf(plan).quality}</button></div>
           {pf.captions && (
             <p key={cap} className={`fade-in pointer-events-none absolute inset-x-3 bottom-3 mx-auto w-fit max-w-full rounded-lg bg-ink-950/75 px-3 py-1.5 text-center font-medium backdrop-blur ${pf.captionSize === 'S' ? 'text-[12px]' : pf.captionSize === 'L' ? 'text-[17px]' : 'text-[14px]'}`}>{needs && !translate ? line.orig : line.en}</p>
           )}
@@ -155,30 +171,13 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
       </div>
       {cinema && (
         <Landscape><Cinema
-          contained compact extra={<CaptionMenu needs={needs} up />} stream={stream} eng={eng} viewers={formatCount(stream.viewers)} hostName={host.name} onExit={leaveCinema}
+          contained compact overlay={moreSheet} onMore={() => setMore(true)} extra={<CaptionMenu needs={needs} up />} stream={stream} eng={eng} viewers={formatCount(stream.viewers)} hostName={host.name} onExit={leaveCinema}
           bursts={<GiftToast bursts={sim.bursts} />}
           captions={pf.captions ? <p key={cap} className={`fade-in max-w-[90%] rounded-lg bg-ink-950/75 px-3 py-1.5 text-center font-medium backdrop-blur ${pf.captionSize === 'S' ? 'text-[12px]' : pf.captionSize === 'L' ? 'text-[17px]' : 'text-[14px]'}`}>{needs && !translate ? line.orig : line.en}</p> : null}
           chat={<ChatPanel msgs={sim.msgs} selfName="You" coins={coins} onGift={onGift} onSend={(x) => sim.send(x, 'You')} locked={eng.chatLock} off={chatOff} className="!h-full !rounded-none !border-0" />}
         /></Landscape>
       )}
-      {more && (
-        <Sheet onClose={() => setMore(false)} title="More">
-          <div className="flex flex-col gap-2 px-5 pb-6">
-            <p className="px-1 pt-2 text-xs font-semibold uppercase tracking-wider text-fg-muted">Captions</p>
-            <Row2 on={pf.captions} onClick={() => setPf('captions', !pf.captions)} icon={<ClosedCaptioning size={22} />} label="Captions" />
-            {needs && <Row2 on={pf.translate} onClick={() => setPf('translate', !pf.translate)} icon={<Translate size={22} />} label="Translate to English" />}
-            <Row2 on={pf.voiceCaptions} onClick={() => setPf('voiceCaptions', !pf.voiceCaptions)} icon={<SpeakerHigh size={22} />} label="Read aloud" />
-            <div className="flex items-center justify-between rounded-2xl bg-ink-800 px-4 py-3"><span className="font-semibold">Caption size</span>
-              <span className="flex gap-1.5">{(['S', 'M', 'L'] as const).map((z) => <button key={z} type="button" aria-pressed={pf.captionSize === z} onClick={() => setPf('captionSize', z)} className={`h-9 w-11 rounded-full text-sm font-bold ${pf.captionSize === z ? 'bg-sky text-ink-950' : 'bg-ink-700 text-fg-muted'}`}>{z}</button>)}</span></div>
-            <p className="px-1 pt-2 text-xs font-semibold uppercase tracking-wider text-fg-muted">Video</p>
-            <div className="flex items-center justify-between rounded-2xl bg-ink-800 px-4 py-3"><span className="font-semibold">Quality</span>
-              <span className="vm-qrow">{QUALITY.map(([q, v]) => { const lock = v > ({ free: 720, plus: 1080, premium: 2160 }[plan as 'free'] || 720); return <button key={q} type="button" aria-pressed={pf.quality === q} disabled={lock} title={lock ? `${q} needs ${v > 1080 ? 'Premium' : 'Plus'}` : `Video quality ${q}`} onClick={() => setPf('quality', q)} className={`vm-q ${pf.quality === q ? 'is-on' : ''}`}>{q}</button> })}</span></div>
-            <button type="button" data-testid="m-pip" onClick={pip} className="flex items-center gap-3 rounded-2xl bg-ink-800 px-4 py-3.5 text-left font-semibold active:scale-[.98]">Picture in picture<span className="ml-auto text-xs font-normal text-fg-muted">Open</span></button>
-            {pipNote && <p className="px-1 text-xs text-fg-muted" data-testid="m-pip-note">{pipNote}</p>}
-            <button type="button" data-testid="m-back" onClick={() => { setMore(false); onClose() }} className="mt-2 rounded-2xl border border-line px-4 py-3 text-center text-sm font-semibold text-fg-muted active:scale-[.98]">Back to Explore</button>
-          </div>
-        </Sheet>
-      )}
+      {!cinema && moreSheet}
       {toast && <div className="pop-in absolute left-1/2 top-24 z-40 -translate-x-1/2 rounded-pill bg-ink-950/90 px-4 py-2 text-sm font-semibold text-fg backdrop-blur">{toast}</div>}
     </div>
     </LiveTheme>
