@@ -120,23 +120,6 @@ function LiveRoom({ stream }: { stream: Stream }) {
         <VideoSlot stream={stream} player={!cinema} audio fit={theater ? 'contain' : 'cover'} className={`lt-ambilight !rounded-none ${theater ? 'lg:col-span-2 lg:!aspect-auto lg:h-[min(76vh,calc((min(100vw,1500px)-4rem)*0.5625))]' : ''}`}>
           {blocks.steer && <SteerRing stream={stream} />}
           <LiveStrip stream={stream} className="absolute left-4 top-14 z-10" />
-          <div className="absolute left-4 top-4 z-10 flex flex-wrap items-center gap-2">
-            <LiveBadge viewers={formatCount(stream.viewers)} />
-            <span className={`rounded-pill px-2.5 py-1 text-xs font-semibold backdrop-blur ${isPremium ? 'bg-sky text-ink-950' : 'bg-ink-950/75 text-fg-muted'}`}>{qualityLabel(quality, plan)}</span>
-            {needsTranslation ? (
-              <button
-                type="button"
-                aria-pressed={translate}
-                onClick={() => setTranslate((v) => !v)}
-                className={`rounded-pill px-3 py-1 text-xs font-semibold backdrop-blur ${translate ? 'bg-sky text-ink-950' : 'bg-ink-950/75 text-fg'}`}
-              >
-                Translation to English: {translate ? 'on' : 'off'}
-              </button>
-            ) : (
-              <span className="rounded-pill bg-ink-950/75 px-3 py-1 text-xs font-medium text-fg-muted backdrop-blur">English audio</span>
-            )}
-          </div>
-
           {capOn && blocks.captions && (
             <div className="pointer-events-none absolute inset-x-3 bottom-14 z-10 flex justify-center sm:bottom-16">
               <p className="max-w-[40ch] rounded-xl bg-ink-950/80 px-4 py-2 text-center backdrop-blur" key={cap}>

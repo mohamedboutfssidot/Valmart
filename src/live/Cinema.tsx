@@ -45,7 +45,7 @@ function CinemaTool({ e, big, compact = false }: { e: ToolEngine; big: boolean; 
   const res = a.closed ? describe(a) : null
   const txt = big ? 'text-lg' : compact ? 'text-[13px]' : 'text-[14px]'
   return (
-    <section key={`${d.id}-${e.done}`} aria-label={d.name} className={`pop-in relative overflow-hidden rounded-2xl border bg-ink-950/90 ${compact ? 'ml-auto w-full max-w-[320px] px-3 pb-2 pt-2.5' : 'px-4 pb-3 pt-3.5'} shadow-lg backdrop-blur-md ${a.closed ? 'border-line' : 'border-sun'}`}>
+    <section key={`${d.id}-${e.done}`} aria-label={d.name} className={`pop-in relative overflow-hidden rounded-2xl border bg-ink-950/90 ${compact ? 'ml-auto w-full max-w-[320px] px-3 pb-2 pt-2.5' : 'ml-auto w-[35%] min-w-[300px] max-w-[460px] px-4 pb-3 pt-3.5'} shadow-lg backdrop-blur-md ${a.closed ? 'border-line' : 'border-sun'}`}>
       <div className="absolute inset-x-0 top-0 h-[3px] bg-ink-700"><div className="h-full bg-sun transition-[width] duration-1000 ease-linear" style={{ width: `${a.closed ? 0 : (a.left / a.total) * 100}%` }} /></div>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <div className={`min-w-0 flex-1 ${compact ? 'basis-full' : 'basis-[220px]'}`}>
@@ -101,7 +101,6 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
   const [paused, setPaused] = useState(false)
   const big = false
   const [look, setLook] = useState(false)
-  const [readOn, setReadOn] = useState(false)
   const [more, setMore] = useState(false)
   const [pan, setPan] = useState(false)
   const timer = useRef(0)
@@ -198,7 +197,6 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
               <Group label="">
                 {cc && <button type="button" aria-pressed={cc.on} onClick={cc.toggle} title="Captions" aria-label="Captions" data-testid="cine-cc" className={`${btn} ${cc.on ? 'is-on' : ''}`}><ClosedCaptioning size={20} weight={cc.on ? 'fill' : 'regular'} /></button>}
                 {cc && <button type="button" onClick={cc.cycle} disabled={!cc.on} title={`Caption size: ${cc.size}`} aria-label="Caption size" data-testid="cine-cc-size" className={`${btn} disabled:opacity-40`}>Size {cc.size}</button>}
-                <button type="button" aria-pressed={readOn} title="Read captions aloud" aria-label="Read captions aloud" data-testid="cine-read" onClick={() => { try { const ss = window.speechSynthesis; if (readOn) ss?.cancel(); else { ss?.cancel(); ss?.speak(new SpeechSynthesisUtterance('Voice on. I will read the captions.')) } } catch { /* no speech */ } setReadOn(!readOn) }} className={`${btn} ${readOn ? 'is-on' : ''}`}>Read aloud</button>
                 <button type="button" aria-pressed={sndOn} onClick={toggleSound} title={sndOn ? 'Sound on' : 'Sound off'} aria-label="Sound" data-testid="cine-sound" className={`${btn} ${sndOn ? 'is-on' : ''}`}>{sndOn ? <SpeakerSimpleHigh size={20} weight="fill" /> : <SpeakerSimpleSlash size={20} />}</button>
               </Group>
               <Group label="" className="ml-auto">

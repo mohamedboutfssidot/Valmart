@@ -184,7 +184,7 @@ function CaptionsPage({ onBack }: { onBack: () => void }) {
   return (
     <Sub title="Translation and captions" onBack={onBack}>
       <Group title="Translation"><Toggle k="translate" label="Translate live speech" detail="Turns a host's words into English" /><Item label="Translate to" right={<span className="text-sm text-fg-muted">English</span>} /><Toggle k="showOriginal" label="Show original text" detail="Small line above the translation" /></Group>
-      <Group title="Captions"><Toggle k="captions" label="Show captions" /><Toggle k="chatPreview" label="Chat over the video" detail="Latest messages while you watch" /><Toggle k="voiceCaptions" label="Read captions aloud" detail="Uses your phone's voice. Quality varies by language." /></Group>
+      <Group title="Captions"><Toggle k="captions" label="Show captions" /><Toggle k="chatPreview" label="Chat over the video" detail="Latest messages while you watch" /></Group>
       <section className="flex flex-col gap-2"><h2 className="px-1 text-xs font-semibold uppercase tracking-wider text-fg-muted">Caption size</h2><Seg options={['S', 'M', 'L'] as const} value={p.captionSize} onChange={(v) => set('captionSize', v)} label="Caption size" />
         <div className="mt-1 rounded-2xl bg-ink-800 p-4 text-center"><span className={`font-medium ${p.captionSize === 'S' ? 'text-[13px]' : p.captionSize === 'M' ? 'text-[15px]' : 'text-[18px]'}`}>This is the famous scramble crossing.</span></div></section>
       <Group title="Display"><Toggle k="reduceMotion" label="Reduce motion" detail="Turns off most animations" /></Group>

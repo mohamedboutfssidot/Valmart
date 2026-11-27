@@ -40,7 +40,6 @@ function CaptionMenu({ needs, up = false, onVideo = true }: { needs: boolean; up
         <div className={`pop-in absolute z-30 flex w-[230px] flex-col gap-2 rounded-2xl border border-line bg-ink-900/95 p-3 text-fg backdrop-blur ${up ? 'bottom-full right-0 mb-2' : 'left-0 top-full mt-2'}`} role="menu" aria-label="Captions">
           <button type="button" aria-pressed={pf.captions} onClick={() => setPf('captions', !pf.captions)} className={chip(pf.captions)} data-testid="m-cc-toggle"><ClosedCaptioning size={16} className="mr-1 inline" />Captions {pf.captions ? 'on' : 'off'}</button>
           {needs && <button type="button" aria-pressed={pf.translate} onClick={() => setPf('translate', !pf.translate)} className={chip(pf.translate)} data-testid="m-tr-toggle"><Translate size={16} className="mr-1 inline" />Translate to English: {pf.translate ? 'on' : 'off'}</button>}
-          <button type="button" aria-pressed={pf.voiceCaptions} onClick={() => setPf('voiceCaptions', !pf.voiceCaptions)} className={chip(pf.voiceCaptions)}><SpeakerHigh size={16} className="mr-1 inline" />Read aloud: {pf.voiceCaptions ? 'on' : 'off'}</button>
           <div className="flex items-center justify-between gap-1"><span className="text-xs text-fg-muted">Size</span>{(['S', 'M', 'L'] as const).map((z) => <button key={z} type="button" aria-pressed={pf.captionSize === z} onClick={() => setPf('captionSize', z)} className={`h-8 w-10 rounded-full text-xs font-bold ${pf.captionSize === z ? 'bg-ink-600 text-fg' : 'bg-ink-700 text-fg-muted'}`}>{z}</button>)}</div>
         </div>
       )}
@@ -120,7 +119,6 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
             <p className="px-1 pt-2 text-xs font-semibold uppercase tracking-wider text-fg-muted">Captions</p>
             <Row2 on={pf.captions} onClick={() => setPf('captions', !pf.captions)} icon={<ClosedCaptioning size={22} />} label="Captions" />
             {needs && <Row2 on={pf.translate} onClick={() => setPf('translate', !pf.translate)} icon={<Translate size={22} />} label="Translate to English" />}
-            <Row2 on={pf.voiceCaptions} onClick={() => setPf('voiceCaptions', !pf.voiceCaptions)} icon={<SpeakerHigh size={22} />} label="Read aloud" />
             <div className="flex items-center justify-between rounded-2xl bg-ink-800 px-4 py-3"><span className="font-semibold">Caption size</span>
               <span className="flex gap-1.5">{(['S', 'M', 'L'] as const).map((z) => <button key={z} type="button" aria-pressed={pf.captionSize === z} onClick={() => setPf('captionSize', z)} className={`h-9 w-11 rounded-full text-sm font-bold ${pf.captionSize === z ? 'bg-sky text-ink-950' : 'bg-ink-700 text-fg-muted'}`}>{z}</button>)}</span></div>
             <p className="px-1 pt-2 text-xs font-semibold uppercase tracking-wider text-fg-muted">Video</p>

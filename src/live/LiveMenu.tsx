@@ -1,7 +1,6 @@
 // The "More" menu of the live controls (page bar and full screen): caption size, read aloud, video quality, picture in picture.
 import { useState } from 'react'
 import { planOf, type PlanId } from '../data/plans'
-import { speak, stopSpeaking, useVoice } from './tts'
 
 export const QUALITIES = ['Auto', '360p', '480p', '720p', '1080p', '1440p', '4K'] as const
 export type Quality = (typeof QUALITIES)[number]
@@ -23,8 +22,6 @@ export function MoreMenu({ capSize, setSize, plan, quality, setQuality, onClose,
   capSize: 'S' | 'M' | 'L'; setSize: (v: 'S' | 'M' | 'L') => void; plan: string
   quality: Quality; setQuality: (q: Quality) => void; onClose: () => void; className?: string
 }) {
-  const voiceOn = useVoice((s) => s.viewer)
-  const setVoice = useVoice((s) => s.setViewer)
   const [pipNote, setPipNote] = useState('')
   const max = MAX_BY_PLAN[plan] || 720
   const pip = () => {
@@ -43,9 +40,6 @@ export function MoreMenu({ capSize, setSize, plan, quality, setQuality, onClose,
           <button key={z} type="button" aria-pressed={capSize === z} onClick={() => setSize(z)} className={`h-7 w-8 rounded-full text-xs font-bold ${capSize === z ? 'bg-sky text-ink-950' : 'bg-ink-700'}`}>{z}</button>
         ))}</span>
       </div>
-      <button type="button" role="menuitem" className={row} aria-pressed={voiceOn} onClick={() => { setVoice(!voiceOn); if (voiceOn) stopSpeaking(); else speak('Voice on. I will read the captions.') }}>
-        <span>Read aloud</span><span className={`text-xs font-semibold ${voiceOn ? 'text-sky' : 'text-fg-muted'}`}>{voiceOn ? 'On' : 'Off'}</span>
-      </button>
       {head('Video')}
       <div className={row}>
         <span>Quality</span>
