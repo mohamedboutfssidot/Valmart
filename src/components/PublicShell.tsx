@@ -5,6 +5,8 @@ import { ThemeToggle } from '../theme'
 import { useDemo } from '../store'
 
 const LINKS = [
+  { to: '/', label: 'Home', end: true },
+  { to: '/app/live', label: 'Browse live' },
   { to: '/viewers', label: 'For viewers' },
   { to: '/hosts', label: 'For hosts' },
   { to: '/pricing', label: 'Pricing' },
@@ -23,7 +25,7 @@ export function PublicShell() {
           <NavLink to="/" aria-label="Valmart home"><LogoAdaptive className="h-7" /></NavLink>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
             {LINKS.map((l) => (
-              <NavLink key={l.to} to={l.to} className={({ isActive }) => `rounded-pill px-3.5 py-2 text-[15px] font-medium transition-colors ${isActive ? 'bg-ink-700 text-fg' : 'text-fg-muted hover:text-fg'}`}>{l.label}</NavLink>
+              <NavLink key={l.to} to={l.to} end={'end' in l} className={({ isActive }) => `rounded-pill px-3.5 py-2 text-[15px] font-medium transition-colors ${isActive ? 'bg-ink-700 text-fg' : 'text-fg-muted hover:text-fg'}`}>{l.label}</NavLink>
             ))}
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
