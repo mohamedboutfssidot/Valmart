@@ -364,3 +364,10 @@ to{box-shadow:0 0 #ff3b3b00}
 @media (width>=1280px){.xl\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.xl\:grid-cols-\[minmax\(0\,1fr\)_360px\]{grid-template-columns:minmax(0,1fr) 360px}}
 @media (width>=1536px){.\32 xl\:inline{display:inline}.\32 xl\:max-w-\[1480px\]{max-width:1480px}.\32 xl\:max-w-\[1680px\]{max-width:1680px}.\32 xl\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media not all and (width>=640px){.max-sm\:\[\&\>\*\]\:flex-1>*{flex:1}}
+
+/* Tools marquee (landing, viewers) */
+@keyframes vm-marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+.vm-marquee-track { animation: vm-marquee var(--dur, 60s) linear infinite; }
+.vm-marquee-rev { animation-direction: reverse; }
+.vm-marquee:hover .vm-marquee-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .vm-marquee { overflow-x: auto; } .vm-marquee-track { animation: none; } }

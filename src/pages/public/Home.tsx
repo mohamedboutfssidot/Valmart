@@ -6,6 +6,7 @@ import { Avatar, Button, LiveBadge } from '../../components/ui'
 import { Reveal } from '../../components/Reveal'
 import { PlanCards } from '../../components/PlanBlocks'
 import { PREVIEW_IDS } from './Watch'
+import { ToolsMarquee } from './ToolsMarquee'
 import { Band, Check, Explorer, Rows, Seg } from './ui2'
 import { EventDemo, RequestDemo, VoteDemo } from './Demos'
 
@@ -130,6 +131,8 @@ export default function Home() {
         <Explorer items={IDEA} />
       </Band>
 
+      <Band eyebrow="Tools" title="One live, dozens of tools" hint="The host launches one at a time. Hover to pause."><ToolsMarquee /></Band>
+
       <Band eyebrow="Why Valmart" title="A better live, not just another live" hint="What changes when the room can steer the walk.">
         <div className="grid gap-x-10 gap-y-2 md:grid-cols-2" data-testid="advantage">
           {ADV.map((a) => <div key={a.t} className="flex gap-4 border-t border-line py-5"><span className="mt-1"><Check on /></span><div><p className="text-lg font-semibold">{a.t}</p><p className="text-fg-muted">{a.d}</p></div></div>)}
@@ -172,19 +175,6 @@ export default function Home() {
             </li>
           ))}
         </ul>
-      </Band>
-
-      <Band title="How a live stays respectful" hint="Hosts are normal people with a camera. The rules are for everyone.">
-        <div className="grid gap-10 lg:grid-cols-2">
-          <ol className="flex flex-col gap-5">
-            {[['Anyone can host', 'A phone and a place to show are enough.'], ['The chat is moderated', 'Hosts can pause it, and every message can be reported.'], ['Viewers rate every session', 'Ratings and reports stay on the host profile.'], ['Repeated problems end the account', 'Reports are reviewed in a queue.']].map(([h, d], i) => (
-              <li key={h} className="flex gap-4"><span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-deep text-sm font-semibold text-white">{i + 1}</span><div><p className="font-semibold">{h}</p><p className="text-fg-muted">{d}</p></div></li>
-            ))}
-          </ol>
-          <ul className="divide-y divide-line border-y border-line self-start">
-            {['No ads, ever', 'Nothing to buy during a walk', 'Every live carries an age label', 'Anyone can report a live or a host'].map((x) => <li key={x} className="flex items-center gap-3 py-3"><Check on />{x}</li>)}
-          </ul>
-        </div>
       </Band>
 
       <Band title="Free to start" hint="Money buys comfort and reach, never more votes.">

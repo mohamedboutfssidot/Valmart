@@ -3,7 +3,7 @@
 import { ToolIcon } from './ToolIcon'
 import { Gesture } from './theme'
 import { createPortal } from 'react-dom'
-import { ClosedCaptioning, DeviceRotate, Lightning, SpeakerSimpleHigh, SpeakerSimpleSlash, SquaresFour, X } from '@phosphor-icons/react'
+import { ClosedCaptioning, DeviceRotate, Lightning, SquaresFour, X } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Stream } from '../data/mock'
 import { LiveBadge } from '../components/ui'
@@ -11,7 +11,7 @@ import { VideoSlot } from '../components/VideoSlot'
 import { describe, type ToolEngine } from './useToolEngine'
 import { PaceChips, PinLayer, VideoEffects } from './ui'
 import { VoiceBadge } from './tts'
-import { toggleSound, useSound } from '../video/sound'
+import { VolumeControl } from '../video/sound'
 
 function CinemaTool({ e, big, compact = false }: { e: ToolEngine; big: boolean; compact?: boolean }) {
   const a = e.active
@@ -118,7 +118,6 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
     return () => { try { so.unlock?.() } catch { /* ignore */ } }
   }, [compact])
   const rotated = !!compact && sideways && portrait
-  const sndOn = useSound((s) => s.on && !s.blocked)
 
   const wake = useCallback(() => {
     setUi(true)
@@ -197,7 +196,7 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
               <Group label="">
                 {cc && <button type="button" aria-pressed={cc.on} onClick={cc.toggle} title="Captions" aria-label="Captions" data-testid="cine-cc" className={`${btn} ${cc.on ? 'is-on' : ''}`}><ClosedCaptioning size={20} weight={cc.on ? 'fill' : 'regular'} /></button>}
                 {cc && <button type="button" onClick={cc.cycle} disabled={!cc.on} title={`Caption size: ${cc.size}`} aria-label="Caption size" data-testid="cine-cc-size" className={`${btn} disabled:opacity-40`}>Size {cc.size}</button>}
-                <button type="button" aria-pressed={sndOn} onClick={toggleSound} title={sndOn ? 'Sound on' : 'Sound off'} aria-label="Sound" data-testid="cine-sound" className={`${btn} ${sndOn ? 'is-on' : ''}`}>{sndOn ? <SpeakerSimpleHigh size={20} weight="fill" /> : <SpeakerSimpleSlash size={20} />}</button>
+                <VolumeControl className={btn} slider="pop" />
               </Group>
               <Group label="" className="ml-auto">
                 {extra}
@@ -210,7 +209,7 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
           <PaceChips e={eng} compact={!big} onVideo iconOnly />
           <button type="button" aria-pressed={look} aria-label="Look here" title="Look here" onClick={() => setLook((x) => !x)} className={`${btn} ${look ? 'is-on' : ''}`}><Gesture name="look" size={compact ? 18 : 15} />{!compact && <>Look here <kbd className="ml-1 rounded bg-ink-700 px-1 text-[10px] text-fg-muted">P</kbd></>}</button>
           <span className="contents">
-            <button type="button" aria-pressed={sndOn} onClick={toggleSound} title={sndOn ? 'Sound on' : 'Sound off'} aria-label="Sound" className={`${btn} ${sndOn ? 'is-on' : ''}`}>{sndOn ? <SpeakerSimpleHigh size={18} /> : <SpeakerSimpleSlash size={18} />}</button>
+            <VolumeControl className={btn} slider="pop" />
             {extra}
             {panels && <button type="button" aria-pressed={pan} onClick={() => { setPan((x) => !x); setMore(false) }} className={`${btn} ${pan ? 'is-on' : ''}`} aria-label="Panels" title="Panels" data-testid="cinema-panels">{compact ? <SquaresFour size={18} weight="duotone" /> : <>Panels <kbd className="ml-1 rounded bg-ink-700 px-1 text-[10px] text-fg-muted">M</kbd></>}</button>}
             {onMore && <button type="button" aria-label="More options" title="More" data-testid="cine-more" onClick={onMore} className={btn}><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg></button>}

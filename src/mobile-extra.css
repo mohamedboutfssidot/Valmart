@@ -53,3 +53,5 @@
 .vm-phone .vm-filters button { font-size: 12px !important; padding: 5px 11px !important; line-height: 1.2; }
 .vm-phone .vm-filters span, .vm-phone .vm-filters legend, .vm-phone .vm-filters p { font-size: 12px; }
 .vm-phone .vm-filters .flex-wrap { gap: 6px; }
+
+@keyframes vm-load { from { width: 0 } to { width: 100% } }

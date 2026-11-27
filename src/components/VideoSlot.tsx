@@ -27,14 +27,16 @@ function Skyline({ seed, shade, base, count }: { seed: number; shade: string; ba
 function ClipPlayer({ clip, onMissing, fit }: { clip: string; onMissing: () => void; fit: string }) {
   const on = useSound((s) => s.on)
   const tick = useSound((s) => s.tick)
+  const volume = useSound((s) => s.volume)
   const ref = useRef<HTMLVideoElement>(null)
   useEffect(() => {
     const el = ref.current
     if (!el) return
     el.muted = !on
+    el.volume = volume
     const r = el.play()
     if (r) r.then(() => useSound.setState({ blocked: false })).catch(() => { el.muted = true; useSound.setState({ blocked: on }); void el.play().catch(() => undefined) })
-  }, [clip, on, tick])
+  }, [clip, on, tick, volume])
   return <video ref={ref} key={clip} className={`absolute inset-0 h-full w-full ${fit}`} src={clip} autoPlay loop playsInline muted preload="auto" onError={onMissing} />
 }
 

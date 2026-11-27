@@ -97,20 +97,45 @@ export function AudienceDemo() {
   )
 }
 
+const usd = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Math.round(n))
+
 export function EarningsDemo() {
   const [per, setPer] = useState(3)
   const [viewers, setViewers] = useState(80)
   const [req, setReq] = useState(2)
+  const [ev, setEv] = useState(1)
   const gifts = per * 4 * viewers * 0.06
   const trips = req * 4 * 30 * 0.7
+  const events = ev * 25 * 8 * 0.8
+  const total = gifts + trips + events
+  const parts = [['Gifts', gifts, 'bg-sun'], ['Trip requests', trips, 'bg-sky'], ['Event tickets', events, 'bg-[#8b6cf6]']] as const
+  const sliders = [['Lives per week', per, setPer, 1, 10], ['Viewers per live', viewers, setViewers, 10, 500], ['Trip requests per week', req, setReq, 0, 8], ['Events per month', ev, setEv, 0, 4]] as const
   return (
-    <div className="flex flex-col gap-4" data-testid="earnings-demo">
-      {[['Lives per week', per, setPer, 1, 10, ''], ['Viewers per live', viewers, setViewers, 10, 500, ''], ['Trip requests per week', req, setReq, 0, 8, '']].map(([l, v, set, mn, mx]) => (
-        <label key={l as string} className="flex flex-col gap-1 text-sm font-medium">{l as string}: <b className="text-base tabular-nums">{v as number}</b>
-          <input type="range" min={mn as number} max={mx as number} value={v as number} onChange={(e) => (set as (n: number) => void)(Number(e.target.value))} aria-label={l as string} className="w-full accent-[var(--sun)]" /></label>
-      ))}
-      <p className="font-display text-4xl font-semibold tabular-nums" data-testid="earn-total">${Math.round(gifts + trips).toLocaleString()}<span className="ml-2 text-base font-medium text-fg-muted">per month, estimate</span></p>
-      <p className="text-sm text-fg-muted">Gifts about ${Math.round(gifts)} + trip requests about ${Math.round(trips)}. Illustrative only: no real payment in this prototype.</p>
+    <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]" data-testid="earnings-demo">
+      <div className="flex flex-col gap-4">
+        {sliders.map(([l, v, set, mn, mx]) => (
+          <label key={l} className="flex flex-col gap-1.5 text-sm font-medium">
+            <span className="flex items-center justify-between">{l}<b className="rounded-pill bg-ink-700 px-2.5 py-0.5 text-sm tabular-nums">{v}</b></span>
+            <input type="range" min={mn} max={mx} value={v} onChange={(e) => set(Number(e.target.value))} aria-label={l} className="w-full accent-[var(--sun)]" />
+          </label>
+        ))}
+      </div>
+      <div className="flex flex-col gap-4 rounded-card border border-line bg-ink-800 p-5">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-fg-muted">Estimated per month</p>
+          <p className="font-display text-5xl font-extrabold tabular-nums text-sun" data-testid="earn-total">{usd(total)}</p>
+          <p className="mt-1 text-sm text-fg-muted tabular-nums">About {usd(total / 4.3)} a week, {usd(total * 12)} a year</p>
+        </div>
+        <div className="flex h-3 overflow-hidden rounded-full bg-ink-700" role="img" aria-label="Income split">
+          {parts.map(([n, v, c]) => <span key={n} className={`${c} transition-all duration-500`} style={{ width: `${total ? (v / total) * 100 : 0}%` }} />)}
+        </div>
+        <ul className="grid gap-2 sm:grid-cols-3">
+          {parts.map(([n, v, c]) => (
+            <li key={n} className="rounded-xl border border-line px-3 py-2.5"><span className="flex items-center gap-2 text-xs text-fg-muted"><i className={`h-2.5 w-2.5 rounded-full ${c}`} />{n}</span><b className="font-display text-xl tabular-nums">{usd(v)}</b></li>
+          ))}
+        </ul>
+        <p className="text-xs text-fg-muted">Illustrative only: no real payment in this prototype. Your share depends on your plan and team.</p>
+      </div>
     </div>
   )
 }

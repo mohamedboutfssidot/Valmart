@@ -46,7 +46,7 @@ export default function Hosts() {
 
       <Band eyebrow="What hosts do" title="More than going live"><Reveal><div className="max-w-[820px]"><Rows items={DO} /></div></Reveal></Band>
       <Band eyebrow="Studio" title="Your workspace" hint="Pick a tool to see what it does."><Explorer items={STUDIO} /></Band>
-      <Band eyebrow="Earnings" title="What could you earn?" hint="Move the sliders."><div className="max-w-[560px]"><EarningsDemo /></div></Band>
+      <Band eyebrow="Earnings" title="What could you earn?" hint="Move the sliders."><EarningsDemo /></Band>
       <Band eyebrow="Getting paid" title="Three ways"><div className="max-w-[820px]"><Rows items={PAY} first={0} /></div></Band>
       <Band title="Questions"><div className="max-w-[780px]"><Rows items={FAQ} first={null} /></div></Band>
       <section className="flex flex-col items-start gap-5 border-t border-line pt-12">

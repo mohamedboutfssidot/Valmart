@@ -8,6 +8,7 @@ import { ReportButton } from '../../features/kit'
 import { NARRATION } from '../../data/live'
 import { useLiveSim } from '../../hooks/useLiveSim'
 import { useDemo } from '../../store'
+import { VolumeControl } from '../../video/sound'
 import { Avatar, Button, LiveBadge } from '../../components/ui'
 import { VideoSlot } from '../../components/VideoSlot'
 import { Hints } from '../../live/Hints'
@@ -146,6 +147,7 @@ function LiveRoom({ stream }: { stream: Stream }) {
           <span className="mx-1 h-5 w-px bg-line" aria-hidden="true" />
           <button type="button" onClick={toggleLook} aria-pressed={lookArmed} aria-label="Look here" title="Look here: tap the video to point at something" className={`${icon} ${lookArmed ? 'is-on' : ''}`}><Gesture name="look" size={20} /></button>
           <button type="button" onClick={() => setCC(!capOn)} aria-pressed={capOn} title="Captions" aria-label="Captions" data-testid="cc-toggle" className={`${icon} ${capOn ? 'is-on' : ''}`}><ClosedCaptioning size={20} weight={capOn ? 'fill' : 'regular'} /></button>
+          <span className="hidden sm:contents"><VolumeControl className={icon} /></span><span className="sm:hidden"><VolumeControl className={icon} slider="pop" /></span>
           <span className="ml-auto flex items-center gap-2">
             <button type="button" onClick={toggleTheater} aria-pressed={theater} data-testid="theater-btn" aria-label={theater ? 'Default view' : 'Cinema mode'} title={theater ? 'Default view (T)' : 'Cinema mode (T)'} className={`${icon} max-sm:hidden ${theater ? 'is-on' : ''}`}><CinemaIcon filled={theater} /></button>
             <button type="button" onClick={() => setCinema(true)} aria-label="Full screen" title="Full screen" className={`${icon} is-hot`}><Gesture name="cinema" size={20} /></button>

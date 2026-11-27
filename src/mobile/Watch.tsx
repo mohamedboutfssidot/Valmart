@@ -15,6 +15,7 @@ import { Icon } from './icons'
 import { usePrefs, type Prefs } from './prefs'
 import { ClosedCaptioning, PaperPlaneTilt, SpeakerHigh, Translate } from '@phosphor-icons/react'
 import { PaceChips } from '../live/ui'
+import { VolumeControl } from '../video/sound'
 import { useToolEngine } from '../live/useToolEngine'
 import { useMode } from '../live/store'
 import { PinLayer, VideoEffects, GiftToast } from '../live/ui'
@@ -158,6 +159,7 @@ export function Watch({ stream, onClose, onTrial, onSwitch, onRequest }: { strea
         <span className="mx-0.5 h-5 w-px bg-line" aria-hidden="true" />
         <button type="button" onClick={toggleLook} aria-pressed={look} aria-label="Look here" title="Look here: tap the video to point at something" className={`lt-icon ${look ? 'is-on' : ''}`}><Gesture name="look" size={18} /></button>
         <button type="button" onClick={() => setPf('captions', !pf.captions)} aria-pressed={pf.captions} title="Captions" aria-label="Captions" data-testid="cc-toggle" className={`lt-icon ${pf.captions ? 'is-on' : ''}`}><ClosedCaptioning size={18} weight={pf.captions ? 'fill' : 'regular'} /></button>
+        <VolumeControl slider="pop" />
         <span className="ml-auto flex items-center gap-1.5">
           <button type="button" className="lt-icon is-hot" aria-label="Full screen" title="Full screen" onClick={goCinema} data-testid="m-cinema"><Gesture name="cinema" size={18} /></button>
           <button type="button" className="lt-icon" onClick={() => setMore(true)} title="More" aria-label="More options" data-testid="m-more"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg></button>

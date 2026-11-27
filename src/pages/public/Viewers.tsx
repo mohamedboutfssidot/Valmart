@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '../../components/ui'
 import { PlanCards } from '../../components/PlanBlocks'
+import { ToolsMarquee } from './ToolsMarquee'
 import { Band, Check, Explorer, Rows, Seg } from './ui2'
 import { AudienceDemo, EventDemo, RequestDemo, VoteDemo } from './Demos'
 
@@ -27,6 +28,8 @@ export default function Viewers() {
       </header>
 
       <Band eyebrow="Try it" title="Four gestures"><Explorer items={GESTURES} /></Band>
+
+      <Band eyebrow="Tools" title="Tools you will answer" hint="A host launches one at a time. You answer in one tap. Hover to pause."><ToolsMarquee /></Band>
 
       <Band title="Free, Plus or Premium" hint="The plan changes your comfort and your limits, never your vote.">
         <PlanCards cta={<Button to="/signin?mode=signup" variant="ghost">Create free account</Button>} />

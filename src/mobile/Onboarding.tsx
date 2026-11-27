@@ -8,19 +8,23 @@ import { Icon } from './icons'
 import { Sheet } from './Sheet'
 
 export function Splash({ onDone }: { onDone: () => void }) {
-  useEffect(() => { const t = window.setTimeout(onDone, 1500); return () => window.clearTimeout(t) }, [onDone])
+  useEffect(() => { const t = window.setTimeout(onDone, 1900); return () => window.clearTimeout(t) }, [onDone])
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-ink-900">
-      <Logo className="h-11" />
-      <p className="text-sm text-fg-muted">Door of Digital Tourism</p>
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 overflow-hidden bg-ink-900" data-testid="splash">
+      <span className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-sun/25 blur-3xl" aria-hidden="true" />
+      <span className="pointer-events-none absolute -bottom-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-sky/20 blur-3xl" aria-hidden="true" />
+      <div className="logo-in relative"><Logo className="h-14" /></div>
+      <p className="fade-up-slow text-[15px] text-fg-muted">Door of Digital Tourism</p>
+      <p className="fade-up-slow mt-2 flex items-center gap-2 rounded-pill border border-line bg-ink-800/80 px-3 py-1.5 text-xs font-semibold"><span className="live-dot" />Live from 40+ cities right now</p>
+      <div className="absolute bottom-16 h-1 w-28 overflow-hidden rounded-full bg-ink-700" aria-hidden="true"><span className="block h-full rounded-full bg-sun" style={{ animation: 'vm-load 1.9s ease-out forwards' }} /></div>
     </div>
   )
 }
 
 const SLIDES = [
-  { k: 'walk', t: 'Visit a place live', d: 'A local walks and films with a phone. You watch from yours.' },
-  { k: 'you', t: 'Four buttons are always yours', d: 'Use them any time. The host does not need to start anything.' },
-  { k: 'host', t: 'The host adds the rest', d: 'The host starts a tool. You answer it. One at a time, never over the video.' },
+  { k: 'walk', t: 'Visit a place live', d: 'A local walks and films with a phone. You watch from yours, in your language.', i: 'live' },
+  { k: 'you', t: 'Four buttons are always yours', d: 'Use them any time. The host does not need to start anything.', i: 'users' },
+  { k: 'host', t: 'The host adds the rest', d: 'The host starts a tool. You answer it. One at a time, never over the video.', i: 'studio' },
 ] as const
 
 const pill = 'rounded-pill bg-ink-700 px-3.5 py-2 text-[13px] font-semibold text-fg'
@@ -36,12 +40,21 @@ function Art({ k }: { k: string }) {
       <div className="flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-full bg-ink-700 text-xs font-semibold">AT</span><div><p className="text-[14px] font-semibold leading-tight">Shibuya after midnight</p><p className="text-xs text-fg-muted">Aiko Tanaka, Tokyo</p></div></div>
     </div>
   )
-  if (k === 'you') return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap gap-2"><span className={pill}>Stay here</span><span className={pill}>Move on</span><span className={pill}>Look here</span><span className={pill}>Save</span></div>
-      <p className="text-[13px] text-fg-muted">Also yours: chat, gifts and subtitles.</p>
-    </div>
-  )
+  if (k === 'you') {
+    const btns = [['Stay here', 'M12 5v14M8 5v14', 'stay'], ['Move on', 'M6 6l7 6-7 6M13 6l7 6-7 6', 'move'], ['Look here', 'M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0M12 3v3M12 18v3M3 12h3M18 12h3', 'look'], ['Save', 'M6 4h12v17l-6-4-6 4z', 'save']] as const
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-4 gap-2">
+          {btns.map(([l, d, id], n) => (
+            <button key={id} type="button" onClick={() => setPick(n)} aria-pressed={pick === n} className={`flex flex-col items-center gap-1.5 rounded-2xl border px-1 py-3 text-[11px] font-semibold transition active:scale-95 ${pick === n ? 'border-sky bg-sky/15 text-sky' : 'border-line bg-ink-700 text-fg'}`}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d} /></svg>{l}
+            </button>
+          ))}
+        </div>
+        <p className="text-[13px] text-fg-muted">{pick === null ? 'Tap one to try it.' : ['You vote to stay a little longer.', 'You vote to go to the next spot.', 'You point at something on the video.', 'You keep this moment in your trips.'][pick]} Also yours: chat, gifts and subtitles.</p>
+      </div>
+    )
+  }
   const opts = [['Left', 64], ['Right', 36]] as const
   return (
     <div className="flex flex-col gap-2.5">
@@ -64,22 +77,30 @@ function Art({ k }: { k: string }) {
 
 export function Onboarding({ onDone }: { onDone: () => void }) {
   const [i, setI] = useState(0)
+  const [x0, setX0] = useState<number | null>(null)
   const s = SLIDES[i]
   const last = i === SLIDES.length - 1
+  const go = (n: number) => setI(Math.max(0, Math.min(SLIDES.length - 1, n)))
   return (
-    <div className="absolute inset-0 flex flex-col bg-ink-900 text-fg">
-      <div className="flex items-center justify-between px-6 pt-14">
+    <div className="absolute inset-0 flex flex-col overflow-hidden bg-ink-900 text-fg" onPointerDown={(e) => setX0(e.clientX)} onPointerUp={(e) => { if (x0 !== null && Math.abs(e.clientX - x0) > 50) go(i + (e.clientX < x0 ? 1 : -1)); setX0(null) }}>
+      <span className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-sun/15 blur-3xl" aria-hidden="true" />
+      <div className="relative flex items-center justify-between px-6 pt-12">
         <Logo className="h-7" />
-        <button type="button" onClick={onDone} className="text-sm font-semibold text-fg-muted">Skip</button>
+        <button type="button" onClick={onDone} className="rounded-pill px-3 py-1.5 text-sm font-semibold text-fg-muted active:bg-ink-800">Skip</button>
       </div>
-      <div key={s.k} className="fade-in mx-6 mt-8 rounded-card border border-line bg-ink-800 p-4" data-testid="intro-art"><Art k={s.k} /></div>
-      <div key={`t${i}`} className="fade-in flex flex-col gap-2 px-6 pt-8">
-        <h1 className="text-[28px] font-semibold leading-tight">{s.t}</h1>
-        <p className="text-[16px] leading-relaxed text-fg-muted">{s.d}</p>
+      <p className="relative px-6 pt-6 text-xs font-semibold uppercase tracking-wider text-sun">Step {i + 1} of {SLIDES.length}</p>
+      <div key={s.k} className="fade-in relative mx-6 mt-3 rounded-card border border-line bg-ink-800 p-4 shadow-[0_12px_40px_rgba(0,0,0,.35)]" data-testid="intro-art"><Art k={s.k} /></div>
+      <div key={`t${i}`} className="fade-in relative flex flex-col gap-2 px-6 pt-7">
+        <span className="grid h-10 w-10 place-items-center rounded-xl bg-sun/15 text-sun"><Icon name={s.i} size={22} /></span>
+        <h1 className="font-display text-[26px] font-extrabold leading-tight">{s.t}</h1>
+        <p className="text-[15px] leading-relaxed text-fg-muted">{s.d}</p>
       </div>
-      <div className="mt-auto flex items-center justify-between px-6 pb-10">
-        <div className="flex gap-2" aria-hidden="true">{SLIDES.map((_, n) => <span key={n} className={`h-2 rounded-full transition-all duration-200 ${n === i ? 'w-6 bg-sky-deep' : 'w-2 bg-line'}`} />)}</div>
-        <button type="button" onClick={() => (last ? onDone() : setI(i + 1))} className="rounded-pill bg-sky-deep px-7 py-3 font-semibold text-white active:scale-95" data-testid="intro-next">{last ? 'Get started' : 'Next'}</button>
+      <div className="relative mt-auto flex items-center justify-between px-6 pb-9">
+        <div className="flex items-center gap-2">
+          {i > 0 && <button type="button" onClick={() => go(i - 1)} aria-label="Previous" className="grid h-11 w-11 place-items-center rounded-full border border-line active:scale-95"><Icon name="back" size={20} /></button>}
+          <div className="ml-1 flex gap-2" aria-hidden="true">{SLIDES.map((_, n) => <span key={n} className={`h-2 rounded-full transition-all duration-200 ${n === i ? 'w-6 bg-sun' : 'w-2 bg-line'}`} />)}</div>
+        </div>
+        <button type="button" onClick={() => (last ? onDone() : go(i + 1))} className="rounded-pill bg-sun px-7 py-3 font-bold text-ink-950 active:scale-95" data-testid="intro-next">{last ? 'Get started' : 'Next'}</button>
       </div>
     </div>
   )
