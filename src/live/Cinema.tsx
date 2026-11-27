@@ -101,6 +101,7 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
   const [paused, setPaused] = useState(false)
   const big = false
   const [look, setLook] = useState(false)
+  const [readOn, setReadOn] = useState(false)
   const [more, setMore] = useState(false)
   const [pan, setPan] = useState(false)
   const timer = useRef(0)
@@ -196,6 +197,8 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
               <span className="hidden h-10 w-px self-end bg-white/15 sm:block" aria-hidden="true" />
               <Group label="">
                 {cc && <button type="button" aria-pressed={cc.on} onClick={cc.toggle} title="Captions" aria-label="Captions" data-testid="cine-cc" className={`${btn} ${cc.on ? 'is-on' : ''}`}><ClosedCaptioning size={20} weight={cc.on ? 'fill' : 'regular'} /></button>}
+                {cc && <button type="button" onClick={cc.cycle} disabled={!cc.on} title={`Caption size: ${cc.size}`} aria-label="Caption size" data-testid="cine-cc-size" className={`${btn} disabled:opacity-40`}>Size {cc.size}</button>}
+                <button type="button" aria-pressed={readOn} title="Read captions aloud" aria-label="Read captions aloud" data-testid="cine-read" onClick={() => { try { const ss = window.speechSynthesis; if (readOn) ss?.cancel(); else { ss?.cancel(); ss?.speak(new SpeechSynthesisUtterance('Voice on. I will read the captions.')) } } catch { /* no speech */ } setReadOn(!readOn) }} className={`${btn} ${readOn ? 'is-on' : ''}`}>Read aloud</button>
                 <button type="button" aria-pressed={sndOn} onClick={toggleSound} title={sndOn ? 'Sound on' : 'Sound off'} aria-label="Sound" data-testid="cine-sound" className={`${btn} ${sndOn ? 'is-on' : ''}`}>{sndOn ? <SpeakerSimpleHigh size={20} weight="fill" /> : <SpeakerSimpleSlash size={20} />}</button>
               </Group>
               <Group label="" className="ml-auto">

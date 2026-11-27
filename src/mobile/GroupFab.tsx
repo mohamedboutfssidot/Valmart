@@ -16,6 +16,9 @@ export function GroupFab({ go, cur, browse }: { go: (id: string) => void; cur: s
   const user = useDemo((s) => s.user)
   const [open, setOpen] = useState(false)
   const [ok, setOk] = useState(false)
+  const [hint, setHint] = useState(false)
+  useEffect(() => { const h = () => setHint(true); window.addEventListener(PICK_EVENT, h); return () => window.removeEventListener(PICK_EVENT, h) }, [])
+  useEffect(() => { if (cur || open) setHint(false) }, [cur, open])
   useEffect(() => { if (!ok) return; const t = window.setTimeout(() => setOk(false), 2200); return () => window.clearTimeout(t) }, [ok])
   if (!group) return null
   const me = user?.name ?? 'You'
@@ -33,6 +36,12 @@ export function GroupFab({ go, cur, browse }: { go: (id: string) => void; cur: s
             <button type="button" data-testid="group-choose-yes" onClick={() => { setGroupLive(cs.id, cs.title); setOk(true) }} className="h-11 flex-[1.3] rounded-pill bg-sun text-sm font-extrabold text-ink-950 active:scale-95">Yes, choose it</button>
             <button type="button" data-testid="group-choose-no" onClick={() => { window.dispatchEvent(new CustomEvent(PICK_EVENT)); browse() }} className="h-11 flex-1 rounded-pill border border-line text-sm font-semibold active:scale-95">No, browse again</button>
           </div>
+        </div>
+      )}
+      {hint && !cur && chief && (
+        <div data-testid="pick-hint" className="absolute inset-x-3 bottom-[132px] z-[85] flex items-center gap-3 rounded-2xl bg-sky px-3.5 py-2.5 text-ink-950">
+          <p className="min-w-0 flex-1 text-sm font-bold leading-snug">Choosing a live for your group. Open one to watch it.</p>
+          <button type="button" aria-label="Cancel" onClick={() => setHint(false)} className="h-8 w-8 shrink-0 rounded-full bg-black/15 text-lg font-bold">×</button>
         </div>
       )}
       {ok && <div role="status" className={`${panel} text-center text-sm font-bold`}>Live chosen for the group</div>}
