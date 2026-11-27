@@ -78,19 +78,6 @@ export function LiveStrip({ stream, viewers, className = '' }: { stream: Stream;
   )
 }
 
-/** Shown when most of the room wants to stay or move on. */
-export function PaceSignal({ stay, className = '' }: { stay: number; className?: string }) {
-  const n = Math.round(stay)
-  const r = n > 60 ? 'stay' : 100 - n > 60 ? 'move' : null
-  if (!r) return null
-  const pct = r === 'stay' ? n : 100 - n
-  return (
-    <div key={r} role="status" aria-live="polite" data-testid="pace-signal" className={`pace-signal flex items-center gap-3 rounded-card border border-sun bg-sun/15 px-4 py-3 ${className}`}>
-      <p className="min-w-0 flex-1 text-sm"><b className="font-display text-base">{pct}% of the room want to {r === 'stay' ? 'stay here' : 'move on'}.</b>{' '}<span className="text-fg-muted">{r === 'stay' ? 'Slow down, show this spot a little longer.' : 'Time to walk to the next spot.'}</span></p>
-    </div>
-  )
-}
-
 /** Host-side: what the room asks (steer votes), with a reset. */
 export function RoomAsks({ category, className = '' }: { category: string; className?: string }) {
   const labels = LABEL[STEER[kitFor(category)]]

@@ -12,7 +12,7 @@ import { VolumeControl } from '../../video/sound'
 import { Avatar, Button, LiveBadge } from '../../components/ui'
 import { VideoSlot } from '../../components/VideoSlot'
 import { Hints } from '../../live/Hints'
-import { LiveStrip, PaceSignal, SteerRing } from '../../live/Steer'
+import { LiveStrip, SteerRing } from '../../live/Steer'
 import { ChatPanel } from '../../components/ChatPanel'
 import { useToolEngine } from '../../live/useToolEngine'
 import { useMode } from '../../live/store'
@@ -147,7 +147,7 @@ function LiveRoom({ stream }: { stream: Stream }) {
           <span className="mx-1 h-5 w-px bg-line" aria-hidden="true" />
           <button type="button" onClick={toggleLook} aria-pressed={lookArmed} aria-label="Look here" title="Look here: tap the video to point at something" className={`${icon} ${lookArmed ? 'is-on' : ''}`}><Gesture name="look" size={20} /></button>
           <button type="button" onClick={() => setCC(!capOn)} aria-pressed={capOn} title="Captions" aria-label="Captions" data-testid="cc-toggle" className={`${icon} ${capOn ? 'is-on' : ''}`}><ClosedCaptioning size={20} weight={capOn ? 'fill' : 'regular'} /></button>
-          <span className="hidden sm:contents"><VolumeControl className={icon} /></span><span className="sm:hidden"><VolumeControl className={icon} slider="pop" /></span>
+          <VolumeControl className={icon} />
           <span className="ml-auto flex items-center gap-2">
             <button type="button" onClick={toggleTheater} aria-pressed={theater} data-testid="theater-btn" aria-label={theater ? 'Default view' : 'Cinema mode'} title={theater ? 'Default view (T)' : 'Cinema mode (T)'} className={`${icon} max-sm:hidden ${theater ? 'is-on' : ''}`}><CinemaIcon filled={theater} /></button>
             <button type="button" onClick={() => setCinema(true)} aria-label="Full screen" title="Full screen" className={`${icon} is-hot`}><Gesture name="cinema" size={20} /></button>
@@ -196,7 +196,6 @@ function LiveRoom({ stream }: { stream: Stream }) {
       <aside className={`flex min-h-0 min-w-0 flex-col gap-0 ${theater ? 'lg:col-start-2 lg:row-start-2 lg:row-span-6' : ''} lg:sticky lg:top-[60px] lg:h-[calc(100vh-60px)] lg:border-l lg:border-line lg:bg-ink-900`} aria-label="Live panel">
         <h2 className="shrink-0 border-b border-line py-3 text-center text-[15px] font-bold">Chat</h2>
         {blocks.tools && <div className="shrink-0 p-2.5"><NowTool e={eng} /></div>}
-        <PaceSignal stay={eng.stay} className="mx-2.5 mb-2" />
         {blocks.chat ? <ChatPanel msgs={sim.msgs} selfName="You" coins={coins} onGift={onGift} onSend={(x) => sim.send(x, 'You')} locked={eng.chatLock} off={chatOff} className="min-h-0 flex-1 !rounded-none !border-0 !bg-transparent max-lg:h-[460px]" /> : <button type="button" onClick={() => setBlocks({ chat: true })} className="lt-btn justify-center"><ChatCircleDots size={18} />Show the chat</button>}
       </aside>
 

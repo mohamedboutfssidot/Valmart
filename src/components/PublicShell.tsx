@@ -6,7 +6,6 @@ import { useDemo } from '../store'
 
 const LINKS = [
   { to: '/', label: 'Home', end: true },
-  { to: '/app/live', label: 'Browse live' },
   { to: '/viewers', label: 'For viewers' },
   { to: '/hosts', label: 'For hosts' },
   { to: '/pricing', label: 'Pricing' },

@@ -42,14 +42,14 @@ export function Page({ title, sub, children, right, bar }: { title: React.ReactN
   const back = useContext(BackCtx)
   return (
     <div className="no-scrollbar absolute inset-0 overflow-y-auto overscroll-contain">
-      <header className="sticky top-0 z-10 bg-ink-900/95 pt-9 backdrop-blur">
-        <div className="flex items-end justify-between gap-3 px-5 pb-3">
+      <header className="sticky top-0 z-10 bg-ink-900/95 pt-8 backdrop-blur">
+        <div className="flex items-center justify-between gap-3 px-4 pb-2.5">
           <div className="flex min-w-0 items-center gap-1.5">{back && <button type="button" onClick={back} aria-label="Back" data-testid="page-back" className="-ml-2 grid h-9 w-9 shrink-0 place-items-center rounded-full text-fg-muted active:bg-ink-800"><Icon name="back" size={22} /></button>}<div className="min-w-0"><h1 className="vm-ptitle font-display text-[26px] font-extrabold leading-none">{title}</h1>{sub && <p className="mt-1.5 text-sm text-fg-muted">{sub}</p>}</div></div>
           {right}
         </div>
         {bar}
       </header>
-      <div className="page-enter stagger flex flex-col gap-6 px-5 pb-8 pt-2">{children}</div>
+      <div className="page-enter stagger flex flex-col gap-5 px-4 pb-8 pt-2">{children}</div>
     </div>
   )
 }
@@ -85,9 +85,9 @@ function FeedCard({ s, badge, line, minutes, views, onOpen }: { s: Stream; badge
   const where = kitFor(s.category) === 'hidden' ? city.country : city.name
   const watching = views ?? s.viewers
   return (
-    <article className="flex flex-col gap-3 border-b border-line/60 pb-5 last:border-0" data-testid="feed-card">
-      <button type="button" ref={ref} onClick={onOpen} aria-label={`Watch ${s.title}`} className="relative block w-full overflow-hidden rounded-2xl text-left shadow-[0_6px_20px_rgba(10,25,50,.14)] transition-transform active:scale-[.985]">
-        <VideoSlot stream={s} showLabel={false} className="!aspect-video !w-full !rounded-2xl" />
+    <article className="flex flex-col gap-2.5" data-testid="feed-card">
+      <button type="button" ref={ref} onClick={onOpen} aria-label={`Watch ${s.title}`} className="relative block w-full overflow-hidden rounded-xl text-left transition-transform active:scale-[.985]">
+        <VideoSlot stream={s} showLabel={false} className="!aspect-video !w-full !rounded-xl" />
         <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/55 to-transparent" />
         <span className="absolute left-2.5 top-2.5 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur">{s.category}</span>
         <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1.5 text-xs font-semibold tabular-nums text-white">
@@ -97,11 +97,11 @@ function FeedCard({ s, badge, line, minutes, views, onOpen }: { s: Stream; badge
           ? <span className="absolute bottom-2.5 right-2.5 rounded-md bg-red-600 px-2 py-1 text-[11px] font-extrabold tracking-wide text-white">LIVE</span>
           : <span className="absolute bottom-2.5 right-2.5 rounded-md bg-black/75 px-2 py-1 text-[11px] font-bold tabular-nums text-white">{minutes ?? 0}:00</span>}
       </button>
-      <div className="flex gap-3 px-0.5">
-        <Avatar name={host.name} size={36} />
+      <div className="flex gap-2.5">
+        <Avatar name={host.name} size={32} />
         <button type="button" onClick={onOpen} className="min-w-0 flex-1 text-left">
-          <span className="line-clamp-2 text-[15.5px] font-semibold leading-snug text-fg">{s.title}</span>
-          <span className="mt-1 block truncate text-[13px] text-fg-muted">{host.name} · {where}</span>
+          <span className="line-clamp-2 text-[14px] font-semibold leading-snug text-fg">{s.title}</span>
+          <span className="mt-0.5 block truncate text-xs text-fg-muted">{host.name} · {where}</span>
           <span className={`block truncate text-[12.5px] ${badge === 'LIVE' ? 'font-medium text-sun' : 'text-fg-muted'}`}>{line}</span>
         </button>
       </div>
@@ -146,50 +146,50 @@ export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id
   ]
   return (
     <>
-    <Page title={<Logo className="vm-logo h-8" />}
-      right={onRooms ? <button type="button" onClick={onRooms} data-testid="open-rooms" className="shrink-0 rounded-pill bg-sun px-3.5 py-2 text-[13px] font-extrabold text-ink-950 active:scale-95">Go live</button> : undefined}
-      bar={<div className="flex flex-col gap-2.5 pb-3">
-        <div className="flex items-center gap-2 px-5">
-          <button type="button" onClick={() => setSearching(true)} aria-label="Search" data-testid="m-search" className="flex h-12 min-w-0 flex-1 items-center gap-2.5 rounded-full border border-line bg-ink-800 px-4 text-left shadow-sm active:scale-[.99]">
-            <Icon name="explore" size={20} />
-            <span className={`min-w-0 flex-1 truncate text-[16px] ${q ? 'font-semibold text-fg' : 'text-fg-muted'}`}>{q || 'Search cities, hosts, topics'}</span>
+    <Page title={<Logo className="vm-logo h-7" />}
+      right={onRooms ? <button type="button" onClick={onRooms} data-testid="open-rooms" className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-pill bg-sun px-3.5 text-[13px] font-extrabold text-ink-950 active:scale-95"><i className="h-1.5 w-1.5 rounded-full bg-ink-950" aria-hidden="true" />Go live</button> : undefined}
+      bar={<div className="flex flex-col gap-2 pb-2.5">
+        <div className="flex items-center gap-2 px-4">
+          <button type="button" onClick={() => setSearching(true)} aria-label="Search" data-testid="m-search" className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-full border border-line bg-ink-800 px-3.5 text-left active:scale-[.99]">
+            <Icon name="explore" size={18} />
+            <span className={`min-w-0 flex-1 truncate text-[14px] ${q ? 'font-semibold text-fg' : 'text-fg-muted'}`}>{q || 'Search cities, hosts, topics'}</span>
             {q && <span role="button" aria-label="Clear search" onClick={(e) => { e.stopPropagation(); setQ('') }} className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink-600 text-fg"><svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></span>}
           </button>
-          <button type="button" onClick={() => setFOpen(true)} aria-label="Filters" data-testid="m-filters" className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border active:scale-90 ${n ? 'border-sky bg-sky text-ink-950' : 'border-line bg-ink-800 text-fg'}`}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>
+          <button type="button" onClick={() => setFOpen(true)} aria-label="Filters" data-testid="m-filters" className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border active:scale-90 ${n ? 'border-sky bg-sky text-ink-950' : 'border-line bg-ink-800 text-fg'}`}>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>
             {n > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-sun px-1 text-xs font-extrabold text-ink-950">{n}</span>}
           </button>
         </div>
-        <div className="no-scrollbar flex gap-2 overflow-x-auto px-5" role="tablist" aria-label="Explore sections">
-          <button type="button" onClick={() => set({ following: !f.following })} aria-pressed={f.following} data-testid="chip-following" className={`inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-[15px] font-bold transition active:scale-95 ${f.following ? 'bg-sky text-ink-950' : 'bg-ink-800 text-fg-muted'}`}>Following</button>
+        <div className="no-scrollbar flex gap-1.5 overflow-x-auto px-4" role="tablist" aria-label="Explore sections">
+          <button type="button" onClick={() => set({ following: !f.following })} aria-pressed={f.following} data-testid="chip-following" className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold transition active:scale-95 ${f.following ? 'bg-sky text-ink-950' : 'bg-ink-800 text-fg-muted'}`}>Following</button>
           {tabs.map(([k, label, count]) => (
-            <button key={k} role="tab" aria-selected={tab === k} type="button" onClick={() => setTab(k)} data-testid={`tab-${k}`} className={`inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-[15px] font-bold transition active:scale-95 ${tab === k ? 'bg-fg text-ink-900' : 'bg-ink-800 text-fg-muted'}`}>
-              {label}{count !== null && <span className={`text-[13px] font-semibold ${tab === k ? 'opacity-70' : 'opacity-60'}`}>{count}</span>}
+            <button key={k} role="tab" aria-selected={tab === k} type="button" onClick={() => setTab(k)} data-testid={`tab-${k}`} className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold transition active:scale-95 ${tab === k ? 'bg-fg text-ink-900' : 'bg-ink-800 text-fg-muted'}`}>
+              {label}{count !== null && <span className={`text-[11.5px] font-semibold ${tab === k ? 'opacity-70' : 'opacity-60'}`}>{count}</span>}
             </button>
           ))}
         </div>
         {n > 0 && (
-          <div className="no-scrollbar flex gap-2 overflow-x-auto px-5" aria-label="Active filters">
+          <div className="no-scrollbar flex gap-1.5 overflow-x-auto px-4" aria-label="Active filters">
             <button type="button" onClick={() => setF(BASE_FILTERS)} className="shrink-0 rounded-full border border-line px-3 py-1.5 text-sm font-bold text-sky-deep active:scale-95">Clear {n}</button>
             {chips.map(([l, off], i) => <button key={i} type="button" onClick={off} className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-sky/15 px-3 py-1.5 text-sm font-bold text-sky-deep active:scale-95">{l}<span aria-hidden="true">✕</span></button>)}
           </div>
         )}
       </div>}>
       {tab === 'you' && (
-        <section className="flex flex-col gap-7" aria-label="Recommended for you">
+        <section className="flex flex-col gap-5" aria-label="Recommended for you">
           {feed.map(card)}
           {feed.length === 0 && <p className="py-10 text-center text-[16px] text-fg-muted">Nothing matches these filters. Remove one to see more.</p>}
         </section>
       )}
       {tab === 'live' && (
-        <section className="flex flex-col gap-7" aria-label="Live now">
+        <section className="flex flex-col gap-5" aria-label="Live now">
           {onLive && !q && n === 0 && <LiveNowList mobile empty={false} onOpen={(l) => onLive(l.room)} />}
           {lives.map((st) => <FeedCard key={st.id} s={st} badge="LIVE" line={`Started ${st.startedMinAgo} min ago`} onOpen={() => onWatch(st.id)} />)}
           {lives.length === 0 && <p className="py-10 text-center text-[16px] text-fg-muted">No live matches. Try another city or topic.</p>}
         </section>
       )}
       {tab === 'replays' && (
-        <section className="flex flex-col gap-7" data-testid="m-replays" aria-label="Replays">
+        <section className="flex flex-col gap-5" data-testid="m-replays" aria-label="Replays">
           <p className="text-[15px] text-fg-muted">Missed a live? Watch it again for 48 hours. The ones ending soonest come first.</p>
           {reps.map((r) => card({ key: `r-${r.id}`, kind: 'replay', id: r.id }))}
           {reps.length === 0 && <p className="py-10 text-center text-[16px] text-fg-muted">No replay matches these filters.</p>}

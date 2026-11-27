@@ -196,7 +196,7 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
               <Group label="">
                 {cc && <button type="button" aria-pressed={cc.on} onClick={cc.toggle} title="Captions" aria-label="Captions" data-testid="cine-cc" className={`${btn} ${cc.on ? 'is-on' : ''}`}><ClosedCaptioning size={20} weight={cc.on ? 'fill' : 'regular'} /></button>}
                 {cc && <button type="button" onClick={cc.cycle} disabled={!cc.on} title={`Caption size: ${cc.size}`} aria-label="Caption size" data-testid="cine-cc-size" className={`${btn} disabled:opacity-40`}>Size {cc.size}</button>}
-                <VolumeControl className={btn} slider="pop" />
+                <VolumeControl className={btn} slider={contained ? 'none' : 'hover'} />
               </Group>
               <Group label="" className="ml-auto">
                 {extra}
@@ -209,7 +209,7 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
           <PaceChips e={eng} compact={!big} onVideo iconOnly />
           <button type="button" aria-pressed={look} aria-label="Look here" title="Look here" onClick={() => setLook((x) => !x)} className={`${btn} ${look ? 'is-on' : ''}`}><Gesture name="look" size={compact ? 18 : 15} />{!compact && <>Look here <kbd className="ml-1 rounded bg-ink-700 px-1 text-[10px] text-fg-muted">P</kbd></>}</button>
           <span className="contents">
-            <VolumeControl className={btn} slider="pop" />
+            <VolumeControl className={btn} slider={contained ? 'none' : 'hover'} />
             {extra}
             {panels && <button type="button" aria-pressed={pan} onClick={() => { setPan((x) => !x); setMore(false) }} className={`${btn} ${pan ? 'is-on' : ''}`} aria-label="Panels" title="Panels" data-testid="cinema-panels">{compact ? <SquaresFour size={18} weight="duotone" /> : <>Panels <kbd className="ml-1 rounded bg-ink-700 px-1 text-[10px] text-fg-muted">M</kbd></>}</button>}
             {onMore && <button type="button" aria-label="More options" title="More" data-testid="cine-more" onClick={onMore} className={btn}><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg></button>}

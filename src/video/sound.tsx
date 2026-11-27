@@ -1,6 +1,5 @@
 // Sound for the clips of the live rooms. On by default. Browsers refuse sound until the person has tapped something on the page:
 // then the clip starts muted and the button says "tap for sound" (one tap fixes it, and it stays on for the next lives).
-import { useState } from 'react'
 import { create } from 'zustand'
 import { SpeakerSimpleHigh, SpeakerSimpleLow, SpeakerSimpleNone, SpeakerSimpleX } from '@phosphor-icons/react'
 
@@ -32,26 +31,19 @@ export function SoundToggle({ className = '' }: { className?: string }) {
 }
 
 /** Speaker button plus a level slider. The button mutes; the slider sets the level (kept for next time). */
-export function VolumeControl({ className = '', slider = 'inline' }: { className?: string; slider?: 'inline' | 'pop' }) {
+export function VolumeControl({ className = '', slider = 'hover' }: { className?: string; slider?: 'hover' | 'none' }) {
   const on = useSound((s) => s.on)
   const blocked = useSound((s) => s.blocked)
   const volume = useSound((s) => s.volume)
-  const [open, setOpen] = useState(false)
   const live = on && !blocked && volume > 0
   const Ico = !live ? SpeakerSimpleX : volume < 0.01 ? SpeakerSimpleNone : volume < 0.5 ? SpeakerSimpleLow : SpeakerSimpleHigh
   const pct = Math.round(volume * 100)
-  const range = (
-    <input type="range" min={0} max={100} value={live ? pct : 0} onChange={(e) => setVolume(Number(e.target.value) / 100)} aria-label="Volume" data-testid="volume-slider" className="vm-vol h-1 w-20 cursor-pointer accent-[var(--sun)]" style={{ ['--v' as string]: `${live ? pct : 0}%` }} />
-  )
   return (
-    <span className="relative inline-flex items-center gap-1.5" data-testid="volume-control">
-      <button type="button" onClick={() => { if (slider === 'pop') setOpen((v) => !v); else toggleSound() }} onDoubleClick={toggleSound} aria-pressed={live} aria-label={live ? `Volume ${pct}%` : 'Sound off'} title={live ? `Volume ${pct}%` : 'Sound off. Tap for sound'} data-testid="volume-btn" className={className || 'lt-icon'}><Ico size={18} weight={live ? 'fill' : 'regular'} /></button>
-      {slider === 'inline' && range}
-      {slider === 'pop' && open && (
-        <span className="pop-in absolute bottom-[calc(100%+8px)] left-1/2 z-30 flex w-44 -translate-x-1/2 items-center gap-2 rounded-2xl border border-line bg-ink-900/95 px-3 py-2.5 shadow-lg backdrop-blur">
-          <button type="button" onClick={toggleSound} aria-label={live ? 'Mute' : 'Unmute'} className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink-700"><Ico size={15} /></button>
-          <input type="range" min={0} max={100} value={live ? pct : 0} onChange={(e) => setVolume(Number(e.target.value) / 100)} aria-label="Volume" data-testid="volume-slider" className="h-1 min-w-0 flex-1 accent-[var(--sun)]" />
-          <b className="w-8 text-right text-xs tabular-nums">{live ? pct : 0}</b>
+    <span className="vm-volume group/vol relative inline-flex items-center" data-testid="volume-control">
+      <button type="button" onClick={toggleSound} aria-pressed={live} aria-label={live ? `Mute (volume ${pct}%)` : 'Unmute'} title={live ? 'Mute' : 'Unmute'} data-testid="volume-btn" className={className || 'lt-icon'}><Ico size={18} weight={live ? 'fill' : 'regular'} /></button>
+      {slider === 'hover' && (
+        <span className="flex w-0 items-center overflow-hidden opacity-0 transition-all duration-200 group-hover/vol:ml-2 group-hover/vol:w-20 group-hover/vol:opacity-100 group-focus-within/vol:ml-2 group-focus-within/vol:w-20 group-focus-within/vol:opacity-100">
+          <input type="range" min={0} max={100} value={live ? pct : 0} onChange={(e) => setVolume(Number(e.target.value) / 100)} aria-label="Volume" data-testid="volume-slider" className="h-1 w-20 shrink-0 cursor-pointer accent-[var(--sun)]" />
         </span>
       )}
     </span>

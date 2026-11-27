@@ -14,7 +14,7 @@ import { Me } from './Settings'
 import { StudioTab } from './Studio'
 import { usePrefs } from './prefs'
 import { Icon } from './icons'
-import { AuthScreen, Onboarding, Splash, TrialSheet } from './Onboarding'
+import { AuthScreen, Splash, TrialSheet } from './Onboarding'
 import { MobileRooms } from './Rooms'
 
 type Tab = 'explore' | 'categories' | 'events' | 'hub' | 'studio' | 'me'
@@ -66,9 +66,8 @@ function PhoneApp() {
         <div className="pointer-events-none absolute left-1/2 top-2 z-[60] hidden h-6 w-24 -translate-x-1/2 rounded-full bg-black sm:block" />
         <div className="relative min-h-0 flex-1">
           {!user ? (
-            flow === 'splash' ? <Splash onDone={() => setFlow('onboard')} />
-              : flow === 'onboard' ? <Onboarding onDone={() => setFlow('auth')} />
-              : <AuthScreen onBack={() => setFlow('onboard')} />
+            flow === 'splash' ? <Splash onDone={() => setFlow('auth')} />
+              : <AuthScreen onBack={() => setFlow('splash')} />
           ) : (
             <BackCtx.Provider value={current === 'explore' ? null : () => setTab('explore')}><div key={current} className={`${dir} absolute inset-0`}>
               {current === 'explore' && <Explore onWatch={watch} onRooms={() => { setRoomCode(undefined); setRooms(true) }} onLive={(r) => { setRoomCode(r); setRooms(true) }} />}

@@ -159,29 +159,34 @@ export function Watch({ stream, onClose, onTrial, onSwitch, onRequest }: { strea
         <span className="mx-0.5 h-5 w-px bg-line" aria-hidden="true" />
         <button type="button" onClick={toggleLook} aria-pressed={look} aria-label="Look here" title="Look here: tap the video to point at something" className={`lt-icon ${look ? 'is-on' : ''}`}><Gesture name="look" size={18} /></button>
         <button type="button" onClick={() => setPf('captions', !pf.captions)} aria-pressed={pf.captions} title="Captions" aria-label="Captions" data-testid="cc-toggle" className={`lt-icon ${pf.captions ? 'is-on' : ''}`}><ClosedCaptioning size={18} weight={pf.captions ? 'fill' : 'regular'} /></button>
-        <VolumeControl slider="pop" />
+        <VolumeControl slider="none" />
         <span className="ml-auto flex items-center gap-1.5">
           <button type="button" className="lt-icon is-hot" aria-label="Full screen" title="Full screen" onClick={goCinema} data-testid="m-cinema"><Gesture name="cinema" size={18} /></button>
           <button type="button" className="lt-icon" onClick={() => setMore(true)} title="More" aria-label="More options" data-testid="m-more"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg></button>
         </span>
       </div>
 
-      <div className="flex shrink-0 flex-col gap-2 border-t border-line px-3 pb-2 pt-3 mt-2" data-testid="channel-row">
-        <div className="flex items-start gap-3">
-          <span className="relative shrink-0"><span className="block rounded-full ring-2 ring-[#e91916]"><Avatar name={host.name} size={44} /></span><span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded bg-[#e91916] px-1 py-0.5 text-[8px] font-extrabold uppercase leading-none text-white">Live</span></span>
+      <div className="mt-2 flex shrink-0 flex-col gap-2.5 border-t border-line px-3 pb-2.5 pt-3" data-testid="channel-row">
+        <div>
+          <h1 className="line-clamp-2 text-[15px] font-bold leading-snug">{stream.title}</h1>
+          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-fg-muted">
+            <span className="inline-flex items-center gap-1.5 font-semibold text-sky"><i className="live-dot" style={{ width: 6, height: 6 }} />{formatCount(stream.viewers)} watching</span>
+            <span aria-hidden="true">·</span><span className="tabular-nums">{String(Math.floor(m / 60)).padStart(2, '0')}:{String(m % 60).padStart(2, '0')}</span>
+            <span aria-hidden="true">·</span><span className="font-semibold text-sky">{stream.category}</span>
+            <span className="rounded-full bg-ink-700 px-2 py-0.5 text-[10.5px] font-semibold text-fg">{stream.language}</span>
+          </p>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <span className="relative shrink-0"><span className="block rounded-full ring-2 ring-[#e91916]"><Avatar name={host.name} size={36} /></span><span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded bg-[#e91916] px-1 py-px text-[7px] font-extrabold uppercase leading-none text-white">Live</span></span>
           <div className="min-w-0 flex-1">
-            <h1 className="flex items-center gap-1.5 text-[15px] font-bold leading-tight"><span className="truncate">{host.name}</span><svg width="14" height="14" viewBox="0 0 24 24" aria-label="Verified" className="shrink-0 text-sky"><path fill="currentColor" d="M12 2l2.4 2 3.1-.2 1 3 2.7 1.6-.8 3 .8 3-2.7 1.6-1 3-3.1-.2L12 22l-2.4-2-3.1.2-1-3L2.8 15.6 3.6 12.6 2.8 9.6 5.5 8l1-3 3.1.2z" /><path d="M8.5 12.2l2.4 2.4 4.6-4.8" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" /></svg></h1>
-            <p className="truncate text-[13px] font-semibold">{stream.title}</p>
-            <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs"><span className="font-semibold text-sky">{stream.category}</span><span className="rounded-full bg-ink-700 px-2 py-0.5 text-[11px] font-semibold">{stream.language}</span><span className="truncate text-fg-muted">{stream.place}, {city.name}</span></p>
+            <p className="flex items-center gap-1 text-[13.5px] font-bold leading-tight"><span className="truncate">{host.name}</span><svg width="13" height="13" viewBox="0 0 24 24" aria-label="Verified" className="shrink-0 text-sky"><path fill="currentColor" d="M12 2l2.4 2 3.1-.2 1 3 2.7 1.6-.8 3 .8 3-2.7 1.6-1 3-3.1-.2L12 22l-2.4-2-3.1.2-1-3L2.8 15.6 3.6 12.6 2.8 9.6 5.5 8l1-3 3.1.2z" /><path d="M8.5 12.2l2.4 2.4 4.6-4.8" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" /></svg></p>
+            <p className="truncate text-[12px] text-fg-muted">{stream.place}, {city.name}</p>
           </div>
-          <div className="flex shrink-0 flex-col items-end gap-1">
-            <button type="button" aria-pressed={following} onClick={() => toggleHost(host.id)} className={`inline-flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-[13px] font-bold active:scale-95 ${following ? 'bg-ink-700 text-fg' : 'bg-sky text-white'}`} data-testid="watch-follow">{following ? 'Following' : 'Follow'}</button>
-            <p className="flex items-center gap-2 text-[11px] font-semibold"><span className="tabular-nums text-sky">{formatCount(stream.viewers)} watching</span><span className="tabular-nums text-fg-muted">{String(Math.floor(m / 60)).padStart(2, '0')}:{String(m % 60).padStart(2, '0')}</span></p>
-          </div>
+          <button type="button" aria-pressed={following} onClick={() => toggleHost(host.id)} className={`inline-flex h-8 shrink-0 items-center rounded-pill px-4 text-[13px] font-bold active:scale-95 ${following ? 'bg-ink-700 text-fg' : 'bg-fg text-ink-900'}`} data-testid="watch-follow">{following ? 'Following' : 'Follow'}</button>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={onRequest} data-testid="m-request" className="inline-flex items-center gap-1.5 rounded-md border border-line px-3 py-1 text-[13px] font-semibold active:scale-95"><PaperPlaneTilt size={15} />Request a trip</button>
-          <ReportButton kind="live" target={stream.title} />
+          <button type="button" onClick={onRequest} data-testid="m-request" className="inline-flex h-8 items-center gap-1.5 rounded-pill border border-line px-3.5 text-[12.5px] font-semibold active:scale-95"><PaperPlaneTilt size={15} />Request a trip</button>
+          <ReportButton kind="live" target={stream.title} className="!text-[12.5px]" />
         </div>
       </div>
 
