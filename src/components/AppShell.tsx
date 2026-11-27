@@ -47,7 +47,7 @@ const TABS: Item[] = [
 ]
 
 const SideLink = ({ it }: { it: Item }) => (
-  <NavLink to={it.to} end={it.end} title={it.label} className={({ isActive }) => `side-link flex items-center gap-3.5 rounded-md px-3 py-2.5 text-[15px] font-semibold ${isActive ? 'bg-ink-700 text-fg' : 'text-fg hover:bg-ink-800'}`}><Icon d={it.d} /><span>{it.label}</span></NavLink>
+  <NavLink to={it.to} end={it.end} title={it.label} className={({ isActive }) => `side-link flex items-center gap-3 rounded-md px-3 py-2 text-[14px] font-semibold ${isActive ? 'bg-ink-700 text-fg' : 'text-fg hover:bg-ink-800'}`}><Icon d={it.d} /><span>{it.label}</span></NavLink>
 )
 
 const Icon = ({ d }: { d: string }) => (
@@ -70,7 +70,8 @@ export function AppShell() {
       <aside className={`border-r border-line bg-ink-900 ${railClass(rail, small, 'sticky top-0 h-screen w-[256px] shrink-0')}`} data-testid="rail" aria-hidden={small && !rail}>
         <Link to="/app" aria-label="Valmart app" className="flex h-16 items-center px-5"><Logo className="h-7" /><span className="hidden h-8 w-8 rounded-xl bg-sky text-center font-display text-lg font-extrabold leading-8 text-white">V</span></Link>
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-2.5 pb-4" aria-label="App">
-          {small && <>{[...MAIN, ...MORE].filter((it) => !it.host || user.isHost).map((it) => <SideLink key={it.to} it={it} />)}<div className="my-2 border-t border-line" /></>}
+          {[...MAIN, ...MORE].filter((it) => !it.host || user.isHost).map((it) => <SideLink key={it.to} it={it} />)}
+          <div className="my-2 border-t border-line" />
           <p className="px-3 pb-1 text-[15px] font-bold">Recommended</p>
           {[...STREAMS].sort((a, b) => b.viewers - a.viewers).slice(0, 8).map((s) => {
             const h = hostOf(s.hostId)
@@ -98,12 +99,7 @@ export function AppShell() {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky z-30 flex h-[60px] items-center justify-between gap-2 border-b border-line bg-ink-900/95 px-3 backdrop-blur sm:gap-4 sm:px-4" style={{ top: 'env(safe-area-inset-top, 0px)' }}>
           <div className="flex shrink-0 items-center gap-2"><RailButton open={rail} onClick={toggleRail} />{(small || !rail) && <Link to="/app" aria-label="Valmart app" className="px-1"><LogoAdaptive className="h-6" /></Link>}</div>
-          <nav className="no-scrollbar hidden min-w-0 items-center gap-0.5 overflow-x-auto md:flex" aria-label="Pages" data-testid="top-nav">
-            {[...MAIN, ...MORE].filter((it) => !it.host || user.isHost).map((it) => (
-              <NavLink key={it.to} to={it.to} end={it.end} className={({ isActive }) => `shrink-0 whitespace-nowrap rounded-pill px-2.5 py-1.5 text-[13px] font-semibold transition-colors ${isActive ? 'bg-ink-700 text-fg' : 'text-fg-muted hover:bg-ink-800 hover:text-fg'}`}>{it.label}</NavLink>
-            ))}
-          </nav>
-          <form role="search" onSubmit={(e) => { e.preventDefault(); const t = q.trim(); nav(t ? `/app?q=${encodeURIComponent(t)}` : '/app') }} className="ml-auto hidden h-10 w-[150px] min-w-0 flex-none lg:flex xl:w-[190px] items-center gap-2 rounded-md border border-line bg-ink-900 px-3 transition-colors focus-within:border-sky hover:border-fg-muted sm:flex">
+          <form role="search" onSubmit={(e) => { e.preventDefault(); const t = q.trim(); nav(t ? `/app?q=${encodeURIComponent(t)}` : '/app') }} className="mx-auto hidden h-10 w-[300px] min-w-0 flex-none items-center gap-2 rounded-md border border-line bg-ink-900 px-3 transition-colors focus-within:border-sky hover:border-fg-muted sm:flex">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0 text-fg-muted" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="M16 16l5 5" /></svg>
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search" aria-label="Search Valmart" data-testid="top-search" className="!outline-none !shadow-none h-full min-w-0 flex-1 bg-transparent text-[15px] placeholder:text-fg-muted" />
           </form>

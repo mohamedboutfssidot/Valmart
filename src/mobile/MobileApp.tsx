@@ -79,7 +79,7 @@ function PhoneApp() {
               {current === 'me' && <Me onTrial={() => setOffer(true)} onRooms={() => { setRoomCode(undefined); setRooms(true) }} />}
             </div></BackCtx.Provider>
           )}
-          {user && stream && <Watch key={stream.id} stream={stream} onClose={() => setWatching(null)} onSwitch={watch} onTrial={() => setOffer(true)} />}
+          {user && stream && <Watch key={stream.id} stream={stream} onClose={() => setWatching(null)} onSwitch={watch} onTrial={() => setOffer(true)} onRequest={() => { setWatching(null); setTab('hub'); window.setTimeout(() => window.dispatchEvent(new CustomEvent('vm-hub-open', { detail: 'requests' })), 80) }} />}
           {user && <GroupFab go={watch} cur={watching} browse={() => setWatching(null)} />}
           {user && offer && <TrialSheet onClose={() => setOffer(false)} />}
           {user && rooms && <MobileRooms key={roomCode ?? 'entry'} initialRoom={roomCode} onClose={() => setRooms(false)} />}

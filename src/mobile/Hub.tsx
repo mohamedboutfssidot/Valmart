@@ -1,5 +1,5 @@
 // "Circle": groups, requests, my trips, guide, host toolkit. Events and Following are their own tabs.
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDemo } from '../store'
 import { Icon } from './icons'
 import { EventsList, Page } from './Screens'
@@ -143,6 +143,7 @@ export function Following({ onWatch }: { onWatch: (id: string) => void }) {
 export function Hub({ onWatch, onPick }: { onWatch: (id: string) => void; onPick?: () => void }) {
   const user = useDemo((s) => s.user)
   const [open, setOpen] = useState<string | null>(null)
+  useEffect(() => { const h = (e: Event) => setOpen((e as CustomEvent<string>).detail); window.addEventListener('vm-hub-open', h); return () => window.removeEventListener('vm-hub-open', h) }, [])
   return (
     <>
       <Page title="More" sub="Group, requests, events">
