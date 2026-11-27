@@ -11,7 +11,7 @@ const codeFromLink = () => {
 }
 
 /** One block for everything done together: friends, family or a class. */
-export function GroupView({ onWatch }: { onWatch?: (id: string) => void }) {
+export function GroupView({ onWatch, onPick }: { onWatch?: (id: string) => void; onPick?: () => void }) {
   const user = useDemo((s) => s.user)
   const { group, createGroup, joinGroup } = useGroup()
   const [code, setCode] = useState(codeFromLink)
@@ -19,7 +19,7 @@ export function GroupView({ onWatch }: { onWatch?: (id: string) => void }) {
   const name = user?.name ?? 'You'
   return (
     <section className={`${card} flex flex-col gap-5`} data-testid="group-block" aria-label="Group">
-      {group ? <GroupRoom group={group} me={name} onWatch={onWatch} /> : (
+      {group ? <GroupRoom group={group} me={name} onWatch={onWatch} onPick={onPick} /> : (
         <>
           <p className="text-fg-muted">Watch together. The leader picks the live and votes for everyone. You get a private group chat on top of the live chat.</p>
           <div className="flex flex-wrap items-end gap-x-8 gap-y-4">

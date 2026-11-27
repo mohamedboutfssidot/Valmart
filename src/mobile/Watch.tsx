@@ -18,7 +18,6 @@ import { useToolEngine } from '../live/useToolEngine'
 import { useMode } from '../live/store'
 import { PinLayer, VideoEffects, GiftToast } from '../live/ui'
 import { NowTool } from '../live/Dock'
-import { PaceSignal } from '../live/Steer'
 import { Landscape } from './Landscape'
 import { Sheet } from './Sheet'
 import { LiveStrip, SteerRing } from '../live/Steer'
@@ -101,6 +100,18 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
     return `Sent ${g.name} to ${host.name}.`
   }
   const stayPct = Math.round(eng.stay)
+  const goCinema = () => {
+    setCinema(true)
+    try {
+      const el = document.documentElement
+      const lock = () => (screen.orientation as unknown as { lock?: (o: string) => Promise<void> }).lock?.('landscape').catch(() => undefined)
+      if (el.requestFullscreen) el.requestFullscreen().then(lock).catch(() => undefined); else lock()
+    } catch { /* not supported */ }
+  }
+  const leaveCinema = () => {
+    setCinema(false)
+    try { screen.orientation.unlock(); if (document.fullscreenElement) void document.exitFullscreen() } catch { /* not supported */ }
+  }
   const chip = (on: boolean) => `shrink-0 rounded-pill px-3.5 py-2 text-[13px] font-semibold transition active:scale-95 ${on ? 'bg-sky text-ink-950' : 'bg-ink-700 text-fg'}`
 
   return (
@@ -113,6 +124,7 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
           {pf.captions && (
             <p key={cap} className={`fade-in pointer-events-none absolute inset-x-3 bottom-3 mx-auto w-fit max-w-full rounded-lg bg-ink-950/75 px-3 py-1.5 text-center font-medium backdrop-blur ${pf.captionSize === 'S' ? 'text-[12px]' : pf.captionSize === 'L' ? 'text-[17px]' : 'text-[14px]'}`}>{needs && !translate ? line.orig : line.en}</p>
           )}
+          <button type="button" aria-label="Leave the live" title="Leave the live" data-testid="m-leave" onClick={onClose} className="absolute right-3 top-3 z-[12] grid h-9 w-9 place-items-center rounded-full bg-ink-950/75 text-fg backdrop-blur active:scale-90"><Icon name="close" size={18} /></button>
           <GiftToast bursts={sim.bursts} />
           <VmPause />
           <VideoEffects e={eng} />
@@ -130,13 +142,12 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
         <div className="min-w-0 flex-1"><h1 className="truncate text-[15px] font-semibold leading-tight">{stream.title}</h1><p className="truncate text-xs text-fg-muted">{host.name}, {city.name}, {formatCount(stream.viewers)} watching</p></div>
         <button type="button" aria-pressed={following} onClick={() => toggleHost(host.id)} className={`rounded-pill px-3.5 py-1.5 text-[13px] font-bold active:scale-95 ${following ? 'bg-ink-700 text-fg' : 'bg-fg text-ink-900'}`} data-testid="watch-follow">{following ? 'Following' : 'Follow'}</button>
       </div>
-      <PaceSignal stay={eng.stay} className="mx-3 mb-1 !py-2" />
-      <div className="grid shrink-0 grid-cols-5 gap-1 px-2.5 py-2.5" aria-label="Steer the live" role="group">
+      <div className="vm-ctl grid shrink-0 grid-cols-5 gap-1 px-2.5 py-1.5" aria-label="Steer the live" role="group">
         <button type="button" className="lt-btn lt-stack" aria-label="Stay here" title="Stay here: vote to stay a little longer" aria-pressed={eng.mineStay === 'stay'} onClick={() => eng.setPace('stay')}><span className="lt-fill !inset-x-0 !top-auto !h-1 rounded-b" style={{ width: `${stayPct}%` }} /><Gesture name="stay" size={20} /><b className="text-[11px]">{stayPct}%</b></button>
         <button type="button" className="lt-btn lt-stack" aria-label="Move on" title="Move on: vote to go to the next spot" aria-pressed={eng.mineStay === 'move'} onClick={() => eng.setPace('move')}><span className="lt-fill !inset-x-0 !top-auto !h-1 rounded-b" style={{ width: `${100 - stayPct}%` }} /><Gesture name="move" size={20} /><b className="text-[11px]">{100 - stayPct}%</b></button>
         <button type="button" className="lt-btn lt-stack" aria-label="Look here" title="Look here: tap the video to point at something" aria-pressed={look} onClick={toggleLook}><Gesture name="look" size={22} /></button>
         <button type="button" className="lt-btn lt-stack" onClick={() => setMore(true)} title="More" aria-label="More options" data-testid="m-more"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg></button>
-        <button type="button" className="lt-btn lt-stack is-hot" aria-label="Full screen" title="Full screen" onClick={() => setCinema(true)} data-testid="m-cinema"><Gesture name="cinema" size={22} /></button>
+        <button type="button" className="lt-btn lt-stack is-hot" aria-label="Full screen" title="Full screen" onClick={goCinema} data-testid="m-cinema"><Gesture name="cinema" size={22} /></button>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col">
@@ -144,7 +155,7 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
       </div>
       {cinema && (
         <Landscape><Cinema
-          contained compact extra={<CaptionMenu needs={needs} up />} stream={stream} eng={eng} viewers={formatCount(stream.viewers)} hostName={host.name} onExit={() => setCinema(false)}
+          contained compact extra={<CaptionMenu needs={needs} up />} stream={stream} eng={eng} viewers={formatCount(stream.viewers)} hostName={host.name} onExit={leaveCinema}
           bursts={<GiftToast bursts={sim.bursts} />}
           captions={pf.captions ? <p key={cap} className={`fade-in max-w-[90%] rounded-lg bg-ink-950/75 px-3 py-1.5 text-center font-medium backdrop-blur ${pf.captionSize === 'S' ? 'text-[12px]' : pf.captionSize === 'L' ? 'text-[17px]' : 'text-[14px]'}`}>{needs && !translate ? line.orig : line.en}</p> : null}
           chat={<ChatPanel msgs={sim.msgs} selfName="You" coins={coins} onGift={onGift} onSend={(x) => sim.send(x, 'You')} locked={eng.chatLock} off={chatOff} className="!h-full !rounded-none !border-0" />}

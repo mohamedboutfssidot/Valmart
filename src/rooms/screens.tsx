@@ -1,5 +1,6 @@
 // The real-room screens: viewer, host (solo or control room) and camera. Router-free.
 import { useEffect, useRef, useState } from 'react'
+import { CameraRotate, CaretDoubleRight, Eye, Pause, PauseCircle, Play, Stop, UsersThree } from '@phosphor-icons/react'
 import type { Category } from '../data/mock'
 import { LiveBadge } from '../components/ui'
 import { VideoSlot } from '../components/VideoSlot'
@@ -17,6 +18,7 @@ import type { RoomRole } from './types'
 import { ErrorLine, Qr, VideoNotice, askMotion, field, ghost, primary, roomStream, useCopy, useMotionWalking, useWakeLock } from './parts'
 import type { ToolDef } from '../live/tools'
 
+const ibtn = 'grid h-9 w-9 place-items-center rounded-full border border-line bg-ink-800 text-fg transition active:scale-90 hover:border-sky'
 const clock = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 
 function useSeconds(on: boolean) {
@@ -179,18 +181,18 @@ function HostLive({ r, room, role, hostMode: initial, category, surface, links: 
             <button type="button" onClick={onRetryCamera} className="rounded-pill bg-sun px-4 py-1.5 font-bold text-ink-950 active:scale-95">Retry camera</button>
           </div>
         )}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-pill border border-line px-3 py-1.5 text-[13px]" data-testid="host-viewers">Watching: <b className="tabular-nums">{r.info.viewers}</b></span>
-          <span className="rounded-pill border border-line px-3 py-1.5 text-[13px]">Stay / Move on: <b className="tabular-nums">{Math.round(eng.stay)} / {100 - Math.round(eng.stay)}</b></span>
+        <div className="flex flex-wrap items-center gap-1.5" data-testid="host-bar">
+          <span className="flex h-9 items-center gap-1.5 rounded-pill border border-line px-3 text-[13px]" data-testid="host-viewers" title="Watching" aria-label={`Watching: ${r.info.viewers}`}><Eye size={16} /><b className="tabular-nums">{r.info.viewers}</b></span>
+          <span className="flex h-9 items-center gap-1.5 rounded-pill border border-line px-3 text-[13px]" title="Stay here / Move on" aria-label={`Stay ${Math.round(eng.stay)}, move on ${100 - Math.round(eng.stay)}`}><PauseCircle size={16} /><b className="tabular-nums">{Math.round(eng.stay)}</b><span className="text-fg-muted">/</span><CaretDoubleRight size={16} /><b className="tabular-nums">{100 - Math.round(eng.stay)}</b></span>
           {!team && (
             <>
-              <button type="button" onClick={() => { const p = !paused; setPaused(p); void r.setPaused(p) }} className={ghost}>{paused ? 'Resume' : 'Pause'}</button>
-              <button type="button" onClick={() => void r.flip()} className={ghost}>Flip camera</button>
+              <button type="button" title={paused ? 'Resume' : 'Pause'} aria-label={paused ? 'Resume' : 'Pause'} aria-pressed={paused} onClick={() => { const p = !paused; setPaused(p); void r.setPaused(p) }} className={`${ibtn} ${paused ? '!border-sky !bg-sky !text-ink-950' : ''}`}>{paused ? <Play size={18} weight="fill" /> : <Pause size={18} weight="fill" />}</button>
+              <button type="button" title="Flip camera" aria-label="Flip camera" onClick={() => void r.flip()} className={ibtn}><CameraRotate size={18} /></button>
             </>
           )}
-          <VoiceToggle who="host" label="Voice for results" />
-          <button type="button" aria-pressed={crowd} onClick={() => setCrowd((v) => !v)} className={`rounded-pill border px-3 py-1.5 text-[13px] font-semibold ${crowd ? 'border-sky bg-sky text-ink-950' : 'border-line hover:border-sky'}`} data-testid="crowd">Demo crowd: {crowd ? 'on' : 'off'}</button>
-          <button type="button" onClick={onEnd} className="ml-auto rounded-pill border border-sun px-4 py-2 font-display text-sm font-bold text-sun-soft hover:bg-sun hover:text-ink-950">End live</button>
+          <VoiceToggle who="host" label="Voice for results" icon className={ibtn} />
+          <button type="button" aria-pressed={crowd} title={`Demo crowd: ${crowd ? 'on' : 'off'}`} aria-label={`Demo crowd: ${crowd ? 'on' : 'off'}`} onClick={() => setCrowd((v) => !v)} className={`${ibtn} ${crowd ? '!border-sky !bg-sky !text-ink-950' : ''}`} data-testid="crowd"><UsersThree size={18} /></button>
+          <button type="button" title="End live" aria-label="End live" onClick={onEnd} className="ml-auto flex h-9 items-center gap-1.5 rounded-pill border border-sun px-3.5 font-display text-[13px] font-bold text-sun-soft hover:bg-sun hover:text-ink-950"><Stop size={16} weight="fill" />End</button>
         </div>
 
         <InvitePanel l={l} room={room} team={team && keysReady} camHere={camHere} copied={copied} copy={copy} error={keysError} />

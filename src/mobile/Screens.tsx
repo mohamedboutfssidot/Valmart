@@ -1,6 +1,6 @@
 import { CatE3 } from '../live/e3d'
 import { ReplayOverlay, ReplayRow } from './Replays'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { LiveNowList } from '../rooms/LiveNow'
 import { useExtra } from '../extra'
 import { CATEGORIES, CITIES, audienceOf, cityOf, formatCount, hostOf, STREAMS, streamById, type Stream } from '../data/mock'
@@ -35,12 +35,16 @@ const money = (v: number) => `${v < 0 ? '−' : ''}$${Math.abs(v).toFixed(2)}`
 const when = (t: number) => new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 
+/** Set by the phone shell: leaves a tab page and goes back to Explore. */
+export const BackCtx = createContext<(() => void) | null>(null)
+
 export function Page({ title, sub, children, right, bar }: { title: React.ReactNode; sub?: string; children: React.ReactNode; right?: React.ReactNode; bar?: React.ReactNode }) {
+  const back = useContext(BackCtx)
   return (
     <div className="no-scrollbar absolute inset-0 overflow-y-auto overscroll-contain">
       <header className="sticky top-0 z-10 bg-ink-900/95 pt-9 backdrop-blur">
         <div className="flex items-end justify-between gap-3 px-5 pb-3">
-          <div className="min-w-0"><h1 className="vm-ptitle font-display text-[26px] font-extrabold leading-none">{title}</h1>{sub && <p className="mt-1.5 text-sm text-fg-muted">{sub}</p>}</div>
+          <div className="flex min-w-0 items-center gap-1.5">{back && <button type="button" onClick={back} aria-label="Back" data-testid="page-back" className="-ml-2 grid h-9 w-9 shrink-0 place-items-center rounded-full text-fg-muted active:bg-ink-800"><Icon name="back" size={22} /></button>}<div className="min-w-0"><h1 className="vm-ptitle font-display text-[26px] font-extrabold leading-none">{title}</h1>{sub && <p className="mt-1.5 text-sm text-fg-muted">{sub}</p>}</div></div>
           {right}
         </div>
         {bar}
@@ -142,8 +146,8 @@ export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id
   ]
   return (
     <>
-    <Page title={<Logo className="vm-logo h-5" />}
-      right={onRooms ? <button type="button" onClick={onRooms} data-testid="open-rooms" className="shrink-0 rounded-pill bg-sun px-4 py-2.5 text-sm font-extrabold text-ink-950 active:scale-95">Go live</button> : undefined}
+    <Page title={<Logo className="vm-logo h-8" />}
+      right={onRooms ? <button type="button" onClick={onRooms} data-testid="open-rooms" className="shrink-0 rounded-pill bg-sun px-3.5 py-2 text-[13px] font-extrabold text-ink-950 active:scale-95">Go live</button> : undefined}
       bar={<div className="flex flex-col gap-2.5 pb-3">
         <div className="flex items-center gap-2 px-5">
           <button type="button" onClick={() => setSearching(true)} aria-label="Search" data-testid="m-search" className="flex h-12 min-w-0 flex-1 items-center gap-2.5 rounded-full border border-line bg-ink-800 px-4 text-left shadow-sm active:scale-[.99]">
@@ -224,11 +228,11 @@ export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id
     {ev && <EventSheet e={ev} onClose={() => setEv(null)} />}
     {fOpen && (
       <Sheet title="Filters" onClose={() => setFOpen(false)}>
-        <div className="flex flex-col gap-5 px-5 pb-6 pt-2">
-          <FilterPanel f={f} set={set} big />
-          <div className="sticky bottom-0 -mx-5 flex gap-3 bg-ink-900 px-5 pb-1 pt-3">
-            <button type="button" onClick={() => setF(BASE_FILTERS)} className="h-12 flex-1 rounded-pill border-2 border-line text-[16px] font-bold active:scale-95">Clear</button>
-            <button type="button" onClick={() => setFOpen(false)} className="h-12 flex-[1.4] rounded-pill bg-sky text-[16px] font-extrabold text-ink-950 active:scale-95">Show {lives.length + reps.length} results</button>
+        <div className="vm-filters flex flex-col gap-3 px-4 pb-4 pt-1">
+          <FilterPanel f={f} set={set} />
+          <div className="sticky bottom-0 -mx-4 flex gap-2 bg-ink-900 px-4 pb-1 pt-2">
+            <button type="button" onClick={() => setF(BASE_FILTERS)} className="h-10 flex-1 rounded-pill border border-line text-sm font-bold active:scale-95">Clear</button>
+            <button type="button" onClick={() => setFOpen(false)} className="h-10 flex-[1.4] rounded-pill bg-sky text-sm font-extrabold text-ink-950 active:scale-95">Show {lives.length + reps.length} results</button>
           </div>
         </div>
       </Sheet>

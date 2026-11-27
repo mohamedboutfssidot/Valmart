@@ -140,7 +140,7 @@ export function Following({ onWatch }: { onWatch: (id: string) => void }) {
   )
 }
 
-export function Hub({ onWatch }: { onWatch: (id: string) => void }) {
+export function Hub({ onWatch, onPick }: { onWatch: (id: string) => void; onPick?: () => void }) {
   const user = useDemo((s) => s.user)
   const [open, setOpen] = useState<string | null>(null)
   return (
@@ -156,7 +156,7 @@ export function Hub({ onWatch }: { onWatch: (id: string) => void }) {
         )}
       </Page>
       {open === 'events' && <Sub title="Events" onBack={() => setOpen(null)}><div className="flex flex-col gap-5 px-5 pb-8"><MobileTickets /><EventsList /></div></Sub>}
-      {open && open !== 'events' && <ExtraPage k={open} onBack={() => setOpen(null)} />}
+      {open && open !== 'events' && <ExtraPage k={open} onBack={() => setOpen(null)} onWatch={onWatch} onPick={onPick} />}
     </>
   )
 }

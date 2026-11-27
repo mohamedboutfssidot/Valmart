@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+import { PICK_EVENT } from './GroupFab'
 import { useDemo } from '../store'
 import { Logo } from '../components/ui'
 import { Watch } from './Watch'
@@ -7,7 +9,7 @@ import { GroupFab } from './GroupFab'
 import { CategoriesTab } from './Categories'
 import '../mobile-extra.css'
 import { STREAMS, streamById } from '../data/mock'
-import { Explore } from './Screens'
+import { BackCtx, Explore } from './Screens'
 import { Me } from './Settings'
 import { StudioTab } from './Studio'
 import { usePrefs } from './prefs'
@@ -18,6 +20,10 @@ import { MobileRooms } from './Rooms'
 type Tab = 'explore' | 'categories' | 'events' | 'hub' | 'studio' | 'me'
 
 export default function MobileApp() {
+  return <MemoryRouter><PhoneApp /></MemoryRouter>
+}
+
+function PhoneApp() {
   const user = useDemo((s) => s.user)
   const isPremium = useDemo((s) => s.isPremium)
   const [flow, setFlow] = useState<'splash' | 'onboard' | 'auth'>(user ? 'auth' : 'splash')
@@ -64,14 +70,14 @@ export default function MobileApp() {
               : flow === 'onboard' ? <Onboarding onDone={() => setFlow('auth')} />
               : <AuthScreen onBack={() => setFlow('onboard')} />
           ) : (
-            <div key={current} className={`${dir} absolute inset-0`}>
+            <BackCtx.Provider value={current === 'explore' ? null : () => setTab('explore')}><div key={current} className={`${dir} absolute inset-0`}>
               {current === 'explore' && <Explore onWatch={watch} onRooms={() => { setRoomCode(undefined); setRooms(true) }} onLive={(r) => { setRoomCode(r); setRooms(true) }} />}
               {current === 'categories' && <CategoriesTab onPick={() => setTab('explore')} />}
               {current === 'events' && <Events />}
-              {current === 'hub' && <Hub onWatch={watch} />}
+              {current === 'hub' && <Hub onWatch={watch} onPick={() => { setTab('explore'); window.setTimeout(() => window.dispatchEvent(new CustomEvent(PICK_EVENT)), 80) }} />}
               {current === 'studio' && <StudioTab />}
               {current === 'me' && <Me onTrial={() => setOffer(true)} onRooms={() => { setRoomCode(undefined); setRooms(true) }} />}
-            </div>
+            </div></BackCtx.Provider>
           )}
           {user && stream && <Watch key={stream.id} stream={stream} onClose={() => setWatching(null)} onSwitch={watch} onTrial={() => setOffer(true)} />}
           {user && <GroupFab go={watch} cur={watching} browse={() => setWatching(null)} />}

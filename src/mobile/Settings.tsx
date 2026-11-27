@@ -275,7 +275,7 @@ const MORE_HOST: [string, string, string][] = [
   ['safety', 'Safety', 'Reports and first steps'],
 ]
 
-export function ExtraPage({ k, onBack }: { k: string; onBack: () => void }) {
+export function ExtraPage({ k, onBack, onWatch, onPick }: { k: string; onBack: () => void; onWatch?: (id: string) => void; onPick?: () => void }) {
   const [sub, setSub] = useState<string | undefined>()
   const [host, setHost] = useState<string | null>(null)
   const user = useDemo((s) => s.user)
@@ -286,7 +286,7 @@ export function ExtraPage({ k, onBack }: { k: string; onBack: () => void }) {
       {k === 'events' && <EventsList />}
       {k === 'requests' && <><RequestsView side="ask" />{user?.isHost && <RequestsView side="host" />}</>}
       {k === 'guide' && <GuideBody />}
-      {k === 'group' && <GroupView />}
+      {k === 'group' && <GroupView onWatch={onWatch} onPick={onPick} />}
       {k === 'following' && <FollowingView onHost={setHost} />}
       {k === 'schedule' && <ScheduleView />}
       {k === 'prep' && <PrepView />}

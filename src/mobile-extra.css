@@ -1,5 +1,5 @@
 /* Phone-only styles, scoped under .yt (mobile shell). Imported by MobileApp. */
-.yt .vm-logo{height:20px;width:auto}
+.yt .vm-logo{height:32px;width:auto}
 .yt .vm-ptitle{display:flex;align-items:center}
 .yt .vm-msearch{display:flex;flex:1;min-width:0;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:999px;background:var(--ink-700,#1b2d44);color:var(--fg-muted,#9fb0c3)}
 .yt .vm-msearch:focus-within{box-shadow:0 0 0 2px #24b1f4}
@@ -26,9 +26,24 @@
 .yt .vm-ffoot button:first-child{padding:0 18px;border:1px solid var(--line,#2a3d55)}
 .yt .vm-ffoot button:last-child{flex:1;background:#24b1f4;color:#06121f}
 /* Trip request form on phone */
-.vm-phone .vm-rf .grid{grid-template-columns:1fr 1fr;gap:10px}
+.vm-phone .vm-rf .grid{grid-template-columns:1fr;gap:14px}
+.vm-phone .vm-rf{padding:16px;gap:14px}
+.vm-phone .vm-rf > *{min-width:0}
+.vm-phone .vm-rf input:not([type=checkbox]),.vm-phone .vm-rf select,.vm-phone .vm-rf textarea{width:100%;min-width:0;box-sizing:border-box}
+.vm-phone .vm-rf [data-testid=send-to] legend{width:100%}
 .vm-phone .vm-rf [data-testid=send-to]{display:flex;flex-wrap:wrap;gap:8px;border:0;padding:0}
 .vm-phone .vm-rf [data-testid=send-to] label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line,#2a3d55);border-radius:999px;padding:6px 12px;font-size:13px}
 .vm-phone .vm-rf [data-testid=send-to] label:has(input:checked){background:#24b1f4;border-color:#24b1f4;color:#06121f;font-weight:700}
 .vm-phone .vm-rf [data-testid=send-to] input{position:absolute;opacity:0;pointer-events:none}
-.vm-phone .vm-rf button[type=submit]{position:sticky;bottom:8px;width:100%}
+.vm-phone .vm-rf button[type=submit]{width:100%;margin-top:4px}
+
+/* smaller live controls on the phone */
+.vm-phone .vm-ctl .lt-btn.lt-stack { padding: .38rem .3rem; gap: .15rem; min-height: 38px; border-radius: 12px; }
+.vm-phone .vm-ctl .lt-btn svg { width: 18px; height: 18px; }
+
+/* compact filters sheet */
+.vm-phone .vm-filters fieldset, .vm-phone .vm-filters > div { gap: .4rem; }
+.vm-phone .vm-filters button { font-size: 13px; }
+.vm-phone [data-testid=request-card]{padding:14px;gap:10px}
+.vm-phone [data-testid=request-card] .ml-auto{margin-left:0;width:100%}
+.vm-phone [data-testid=request-card] .ml-auto > *{flex:1 1 auto}

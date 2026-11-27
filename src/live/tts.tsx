@@ -1,6 +1,7 @@
 // Text to speech, private use only: what the host hears and what a viewer asks to hear.
 // Free: uses the voice built into the browser. Quality varies by device and language.
 import { useEffect, useRef } from 'react'
+import { SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react'
 import { create } from 'zustand'
 import { describe, type ToolEngine } from './useToolEngine'
 
@@ -57,7 +58,7 @@ export function VoiceBadge({ className = '' }: { className?: string }) {
   )
 }
 
-export function VoiceToggle({ who, label, className = '' }: { who: 'viewer' | 'host'; label?: string; className?: string }) {
+export function VoiceToggle({ who, label, className = '', icon = false }: { who: 'viewer' | 'host'; label?: string; className?: string; icon?: boolean }) {
   const on = useVoice((s) => (who === 'viewer' ? s.viewer : s.host))
   const set = useVoice((s) => (who === 'viewer' ? s.setViewer : s.setHost))
   return (
@@ -65,9 +66,11 @@ export function VoiceToggle({ who, label, className = '' }: { who: 'viewer' | 'h
       type="button"
       aria-pressed={on}
       onClick={() => { set(!on); if (!on) speak(who === 'host' ? 'Voice on. I will read your results.' : 'Voice on. I will read the captions.') ; else stopSpeaking() }}
-      className={`rounded-pill border px-3 py-1.5 text-[13px] font-semibold transition-colors ${on ? 'border-sky bg-sky text-ink-950' : 'border-line bg-ink-800 hover:border-sky'} ${className}`}
+      title={`${label ?? 'Voice'}: ${on ? 'on' : 'off'}`}
+      aria-label={`${label ?? 'Voice'}: ${on ? 'on' : 'off'}`}
+      className={icon ? `${className} ${on ? '!border-sky !bg-sky !text-ink-950' : ''}` : `rounded-pill border px-3 py-1.5 text-[13px] font-semibold transition-colors ${on ? 'border-sky bg-sky text-ink-950' : 'border-line bg-ink-800 hover:border-sky'} ${className}`}
     >
-      {label ?? 'Voice'}: {on ? 'on' : 'off'}
+      {icon ? (on ? <SpeakerHigh size={18} /> : <SpeakerSlash size={18} />) : <>{label ?? 'Voice'}: {on ? 'on' : 'off'}</>}
     </button>
   )
 }

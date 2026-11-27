@@ -9,7 +9,7 @@ import { field, ghost, primary, Pill } from './kit'
 
 const chip = 'rounded-pill border border-line px-2.5 py-1 text-xs font-semibold hover:border-sky'
 
-export default function GroupRoom({ group, me, onWatch }: { group: Group; me: string; onWatch?: (id: string) => void }) {
+export default function GroupRoom({ group, me, onWatch, onPick }: { group: Group; me: string; onWatch?: (id: string) => void; onPick?: () => void }) {
   const { leaveGroup, addToGroup, transferChief, removeFromGroup, regenCode } = useGroup()
   const plan = useDemo((s) => s.plan)
   const cap = planOf(plan).group
@@ -66,7 +66,7 @@ export default function GroupRoom({ group, me, onWatch }: { group: Group; me: st
         ) : (
           <p className="text-sm text-fg-muted">{chief ? 'Open any live, watch it, then choose it for the group from the live page.' : `${group.chief} has not picked a live yet.`}</p>
         )}
-        {chief && <button type="button" className={primary} data-testid="group-pick" onClick={() => nav('/app/live')}>{group.liveId ? 'Change the live' : 'Pick a live to watch'}</button>}
+        {chief && <button type="button" className={primary} data-testid="group-pick" onClick={() => (onPick ? onPick() : nav('/app/live'))}>{group.liveId ? 'Change the live' : 'Pick a live to watch'}</button>}
       </div>
       <GroupChat group={group} me={me} />
       <p className="text-sm text-fg-muted">{chief ? `You are the leader. When you vote in a live, it counts for all ${group.members.length} people.` : `${group.chief} votes for the whole group. You keep the group chat and your questions.`}</p>
