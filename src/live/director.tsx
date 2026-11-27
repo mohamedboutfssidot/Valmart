@@ -34,13 +34,14 @@ export function HostModePicker({ value, onChange, compact = false, mobile = fals
 export function useSuggestion(e: ToolEngine, enabled: boolean, walking: boolean, every = 18) {
   const off = useLiveTools((s) => s.off)
   const secs = useLiveTools((s) => s.secs)
+  const words = useLiveTools((s) => s.words)
   const { pool, empty } = useMemo(() => {
     const kit = TOOLS.filter((t) => t.kit === e.kit)
     const base = TOOLS.filter((t) => t.kit === 'base')
     const all = [kit[0], base[0], kit[1] ?? kit[0], base[1], kit[2] ?? kit[0], base[2]].filter(Boolean) as ToolDef[]
     const on = all.filter((t) => !off.includes(t.id))
-    return { pool: (on.length ? on : all).map((t) => withSecs(t, secs)), empty: on.length === 0 }
-  }, [e.kit, off, secs])
+    return { pool: (on.length ? on : all).map((t) => withSecs(t, secs, words)), empty: on.length === 0 }
+  }, [e.kit, off, secs, words])
   const [idx, setIdx] = useState(0)
   const [inSec, setInSec] = useState(8)
   const busy = !!e.active || e.queue.length > 0

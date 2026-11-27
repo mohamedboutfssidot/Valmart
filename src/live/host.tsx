@@ -6,7 +6,8 @@ import type { ToolEngine } from './useToolEngine'
 
 /* ---------- launcher: the host picks a tool, the room answers ---------- */
 export function ToolLauncher({ e, category, onBuild, compact = false, manageHref, onManage }: { e: ToolEngine; category: string; onBuild: () => void; compact?: boolean; manageHref?: string; onManage?: () => void }) {
-  const { custom, off, fav, secs, toggleTool, toggleFav } = useLiveTools()
+  const { custom, off, fav, secs, words, toggleTool, toggleFav } = useLiveTools()
+  const [editing, setEditing] = useState<string | null>(null)
   const hasFav = [...TOOLS, ...custom].some((t) => fav.includes(t.id))
   const [kit, setKit] = useState<Kit | 'fav'>(hasFav ? 'fav' : kitFor(category))
   const [edit, setEdit] = useState(false)
@@ -33,13 +34,15 @@ export function ToolLauncher({ e, category, onBuild, compact = false, manageHref
         {list.map((t) => {
           const on = !off.includes(t.id)
           return (
-            <li key={t.id} className={`flex items-center gap-3 border-t border-line py-2 ${on ? '' : 'opacity-60'}`}>
+            <li key={t.id} className={`flex flex-wrap items-center gap-3 border-t border-line py-2 ${on ? '' : 'opacity-60'}`}>
               {edit && <StarButton on={fav.includes(t.id)} onChange={() => toggleFav(t.id)} name={t.name} />}
-              <button type="button" disabled={!on} onClick={() => e.launch(withSecs(t, secs))} className={`flex min-w-0 flex-1 flex-col items-start rounded-lg px-2 py-1.5 text-left transition-colors ${busy(t.id) ? 'bg-sun/10' : 'hover:bg-ink-700'} disabled:cursor-not-allowed`}>
+              <button type="button" disabled={!on} onClick={() => e.launch(withSecs(t, secs, words))} className={`flex min-w-0 flex-1 flex-col items-start rounded-lg px-2 py-1.5 text-left transition-colors ${busy(t.id) ? 'bg-sun/10' : 'hover:bg-ink-700'} disabled:cursor-not-allowed`}>
                 <span className="flex w-full items-center justify-between gap-2"><span className="font-semibold">{t.name}</span><span className="text-xs text-fg-muted">{busy(t.id) ? (e.active?.def.id === t.id ? 'On air' : 'Queued') : `${secs[t.id] ?? t.seconds}s`}</span></span>
                 <span className="text-[13px] text-fg-muted">{t.summary}</span>
               </button>
+              {edit && t.kind !== 'pin' && <button type="button" aria-expanded={editing === t.id} onClick={() => setEditing(editing === t.id ? null : t.id)} className="shrink-0 rounded-pill border border-line px-2.5 py-1 text-xs font-semibold text-sky-deep hover:bg-ink-700" data-testid={`launch-edit-${t.id}`}>{editing === t.id ? 'Close' : 'Edit words'}</button>}
               {edit && <Switch on={on} onChange={() => toggleTool(t.id)} label={`${t.name} ${on ? 'on' : 'off'}`} />}
+              {editing === t.id && <div className="basis-full"><WordsEditor t={t} /></div>}
             </li>
           )
         })}
@@ -175,6 +178,35 @@ export function ToolBuilder({ category, onDone, onLaunch }: { category: string; 
         </>
       )}
       {msg && <p className="fade-in text-sm font-semibold text-sky-soft" role="status">{msg}</p>}
+    </div>
+  )
+}
+
+/** Edit the wording of one tool, keep it for next time, or save it as a template. */
+function WordsEditor({ t }: { t: ToolDef }) {
+  const { words, setWords, templates, saveTemplate, removeTemplate } = useLiveTools()
+  const w = words[t.id]
+  const prompt = w?.prompt ?? t.prompt
+  const options = w?.options ?? t.options
+  const [name, setName] = useState('')
+  const [saved, setSaved] = useState(false)
+  const mine = templates.filter((x) => x.toolId === t.id)
+  const input = 'w-full rounded-lg border border-line bg-ink-900 px-3 py-2 text-sm focus:border-sky focus:outline-none'
+  return (
+    <div className="flex flex-col gap-2 rounded-xl border border-line bg-ink-900/60 p-3" data-testid="words-editor">
+      <label className="text-xs font-semibold text-fg-muted" htmlFor={`w-${t.id}`}>Question</label>
+      <input id={`w-${t.id}`} className={input} value={prompt} maxLength={120} onChange={(e) => setWords(t.id, { prompt: e.target.value, options })} />
+      {options?.map((o, i) => (
+        <input key={i} aria-label={`Option ${i + 1}`} className={input} value={o} maxLength={40} onChange={(e) => setWords(t.id, { prompt, options: options.map((x, j) => (j === i ? e.target.value : x)) })} />
+      ))}
+      <div className="flex flex-wrap items-center gap-2">
+        <input aria-label="Template name" className={`${input} min-w-[160px] flex-1`} value={name} maxLength={30} placeholder="Name, for example Night market" onChange={(e) => setName(e.target.value)} />
+        <button type="button" data-testid="save-template" onClick={() => { saveTemplate(name.trim() || t.name, t.id, { prompt, options }); setName(''); setSaved(true); window.setTimeout(() => setSaved(false), 1500) }} className="rounded-pill bg-sky-deep px-4 py-2 text-sm font-bold text-white hover:opacity-90 active:scale-95">{saved ? 'Saved ✓' : 'Save as template'}</button>
+      </div>
+      {mine.length > 0 && <ul className="flex flex-col gap-1.5" data-testid="templates">{mine.map((x) => (
+        <li key={x.id} className="flex items-center gap-2 rounded-lg bg-ink-800 px-3 py-2"><span className="min-w-0 flex-1 truncate text-sm"><b>{x.name}</b> <span className="text-xs text-fg-muted">{x.data.prompt}</span></span><button type="button" onClick={() => setWords(t.id, x.data)} className="rounded-pill border border-line px-3 py-1 text-sm font-semibold hover:border-sky">Use</button><button type="button" aria-label={`Delete ${x.name}`} onClick={() => removeTemplate(x.id)} className="grid h-8 w-8 place-items-center rounded-full text-fg-muted hover:bg-ink-700">✕</button></li>
+      ))}</ul>}
+      <div className="flex items-center justify-between gap-3 border-t border-line pt-2 text-sm"><span className="text-fg-muted">{w ? 'Saved automatically. Used the next time you launch this tool.' : 'Original wording. Change anything above.'}</span>{w && <button type="button" onClick={() => setWords(t.id, null)} className="font-semibold text-sky-deep hover:underline">Back to original</button>}</div>
     </div>
   )
 }
