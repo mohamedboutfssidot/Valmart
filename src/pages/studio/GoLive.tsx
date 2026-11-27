@@ -8,6 +8,7 @@ import { giftUsd } from '../../data/demo'
 import { VideoSlot } from '../../components/VideoSlot'
 import { ChatPanel } from '../../components/ChatPanel'
 import { VoteCard } from '../../components/VoteCard'
+import { kitFor, KITS, TOOLS } from '../../live/tools'
 import { useToolEngine } from '../../live/useToolEngine'
 import { useMode } from '../../live/store'
 import { PinLayer, ToolCard, VideoEffects, GiftToast } from '../../live/ui'
@@ -22,6 +23,12 @@ interface Summary { seconds: number; peak: number; gifts: number; coins: number 
 
 const usd = (coins: number) => `$${giftUsd(coins).toFixed(2)}`
 const clock = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
+
+const POLICY: Record<'exact' | 'area' | 'secret', { note: string }> = {
+  exact: { note: 'Exact places, route sketch and photos are on.' },
+  area: { note: 'Only the area is named. Exact spot kept for safety.' },
+  secret: { note: 'The spot stays secret: no map, no exact place, no photos.' },
+}
 
 const field = 'w-full rounded-xl border border-line bg-ink-900 px-4 py-2.5 text-[15px] placeholder:text-fg-muted focus:border-sky focus:outline-none'
 
@@ -117,6 +124,7 @@ function Setup({ defaultCity }: { defaultCity: string }) {
             </div>
           ))}
         </dl>
+        <p className="rounded-card border border-line bg-ink-800 px-4 py-3 text-sm" data-testid="replay-made"><b>Your replay is ready.</b> Viewers can watch it for 48 hours. Add a note or pin it from Replays.</p>
         <p className="text-sm text-fg-muted">Added to your earnings. Sample rate: 100 coins equal $1 and you keep 70%.</p>
         <div className="flex flex-wrap gap-3">
           <Button onClick={() => setPhase('setup')}>Plan another session</Button>
@@ -127,6 +135,8 @@ function Setup({ defaultCity }: { defaultCity: string }) {
   }
 
   const city = CITIES.find((c) => c.id === cfg.cityId)!
+  const kit = kitFor(cfg.category)
+  const policy = kit === 'hidden' ? 'secret' : kit === 'fear' || kit === 'adventure' || kit === 'nature' ? 'area' : 'exact'
 
   return (
     <div className="flex flex-col gap-10">
@@ -153,6 +163,10 @@ function Setup({ defaultCity }: { defaultCity: string }) {
           <div className="flex flex-col gap-2">
             <label htmlFor="host-place" className="text-sm font-medium">Starting point</label>
             <input id="host-place" className={field} value={cfg.place} maxLength={60} onChange={(e) => setCfg({ ...cfg, place: e.target.value })} placeholder="A landmark or street" required />
+            <p className="flex items-start gap-2 rounded-xl bg-ink-700/60 px-3 py-2 text-sm" data-testid="place-preview">
+              <span aria-hidden="true">👁</span>
+              <span><b>Viewers will see:</b> {policy === 'exact' ? `${cfg.place || 'your starting point'}, ${city.name}` : policy === 'area' ? `${city.name}, ${city.country}` : city.country}. <span className="text-fg-muted">{policy === 'exact' ? 'This type shows the place and a map.' : policy === 'area' ? 'This type shows only the area, never the exact spot.' : 'This type never shows the place. Only the country.'}</span></span>
+            </p>
           </div>
           <fieldset className="flex flex-col gap-2">
             <legend className="mb-1 text-sm font-medium">Type of experience</legend>
@@ -162,6 +176,11 @@ function Setup({ defaultCity }: { defaultCity: string }) {
               ))}
             </div>
           </fieldset>
+          <div className="flex flex-col gap-2 rounded-xl border border-line px-3.5 py-3" data-testid="kit-preview">
+            <p className="text-sm"><b>Tools for this type</b> <span className="text-fg-muted">· {KITS.find((k) => k.id === kit)?.label}</span></p>
+            <div className="flex flex-wrap gap-1.5">{TOOLS.filter((t) => t.kit === 'base' || t.kit === kit).map((t) => <span key={t.id} className="rounded-pill bg-ink-700 px-2.5 py-1 text-xs font-semibold">{t.name}</span>)}</div>
+            <p className="text-xs text-fg-muted">{POLICY[kit === 'hidden' ? 'secret' : kit === 'fear' || kit === 'adventure' || kit === 'nature' ? 'area' : 'exact'].note} <Link to="/studio/tools" className="font-semibold text-sky hover:underline">Choose your tools</Link></p>
+          </div>
           <fieldset className="flex flex-col gap-2">
             <legend className="mb-1 text-sm font-medium">How do you run this live?</legend>
             <HostModePicker value={cfg.hostMode} onChange={(m) => setCfg({ ...cfg, hostMode: m })} />
