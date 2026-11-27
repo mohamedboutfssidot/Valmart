@@ -37,9 +37,9 @@ export default function MobileApp() {
 
   type TabDef = [Tab, string, Parameters<typeof Icon>[0]['name']]
   const tabs: TabDef[] = [
-    ['explore', 'Explore', 'live'], ['categories', 'Categories', 'explore'],
+    ['explore', 'Explore', 'live'], ['categories', 'Categories', 'target'],
     ...(user?.isHost ? [['studio', 'Studio', 'studio'] as TabDef] : []),
-    ['hub', 'More', 'users'], ['me', 'Profile', 'me'],
+    ['hub', 'More', 'trips'], ['me', 'Profile', 'me'],
   ]
   const current = tabs.some(([k]) => k === tab) ? tab : 'explore'
   const idx = tabs.findIndex(([k]) => k === current)
