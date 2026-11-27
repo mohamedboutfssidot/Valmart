@@ -2,7 +2,7 @@ import { create } from 'zustand'
 
 export interface Prefs {
   translate: boolean; captions: boolean; showOriginal: boolean; captionSize: 'S' | 'M' | 'L'; chatPreview: boolean
-  quality: 'Auto' | '720p' | '1080p'; autoplay: boolean; dataSaver: boolean
+  quality: 'Auto' | '360p' | '480p' | '720p' | '1080p' | '1440p' | '4K'; autoplay: boolean; dataSaver: boolean
   notifLive: boolean; notifEvents: boolean; notifTips: boolean; notifSound: boolean
   showName: boolean; profilePublic: boolean; reduceMotion: boolean
   voiceCaptions: boolean; hostVoice: boolean

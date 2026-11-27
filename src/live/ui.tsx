@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ToolIcon } from './ToolIcon'
 import { Gesture, GiftArt } from './theme'
 import { GIFTS } from '../data/live'
 import { describe, type ToolEngine } from './useToolEngine'
@@ -130,7 +131,7 @@ export function ToolCard({ e, variant = 'viewer', className = '', compact = fals
   return (
     <section key={`${d.id}-${e.done}`} className={`lt-tool flex flex-col rounded-card border bg-ink-800 ${compact ? 'gap-2 p-3' : 'gap-3 p-4'} ${a.closed ? 'border-line' : 'border-sun'} ${className}`} aria-label={d.name} data-counts={a.counts.join(',')} data-n={a.n}>
       <div className="flex items-center justify-between gap-2">
-        <p className={compact ? 'text-xs font-semibold text-sun-soft' : 'text-[11px] font-bold uppercase tracking-wider text-sun-soft'}>{compact ? d.name : `${host ? 'On air' : 'Host tool'} · ${d.name}`}</p>
+        <p className={`flex items-center gap-1.5 ${compact ? 'text-xs font-semibold text-sun-soft' : 'text-[11px] font-bold uppercase tracking-wider text-sun-soft'}`}><span className="ti-badge"><ToolIcon def={d} size={compact ? 16 : 20} /></span>{compact ? d.name : `${host ? 'On air' : 'Host tool'} · ${d.name}`}</p>
         <span className="rounded-pill border border-line px-2.5 py-0.5 text-xs font-semibold tabular-nums">{a.closed ? 'Closed' : `${a.left}s`}</span>
       </div>
       <div className="h-1 overflow-hidden rounded-full bg-ink-700"><div className="lt-tool-bar h-full rounded-full transition-[width] duration-1000 ease-linear" style={{ width: `${a.closed ? 0 : (a.left / a.total) * 100}%` }} /></div>

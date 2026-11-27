@@ -1,5 +1,6 @@
 // Cinema mode (web viewer): the video fills the screen and only three things stay close:
 // Stay here / Move on, Look here, and the active tool as one thin bar at the bottom.
+import { ToolIcon } from './ToolIcon'
 import { Gesture } from './theme'
 import { createPortal } from 'react-dom'
 import { ClosedCaptioning, DeviceRotate, Lightning, SpeakerSimpleHigh, SpeakerSimpleSlash, SquaresFour, X } from '@phosphor-icons/react'
@@ -48,7 +49,7 @@ function CinemaTool({ e, big, compact = false }: { e: ToolEngine; big: boolean; 
       <div className="absolute inset-x-0 top-0 h-[3px] bg-ink-700"><div className="h-full bg-sun transition-[width] duration-1000 ease-linear" style={{ width: `${a.closed ? 0 : (a.left / a.total) * 100}%` }} /></div>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <div className={`min-w-0 flex-1 ${compact ? 'basis-full' : 'basis-[220px]'}`}>
-          <p className="flex items-center justify-between gap-2 text-[10.5px] font-bold uppercase tracking-wider text-sun-soft"><span>{d.name} · {a.closed ? 'closed' : `${a.left}s`}</span>{compact && <button type="button" onClick={() => setPeek(false)} aria-label="Hide" className="grid h-6 w-6 place-items-center rounded-full bg-white/10 text-white"><X size={12} weight="bold" /></button>}</p>
+          <p className="flex items-center justify-between gap-2 text-[10.5px] font-bold uppercase tracking-wider text-sun-soft"><span className="flex items-center gap-2"><span className="ti-badge"><ToolIcon def={d} size={16} /></span>{d.name} · {a.closed ? 'closed' : `${a.left}s`}</span>{compact && <button type="button" onClick={() => setPeek(false)} aria-label="Hide" className="grid h-6 w-6 place-items-center rounded-full bg-white/10 text-white"><X size={12} weight="bold" /></button>}</p>
           <p className={`font-display font-bold leading-snug ${big ? 'text-2xl' : compact ? 'text-[14px]' : 'text-[16px]'}`}>{res ? res.headline : d.prompt}</p>
           {res?.detail && <p className={`mt-0.5 text-sky-soft ${txt}`}>{res.detail}</p>}
         </div>

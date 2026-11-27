@@ -23,6 +23,8 @@ import { useResultVoice, VoiceBadge } from '../live/tts'
 import { usePrefs } from './prefs'
 import { Logo } from '../components/ui'
 import { pendingCategory } from './Categories'
+import { PICK_EVENT, PickBar } from './GroupFab'
+import { useGroup } from '../groupStore'
 import { BASE_FILTERS, filterCount, filterReplays, filterStreams, useRecent, type Filters } from '../pages/app/discover/filters'
 import { FilterPanel } from '../pages/app/discover/FilterPanel'
 import { SuggestPanel } from '../pages/app/discover/Suggest'
@@ -103,9 +105,12 @@ function FeedCard({ s, badge, line, minutes, views, onOpen }: { s: Stream; badge
   )
 }
 
-export function Explore({ onWatch, onRooms, onLive }: { onWatch: (id: string) => void; onRooms?: () => void; onLive?: (room: string) => void }) {
+export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id: string) => void; onRooms?: () => void; onLive?: (room: string) => void }) {
   const [searching, setSearching] = useState(false); const [q, setQ] = useState(''); const [f, setF] = useState<Filters>(BASE_FILTERS); const [tab, setTab] = useState<Tab>('you')
-  const [fOpen, setFOpen] = useState(false); const [ev, setEv] = useState<EventItem | null>(null); const [rp, setRp] = useState<string | null>(null)
+  const [fOpen, setFOpen] = useState(false); const [pick, setPick] = useState(false); const [sel, setSel] = useState<Stream | null>(null); const [ev, setEv] = useState<EventItem | null>(null); const [rp, setRp] = useState<string | null>(null)
+  const setGroupLive = useGroup((st) => st.setGroupLive)
+  useEffect(() => { const h = () => { setPick(true); setSel(null) }; window.addEventListener(PICK_EVENT, h); return () => window.removeEventListener(PICK_EVENT, h) }, [])
+  const onWatch = (id: string) => { if (pick) { setSel(streamById(id) ?? null); return } openStream(id) }
   const set = (p: Partial<Filters>) => setF((x) => ({ ...x, ...p }))
   const recent = useRecent()
   const user = useDemo((st) => st.user); const { followHosts, followCities } = useExtra()
@@ -242,6 +247,7 @@ export function Explore({ onWatch, onRooms, onLive }: { onWatch: (id: string) =>
         </div>
       </div>
     )}
+    {pick && <PickBar sel={sel} yes={() => { if (sel) setGroupLive(sel.id, sel.title); setPick(false); setSel(null) }} no={() => setSel(null)} cancel={() => { setPick(false); setSel(null) }} />}
     {rp && <ReplayOverlay id={rp} onClose={() => setRp(null)} />}
     </>
   )

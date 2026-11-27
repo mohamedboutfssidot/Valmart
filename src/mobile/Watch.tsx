@@ -1,8 +1,7 @@
 // Watching a live on a phone: a normal watch page (video on top, details and tools below), not a swipe feed.
 import { Gesture, LiveTheme } from '../live/theme'
 import { planOf } from '../data/plans'
-import { useEffect, useRef, useState } from 'react'
-import { LiveRecap } from '../live/Recap'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { cityOf, formatCount, hostOf, type Stream } from '../data/mock'
 import { NARRATION } from '../data/live'
 import { useLiveSim } from '../hooks/useLiveSim'
@@ -13,7 +12,7 @@ import { VideoSlot } from '../components/VideoSlot'
 import { Hints } from '../live/Hints'
 import { ChatPanel } from '../components/ChatPanel'
 import { Icon } from './icons'
-import { usePrefs } from './prefs'
+import { usePrefs, type Prefs } from './prefs'
 import { ClosedCaptioning, SpeakerHigh, Translate } from '@phosphor-icons/react'
 import { useToolEngine } from '../live/useToolEngine'
 import { useMode } from '../live/store'
@@ -21,7 +20,9 @@ import { PinLayer, VideoEffects, GiftToast } from '../live/ui'
 import { NowTool } from '../live/Dock'
 import { PaceSignal } from '../live/Steer'
 import { Landscape } from './Landscape'
-import { MobileGroupBar } from './GroupBar'
+import { Sheet } from './Sheet'
+import { LiveStrip, SteerRing } from '../live/Steer'
+import { VmPause } from '../live/Pause'
 import { Cinema } from '../live/Cinema'
 import { speak } from '../live/tts'
 import { ReportButton } from '../features/kit'
@@ -48,6 +49,17 @@ function CaptionMenu({ needs, up = false, onVideo = true }: { needs: boolean; up
   )
 }
 
+const QUALITY: [Prefs['quality'], number][] = [['Auto', 0], ['360p', 360], ['480p', 480], ['720p', 720], ['1080p', 1080], ['1440p', 1440], ['4K', 2160]]
+
+function Row2({ on, onClick, icon, label }: { on: boolean; onClick: () => void; icon: ReactNode; label: string }) {
+  return (
+    <button type="button" role="switch" aria-checked={on} onClick={onClick} className="flex items-center gap-3 rounded-2xl bg-ink-800 px-4 py-3 text-left active:scale-[.98]">
+      <span className="text-sky">{icon}</span><span className="flex-1 font-semibold">{label}</span>
+      <span className={`relative h-[30px] w-[52px] shrink-0 rounded-full transition-colors duration-300 ${on ? 'bg-sky' : 'bg-ink-700'}`}><span className="absolute left-[3px] top-[3px] h-6 w-6 rounded-full bg-white shadow transition-transform duration-300" style={{ transform: on ? 'translateX(22px)' : 'none' }} /></span>
+    </button>
+  )
+}
+
 export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; onClose: () => void; onTrial: () => void; onSwitch?: (id: string) => void }) {
   const host = hostOf(stream.hostId)
   const city = cityOf(stream.cityId)
@@ -62,7 +74,9 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
   const toggleLook = () => { if (!look && looks >= planOf(plan).looks) return setToast(planOf(plan).looks === 0 ? 'Look here starts with Plus (5 per live).' : `${planOf(plan).name}: ${planOf(plan).looks} Look here per live. Upgrade for more.`); setLook((v) => !v) }
   const [cinema, setCinema] = useState(false)
   const pf = usePrefs((s) => s.p)
+  const setPf = usePrefs((s) => s.set)
   const translate = pf.translate
+  const pip = () => { const v = document.querySelector('video'); if (v && document.pictureInPictureEnabled) { if (document.pictureInPictureElement) document.exitPictureInPicture().catch(() => undefined); else v.requestPictureInPicture().then(() => setMore(false)).catch(() => setPipNote('Picture in picture is blocked by your browser.')) } else setPipNote('Picture in picture needs a real video stream. Not available in this demo scene.') }
   const [cap, setCap] = useState(0)
   const needs = stream.language !== 'English'
   const line = NARRATION[city.id][cap % NARRATION[city.id].length]
@@ -73,7 +87,8 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
   useEffect(() => { visit(stream.id) }, [visit, stream.id])
   const t0 = useRef(Date.now())
   const [giftN, setGiftN] = useState(0)
-  const [recap, setRecap] = useState(false)
+  const [more, setMore] = useState(false)
+  const [pipNote, setPipNote] = useState<string | null>(null)
   useEffect(() => { const t = window.setInterval(() => setCap((n) => n + 1), 7000); return () => window.clearInterval(t) }, [])
   useEffect(() => { if (pf.voiceCaptions) speak(needs && translate ? line.en : needs ? line.orig : line.en, needs && !translate ? 'und' : 'en-US') }, [cap, pf.voiceCaptions]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (!toast) return; const t = window.setTimeout(() => setToast(null), 1800); return () => window.clearTimeout(t) }, [toast])
@@ -99,10 +114,12 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
             <p key={cap} className={`fade-in pointer-events-none absolute inset-x-3 bottom-3 mx-auto w-fit max-w-full rounded-lg bg-ink-950/75 px-3 py-1.5 text-center font-medium backdrop-blur ${pf.captionSize === 'S' ? 'text-[12px]' : pf.captionSize === 'L' ? 'text-[17px]' : 'text-[14px]'}`}>{needs && !translate ? line.orig : line.en}</p>
           )}
           <GiftToast bursts={sim.bursts} />
+          <VmPause />
           <VideoEffects e={eng} />
           <PinLayer e={eng} armed={look || eng.pinArmed} onDone={() => { setLook(false); setLooks((n) => n + 1) }} />
+          <SteerRing stream={stream} />
+          <LiveStrip stream={stream} className="absolute left-3 top-12 z-[8]" />
         </VideoSlot>
-        <button type="button" onClick={() => setRecap(true)} aria-label="Back" className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-ink-950/70 text-fg backdrop-blur active:scale-90" data-testid="watch-close"><Icon name="close" size={20} /></button>
       </div>
 
       <Hints className="left-1/2 top-14 -translate-x-1/2" />
@@ -114,12 +131,12 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
         <button type="button" aria-pressed={following} onClick={() => toggleHost(host.id)} className={`rounded-pill px-3.5 py-1.5 text-[13px] font-bold active:scale-95 ${following ? 'bg-ink-700 text-fg' : 'bg-fg text-ink-900'}`} data-testid="watch-follow">{following ? 'Following' : 'Follow'}</button>
       </div>
       <PaceSignal stay={eng.stay} className="mx-3 mb-1 !py-2" />
-      <MobileGroupBar streamId={stream.id} streamTitle={stream.title} onJoin={(id) => onSwitch?.(id)} onBrowse={onClose} />
-      <div className="grid shrink-0 grid-cols-4 gap-1 px-2.5 py-2.5" aria-label="Steer the walk" role="group">
-        <button type="button" className="lt-btn lt-stack" aria-pressed={eng.mineStay === 'stay'} onClick={() => eng.setPace('stay')}><span className="lt-fill !inset-x-0 !top-auto !h-1 rounded-b" style={{ width: `${stayPct}%` }} /><Gesture name="stay" size={20} /><span>Stay <b>{stayPct}%</b></span></button>
-        <button type="button" className="lt-btn lt-stack" aria-pressed={eng.mineStay === 'move'} onClick={() => eng.setPace('move')}><span className="lt-fill !inset-x-0 !top-auto !h-1 rounded-b" style={{ width: `${100 - stayPct}%` }} /><Gesture name="move" size={20} /><span>Move <b>{100 - stayPct}%</b></span></button>
-        <button type="button" className="lt-btn lt-stack" aria-pressed={look} onClick={toggleLook}><Gesture name="look" size={20} /><span>Look</span></button>
-        <button type="button" className="lt-btn lt-stack is-hot" onClick={() => setCinema(true)} data-testid="m-cinema"><Gesture name="cinema" size={20} /><span>Full</span></button>
+      <div className="grid shrink-0 grid-cols-5 gap-1 px-2.5 py-2.5" aria-label="Steer the live" role="group">
+        <button type="button" className="lt-btn lt-stack" aria-label="Stay here" title="Stay here: vote to stay a little longer" aria-pressed={eng.mineStay === 'stay'} onClick={() => eng.setPace('stay')}><span className="lt-fill !inset-x-0 !top-auto !h-1 rounded-b" style={{ width: `${stayPct}%` }} /><Gesture name="stay" size={20} /><b className="text-[11px]">{stayPct}%</b></button>
+        <button type="button" className="lt-btn lt-stack" aria-label="Move on" title="Move on: vote to go to the next spot" aria-pressed={eng.mineStay === 'move'} onClick={() => eng.setPace('move')}><span className="lt-fill !inset-x-0 !top-auto !h-1 rounded-b" style={{ width: `${100 - stayPct}%` }} /><Gesture name="move" size={20} /><b className="text-[11px]">{100 - stayPct}%</b></button>
+        <button type="button" className="lt-btn lt-stack" aria-label="Look here" title="Look here: tap the video to point at something" aria-pressed={look} onClick={toggleLook}><Gesture name="look" size={22} /></button>
+        <button type="button" className="lt-btn lt-stack" onClick={() => setMore(true)} title="More" aria-label="More options" data-testid="m-more"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg></button>
+        <button type="button" className="lt-btn lt-stack is-hot" aria-label="Full screen" title="Full screen" onClick={() => setCinema(true)} data-testid="m-cinema"><Gesture name="cinema" size={22} /></button>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col">
@@ -133,8 +150,25 @@ export function Watch({ stream, onClose, onTrial, onSwitch }: { stream: Stream; 
           chat={<ChatPanel msgs={sim.msgs} selfName="You" coins={coins} onGift={onGift} onSend={(x) => sim.send(x, 'You')} locked={eng.chatLock} off={chatOff} className="!h-full !rounded-none !border-0" />}
         /></Landscape>
       )}
+      {more && (
+        <Sheet onClose={() => setMore(false)} title="More">
+          <div className="flex flex-col gap-2 px-5 pb-6">
+            <p className="px-1 pt-2 text-xs font-semibold uppercase tracking-wider text-fg-muted">Captions</p>
+            <Row2 on={pf.captions} onClick={() => setPf('captions', !pf.captions)} icon={<ClosedCaptioning size={22} />} label="Captions" />
+            {needs && <Row2 on={pf.translate} onClick={() => setPf('translate', !pf.translate)} icon={<Translate size={22} />} label="Translate to English" />}
+            <Row2 on={pf.voiceCaptions} onClick={() => setPf('voiceCaptions', !pf.voiceCaptions)} icon={<SpeakerHigh size={22} />} label="Read aloud" />
+            <div className="flex items-center justify-between rounded-2xl bg-ink-800 px-4 py-3"><span className="font-semibold">Caption size</span>
+              <span className="flex gap-1.5">{(['S', 'M', 'L'] as const).map((z) => <button key={z} type="button" aria-pressed={pf.captionSize === z} onClick={() => setPf('captionSize', z)} className={`h-9 w-11 rounded-full text-sm font-bold ${pf.captionSize === z ? 'bg-sky text-ink-950' : 'bg-ink-700 text-fg-muted'}`}>{z}</button>)}</span></div>
+            <p className="px-1 pt-2 text-xs font-semibold uppercase tracking-wider text-fg-muted">Video</p>
+            <div className="flex items-center justify-between rounded-2xl bg-ink-800 px-4 py-3"><span className="font-semibold">Quality</span>
+              <span className="vm-qrow">{QUALITY.map(([q, v]) => { const lock = v > ({ free: 720, plus: 1080, premium: 2160 }[plan as 'free'] || 720); return <button key={q} type="button" aria-pressed={pf.quality === q} disabled={lock} title={lock ? `${q} needs ${v > 1080 ? 'Premium' : 'Plus'}` : `Video quality ${q}`} onClick={() => setPf('quality', q)} className={`vm-q ${pf.quality === q ? 'is-on' : ''}`}>{q}</button> })}</span></div>
+            <button type="button" data-testid="m-pip" onClick={pip} className="flex items-center gap-3 rounded-2xl bg-ink-800 px-4 py-3.5 text-left font-semibold active:scale-[.98]">Picture in picture<span className="ml-auto text-xs font-normal text-fg-muted">Open</span></button>
+            {pipNote && <p className="px-1 text-xs text-fg-muted" data-testid="m-pip-note">{pipNote}</p>}
+            <button type="button" data-testid="m-back" onClick={() => { setMore(false); onClose() }} className="mt-2 rounded-2xl border border-line px-4 py-3 text-center text-sm font-semibold text-fg-muted active:scale-[.98]">Back to Explore</button>
+          </div>
+        </Sheet>
+      )}
       {toast && <div className="pop-in absolute left-1/2 top-24 z-40 -translate-x-1/2 rounded-pill bg-ink-950/90 px-4 py-2 text-sm font-semibold text-fg backdrop-blur">{toast}</div>}
-      {recap && <LiveRecap title={stream.title} host={host.name} minutes={Math.round((Date.now() - t0.current) / 60000)} gifts={giftN} moments={saved} onStay={() => setRecap(false)} onLeave={onClose} />}
     </div>
     </LiveTheme>
   )

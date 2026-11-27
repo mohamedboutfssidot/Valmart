@@ -3,6 +3,7 @@ import { useDemo } from '../store'
 import { Logo } from '../components/ui'
 import { Watch } from './Watch'
 import { Events, Hub } from './Hub'
+import { GroupFab } from './GroupFab'
 import { CategoriesTab } from './Categories'
 import '../mobile-extra.css'
 import { STREAMS, streamById } from '../data/mock'
@@ -73,6 +74,7 @@ export default function MobileApp() {
             </div>
           )}
           {user && stream && <Watch key={stream.id} stream={stream} onClose={() => setWatching(null)} onSwitch={watch} onTrial={() => setOffer(true)} />}
+          {user && <GroupFab go={watch} cur={watching} browse={() => setWatching(null)} />}
           {user && offer && <TrialSheet onClose={() => setOffer(false)} />}
           {user && rooms && <MobileRooms key={roomCode ?? 'entry'} initialRoom={roomCode} onClose={() => setRooms(false)} />}
         </div>
