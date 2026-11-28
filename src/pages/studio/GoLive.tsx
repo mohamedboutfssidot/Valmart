@@ -14,11 +14,13 @@ import { useToolEngine } from '../../live/useToolEngine'
 import { useMode } from '../../live/store'
 import { PinLayer, ToolCard, VideoEffects, GiftToast } from '../../live/ui'
 import { ToolBuilder, ToolLauncher } from '../../live/host'
-import { HostModePicker, OneButton, TeamPanel, WalkingSwitch, useSuggestion, type HostMode } from '../../live/director'
+import { HOST_MODES, HostModePicker, OneButton, TeamPanel, WalkingSwitch, useSuggestion, type HostMode } from '../../live/director'
 import { createRoom, pushThumb } from '../../rooms/api'
 import { saveThumb } from '../../rooms/thumb'
 import { CoverPicker, DEFAULT_COVER, makeCover, type Cover } from './CoverPicker'
 import { CatIcon } from '../../components/icons2'
+import { Dropdown } from '../../components/Dropdown'
+import { GROUPS } from '../app/Categories'
 import { HostRoom } from '../../rooms/screens'
 import { useResultVoice, useVoice, VoiceBadge, VoiceToggle } from '../../live/tts'
 
@@ -33,8 +35,6 @@ const POLICY: Record<'exact' | 'area' | 'secret', { note: string }> = {
   area: { note: 'Only the area is named. Exact spot kept for safety.' },
   secret: { note: 'The spot stays secret: no map, no exact place, no photos.' },
 }
-
-const POPULAR: Category[] = ['Discovery', 'Cultural Tour', 'Food Journey', 'Night Exploration', 'Hidden Places', 'Travel Guide', 'Adventure', 'Nature Walk', 'Horror']
 
 const field = 'w-full rounded-xl border border-line bg-ink-900 px-4 py-2.5 text-[15px] placeholder:text-fg-muted focus:border-sky focus:outline-none'
 
@@ -86,8 +86,6 @@ function Setup({ defaultCity }: { defaultCity: string }) {
   const [cfg, setCfg] = useState<Config>({ cityId: defaultCity, title: 'Evening walk along the Seine', place: 'Pont de l’Alma', category: 'Discovery', hostMode: 'auto' })
   const [summary, setSummary] = useState<Summary | null>(null)
   const [cover, setCover] = useState<Cover>(DEFAULT_COVER)
-  const [catQ, setCatQ] = useState('')
-  const [showAll, setShowAll] = useState(false)
 
   // real live: the room is created with the details above, then it appears in "Live now" for every viewer
   const startReal = async () => {
@@ -161,12 +159,7 @@ function Setup({ defaultCity }: { defaultCity: string }) {
           className="flex min-w-0 flex-col gap-5 rounded-card border border-line bg-ink-800 p-5 sm:p-6"
           onSubmit={(e) => { e.preventDefault(); void startReal() }}
         >
-          <div className="flex flex-col gap-2">
-            <label htmlFor="host-city" className="text-sm font-medium">City</label>
-            <select id="host-city" className={field} value={cfg.cityId} onChange={(e) => setCfg({ ...cfg, cityId: e.target.value })}>
-              {CITIES.map((c) => <option key={c.id} value={c.id}>{c.name}, {c.country}</option>)}
-            </select>
-          </div>
+          <Dropdown label="City" testId="dd-city" searchable value={cfg.cityId} onChange={(v) => setCfg({ ...cfg, cityId: v })} options={CITIES.map((c) => ({ value: c.id, label: c.name, hint: c.country }))} />
           <div className="flex flex-col gap-2">
             <label htmlFor="host-title" className="text-sm font-medium">Session title</label>
             <input id="host-title" className={field} value={cfg.title} maxLength={80} onChange={(e) => setCfg({ ...cfg, title: e.target.value })} placeholder="What will you show?" required />
@@ -182,28 +175,16 @@ function Setup({ defaultCity }: { defaultCity: string }) {
               <span><b>Viewers will see:</b> {policy === 'exact' ? `${cfg.place || 'your starting point'}, ${city.name}` : policy === 'area' ? `${city.name}, ${city.country}` : city.country}. <span className="text-fg-muted">{policy === 'exact' ? 'This type shows the place and a map.' : policy === 'area' ? 'This type shows only the area, never the exact spot.' : 'This type never shows the place. Only the country.'}</span></span>
             </p>
           </div>
-          <fieldset className="flex flex-col gap-2.5" data-testid="cat-picker">
-            <legend className="mb-1 text-sm font-medium">Category</legend>
-            <input type="search" aria-label="Search categories" value={catQ} onChange={(e) => setCatQ(e.target.value)} placeholder="Search a category" className={field} />
-            <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Category">
-              {CATEGORIES.filter((c) => c.toLowerCase().includes(catQ.toLowerCase()) && (showAll || catQ || POPULAR.includes(c) || c === cfg.category)).map((c) => (
-                <button key={c} type="button" role="radio" aria-checked={cfg.category === c} onClick={() => setCfg({ ...cfg, category: c })} className={`flex min-w-0 items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-[13px] font-semibold transition ${cfg.category === c ? 'border-sky bg-sky/15 text-fg' : 'border-line hover:border-sky'}`}>
-                  <CatIcon c={c} size={18} className={cfg.category === c ? 'text-sky' : 'text-fg-muted'} /><span className="truncate">{c}</span>
-                </button>
-              ))}
-            </div>
-            {!catQ && <button type="button" onClick={() => setShowAll((v) => !v)} className="self-start text-[13px] font-semibold text-sky hover:underline">{showAll ? 'Show fewer' : `Show all ${CATEGORIES.length} categories`}</button>}
-          </fieldset>
+          <Dropdown label="Category" testId="dd-category" searchable value={cfg.category} onChange={(v) => setCfg({ ...cfg, category: v })}
+            options={GROUPS.flatMap((g) => g.items.map((c) => ({ value: c, label: c, group: g.title, icon: <CatIcon c={c} size={18} /> })))} />
           <CoverPicker value={cover} onChange={setCover} title={cfg.title} place={`${cfg.place}, ${city.name}`} />
           <div className="flex flex-col gap-2 rounded-xl border border-line px-3.5 py-3" data-testid="kit-preview">
             <p className="text-sm"><b>Tools for this type</b> <span className="text-fg-muted">· {KITS.find((k) => k.id === kit)?.label}</span></p>
             <div className="flex flex-wrap gap-1.5">{TOOLS.filter((t) => t.kit === 'base' || t.kit === kit).map((t) => <span key={t.id} className="rounded-full bg-ink-700 px-2.5 py-1 text-xs font-semibold">{t.name}</span>)}</div>
             <p className="text-xs text-fg-muted">{POLICY[kit === 'hidden' ? 'secret' : kit === 'fear' || kit === 'adventure' || kit === 'nature' ? 'area' : 'exact'].note} <Link to="/studio/tools" className="font-semibold text-sky hover:underline">Choose your tools</Link></p>
           </div>
-          <fieldset className="flex flex-col gap-2">
-            <legend className="mb-1 text-sm font-medium">How do you run this live?</legend>
-            <HostModePicker value={cfg.hostMode} onChange={(m) => setCfg({ ...cfg, hostMode: m })} />
-          </fieldset>
+          <Dropdown label="How do you run this live?" testId="dd-mode" value={cfg.hostMode} onChange={(v) => setCfg({ ...cfg, hostMode: v })}
+            options={HOST_MODES.map((m) => ({ value: m.id, label: m.label, hint: `${m.who}. ${m.line}` }))} />
           <button type="submit" disabled={busy} className="mt-1 inline-flex items-center justify-center rounded-full bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft disabled:opacity-60">
             {busy ? 'Starting…' : <>{cfg.hostMode === 'team' ? 'Open the control room in ' : 'Start session in '}{city.name}</>}
           </button>

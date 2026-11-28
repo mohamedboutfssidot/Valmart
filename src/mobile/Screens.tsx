@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import { liveStream, useLiveNow, whereOf } from '../rooms/LiveNow'
 import type { LiveNow } from '../rooms/types'
 import { useThumb } from '../rooms/thumb'
+import { usePreviewStream } from '../rooms/preview'
 import { useExtra } from '../extra'
 import { CATEGORIES, CITIES, audienceOf, cityOf, formatCount, hostOf, STREAMS, streamById, type Stream } from '../data/mock'
 import { EVENTS, eventById, type EventItem } from '../data/events'
@@ -76,10 +77,12 @@ type Tab = 'you' | 'live' | 'replays' | 'cities' | 'events'
 /** One card of the Explore feed: 16:9 video, host avatar, title, meta. Plays muted while on screen. */
 function RealFeedCard({ l, onOpen }: { l: LiveNow; onOpen: () => void }) {
   const still = useThumb(l.room, l.thumb)
-  return <FeedCard s={liveStream(l)} still={still} badge="LIVE" line={`Started ${liveStream(l).startedMinAgo} min ago`} hostName={l.host} whereText={whereOf(l)} onOpen={onOpen} />
+  const box = useRef<HTMLDivElement>(null)
+  const live = usePreviewStream(l.room, box)
+  return <div ref={box}><FeedCard s={liveStream(l)} still={still} live={live} badge="LIVE" line={`Started ${liveStream(l).startedMinAgo} min ago`} hostName={l.host} whereText={whereOf(l)} onOpen={onOpen} /></div>
 }
 
-function FeedCard({ s, badge, line, minutes, views, onOpen, hostName, whereText, still }: { still?: string | null; s: Stream; badge: 'LIVE' | 'REPLAY'; line: string; minutes?: number; views?: number; onOpen: () => void; hostName?: string; whereText?: string }) {
+function FeedCard({ s, badge, line, minutes, views, onOpen, hostName, whereText, still, live }: { still?: string | null; live?: MediaStream | null; s: Stream; badge: 'LIVE' | 'REPLAY'; line: string; minutes?: number; views?: number; onOpen: () => void; hostName?: string; whereText?: string }) {
   const host = hostOf(s.hostId); const city = cityOf(s.cityId)
   const ref = useRef<HTMLButtonElement>(null)
   useEffect(() => {
@@ -93,7 +96,7 @@ function FeedCard({ s, badge, line, minutes, views, onOpen, hostName, whereText,
   return (
     <article className="flex flex-col gap-2.5" data-testid="feed-card">
       <button type="button" ref={ref} onClick={onOpen} aria-label={`Watch ${s.title}`} className="relative block w-full overflow-hidden rounded-xl text-left transition-transform active:scale-[.985]">
-        <VideoSlot stream={s} still={still} showLabel={false} className="!aspect-video !w-full !rounded-xl" />
+        <VideoSlot stream={s} still={still} mediaStream={live} showLabel={false} className="!aspect-video !w-full !rounded-xl" />
         <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/55 to-transparent" />
         <span className="absolute left-2.5 top-2.5 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur">{s.category}</span>
         <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1.5 text-xs font-semibold tabular-nums text-white">

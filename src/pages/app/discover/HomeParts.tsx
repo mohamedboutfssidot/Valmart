@@ -1,46 +1,65 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CatIcon } from '../../../components/icons2'
 import { Avatar } from '../../../components/ui'
 import { VideoSlot } from '../../../components/VideoSlot'
-import { CATEGORIES, STREAMS, audienceOf, cityOf, formatCount, hostOf, slugOf } from '../../../data/mock'
+import { CATEGORIES, STREAMS, audienceOf, cityOf, formatCount, hostOf, slugOf, type Stream } from '../../../data/mock'
+import { liveStream, useLiveNow } from '../../../rooms/LiveNow'
+import { usePreviewStream } from '../../../rooms/preview'
+import { useThumb } from '../../../rooms/thumb'
+import type { LiveNow } from '../../../rooms/types'
 
-/** Featured live on Home: one big player card that rotates through the most watched lives. */
+/** One featured live: the video starts at once (a real live shows its camera, a catalogue live plays its clip). */
+function HeroSlot({ s, room, real }: { s: Stream; room?: string; real?: LiveNow }) {
+  const box = useRef<HTMLDivElement>(null)
+  const live = usePreviewStream(room ?? '', box, !!room)
+  const still = useThumb(room ?? '', real?.thumb)
+  const host = hostOf(s.hostId)
+  return (
+    <div ref={box}>
+      <VideoSlot stream={s} player mediaStream={room ? live : undefined} still={room ? still : null} showLabel={false} className="!rounded-none">
+        <Link to={room ? `/app/room/${room}?auto=1` : `/app/live/${s.id}`} aria-label={`Watch ${s.title}`} title={`Watch ${real?.host ?? host.name} live`} data-testid="hero-open" className="absolute inset-0 z-10 cursor-pointer bg-black/0 transition hover:bg-black/15 focus-visible:ring-2 focus-visible:ring-sky" />
+        <span className="absolute left-3 top-3 rounded bg-[#e91916] px-2 py-1 text-xs font-bold uppercase leading-none text-white">Live</span>
+        <span className="absolute bottom-3 left-3 rounded bg-black/70 px-2 py-1 text-xs font-semibold tabular-nums text-white">{formatCount(s.viewers)} watching</span>
+      </VideoSlot>
+    </div>
+  )
+}
+
+/** Featured live on Home: one big player card. It stays on the live you chose (no automatic switch); real lives come first. */
 export function Hero() {
-  const top = useMemo(() => [...STREAMS].sort((a, b) => b.viewers - a.viewers).slice(0, 5), [])
+  const { lives } = useLiveNow()
+  const items = useMemo(() => {
+    const demo = [...STREAMS].sort((a, b) => b.viewers - a.viewers).slice(0, 5).map((s) => ({ s, real: undefined as LiveNow | undefined }))
+    return [...lives.map((l) => ({ s: liveStream(l), real: l })), ...demo]
+  }, [lives])
   const [i, setI] = useState(0)
-  useEffect(() => {
-    const t = window.setInterval(() => setI((n) => (n + 1) % top.length), 7000)
-    return () => window.clearInterval(t)
-  }, [top.length])
-  const s = top[i]
+  const idx = Math.min(i, items.length - 1)
+  const { s, real } = items[idx]
   const host = hostOf(s.hostId)
   const city = cityOf(s.cityId)
-  const step = (d: number) => setI((n) => (n + d + top.length) % top.length)
+  const step = (d: number) => setI((n) => (n + d + items.length) % items.length)
+  const tags = real ? [real.category, [real.city, real.country].filter(Boolean).join(', ')].filter(Boolean) : [s.category, city.name, s.language, audienceOf(s.category)]
   return (
     <section className="mx-auto grid w-full max-w-[980px] gap-3" aria-label="Featured live" data-testid="hero">
       <div className="overflow-hidden rounded-card border border-line bg-ink-800">
         <div className="relative">
-          <VideoSlot key={s.id} stream={s} showLabel={false} className="!rounded-none">
-            <Link to={`/app/live/${s.id}`} aria-label={`Watch ${s.title}`} title={`Watch ${host.name} live`} data-testid="hero-open" className="absolute inset-0 z-10 cursor-pointer bg-black/0 transition hover:bg-black/15 focus-visible:ring-2 focus-visible:ring-sky" />
-            <span className="absolute left-3 top-3 rounded bg-[#e91916] px-2 py-1 text-xs font-bold uppercase leading-none text-white">Live</span>
-            <span className="absolute bottom-3 left-3 rounded bg-black/70 px-2 py-1 text-xs font-semibold tabular-nums text-white">{formatCount(s.viewers)} watching</span>
-          </VideoSlot>
+          <HeroSlot key={real ? real.room : s.id} s={s} room={real?.room} real={real} />
         </div>
         <div className="flex flex-wrap items-center gap-3 p-3.5 sm:p-4">
-          <Avatar name={host.name} size={48} />
+          <Avatar name={real?.host ?? host.name} size={48} />
           <div className="min-w-0 flex-1">
-            <h2 className="truncate text-lg font-bold">{host.name}</h2>
+            <h2 className="truncate text-lg font-bold">{real?.host ?? host.name}</h2>
             <p className="truncate text-sm text-fg-muted">{s.title}</p>
             <div className="mt-1.5 flex flex-wrap gap-1.5 text-xs font-semibold">
-              {[s.category, city.name, s.language, audienceOf(s.category)].map((t) => <span key={t} className="rounded-md bg-ink-700 px-2 py-1">{t}</span>)}
+              {tags.map((t) => <span key={t} className="rounded-md bg-ink-700 px-2 py-1">{t}</span>)}
             </div>
           </div>
         </div>
         <div className="flex items-center justify-between border-t border-line px-4 py-2.5">
           <div className="flex gap-1.5" role="tablist" aria-label="Featured lives">
-            {top.map((x, n) => (
-              <button key={x.id} type="button" role="tab" aria-selected={n === i} aria-label={x.title} onClick={() => setI(n)} className={`h-1.5 rounded-full transition-all duration-300 ${n === i ? 'w-8 bg-sky' : 'w-3 bg-line hover:bg-fg-muted'}`} />
+            {items.map((x, n) => (
+              <button key={x.real?.room ?? x.s.id} type="button" role="tab" aria-selected={n === idx} aria-label={x.s.title} onClick={() => setI(n)} className={`h-1.5 rounded-full transition-all duration-300 ${n === idx ? 'w-8 bg-sky' : 'w-3 bg-line hover:bg-fg-muted'}`} />
             ))}
           </div>
           <div className="flex gap-1">

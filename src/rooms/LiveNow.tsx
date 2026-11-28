@@ -1,9 +1,10 @@
 // The list of real lives that are on air right now (hosts who pressed "Go live"). Click one to watch, no code.
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LiveBadge } from '../components/ui'
 import { listLives } from './api'
 import type { LiveNow } from './types'
 import { useThumb } from './thumb'
+import { usePreviewStream } from './preview'
 import { StreamCard } from '../components/StreamCard'
 import { STREAMS, type Category, type Stream } from '../data/mock'
 
@@ -69,5 +70,7 @@ export function LiveNowList({ onOpen, mobile = false, empty = true }: { onOpen: 
 /** Web card for a real live: same card as the catalogue, with the latest still of the host's camera. */
 export function RealLiveCard({ l }: { l: LiveNow }) {
   const still = useThumb(l.room, l.thumb)
-  return <StreamCard stream={liveStream(l)} still={still} to={`/app/room/${l.room}?auto=1`} hostName={l.host} whereText={whereOf(l)} />
+  const box = useRef<HTMLDivElement>(null)
+  const live = usePreviewStream(l.room, box)
+  return <div ref={box}><StreamCard stream={liveStream(l)} still={still} mediaStream={live} to={`/app/room/${l.room}?auto=1`} hostName={l.host} whereText={whereOf(l)} /></div>
 }

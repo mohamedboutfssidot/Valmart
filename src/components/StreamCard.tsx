@@ -3,12 +3,12 @@ import { audienceOf, cityOf, formatCount, hostOf, type Stream } from '../data/mo
 import { Avatar, LiveBadge } from './ui'
 import { VideoSlot } from './VideoSlot'
 
-export function StreamCard({ stream, to, hostName, whereText, still }: { stream: Stream; to?: string; hostName?: string; whereText?: string; still?: string | null }) {
+export function StreamCard({ stream, to, hostName, whereText, still, mediaStream }: { stream: Stream; to?: string; hostName?: string; whereText?: string; still?: string | null; mediaStream?: MediaStream | null }) {
   const host = hostOf(stream.hostId)
   const city = cityOf(stream.cityId)
   return (
     <Link to={to ?? `/app/live/${stream.id}`} className="group flex min-w-0 flex-col gap-3">
-      <VideoSlot stream={stream} still={still} showLabel={false} className="rounded-card ring-1 ring-line transition group-hover:ring-sky">
+      <VideoSlot stream={stream} still={still} mediaStream={mediaStream} showLabel={false} className="rounded-card ring-1 ring-line transition group-hover:ring-sky">
         <div className="absolute left-3 top-3"><LiveBadge viewers={formatCount(stream.viewers)} /></div>
         <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
           <span className="min-w-0 truncate font-display text-sm font-semibold drop-shadow">{whereText ?? `${city.name}, ${city.country}`}</span>

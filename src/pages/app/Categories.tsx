@@ -37,7 +37,7 @@ const MORE: Record<string, string> = {
   'Transport Journey': 'Trains, ferries and road trips, seat by seat.',
   'Language & Lessons': 'Learn useful phrases while you walk.',
 }
-const GROUPS: { title: string; items: Category[] }[] = [
+export const GROUPS: { title: string; items: Category[] }[] = [
   { title: 'Explore the city', items: ['Discovery', 'Urban Exploration', 'Hidden Places', 'Night Exploration', 'Travel Guide', 'A Day with a Local', 'Transport Journey'] },
   { title: 'Food, culture and music', items: ['Food Journey', 'Street Food Market', 'Cultural Tour', 'History & Heritage', 'Art & Museums', 'Festival / Event', 'Nightlife & Music', 'Educational Tour', 'Language & Lessons'] },
   { title: 'Nature and adventure', items: ['Adventure', 'Nature Walk', 'Wildlife & Safari', 'Weather & Storms', 'Sports & Fitness', 'Survival-Style', 'Horror'] },
