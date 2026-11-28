@@ -9,7 +9,8 @@ import { GroupFab } from './GroupFab'
 import { CategoriesTab } from './Categories'
 import '../mobile-extra.css'
 import '../pro.css'
-import { STREAMS, streamById } from '../data/mock'
+import { STREAMS, streamById, type Stream } from '../data/mock'
+import { liveStream } from '../rooms/LiveNow'
 import { BackCtx, Explore } from './Screens'
 import { Me } from './Settings'
 import { StudioTab } from './Studio'
@@ -40,7 +41,8 @@ function PhoneApp() {
   const [tab, setTab] = useState<Tab>('explore')
   const [watching, setWatching] = useState<string | null>(null)
   const watch = (id: string) => setWatching(id)
-  const stream = watching ? streamById(watching) ?? STREAMS[0] : null
+  const [liveRoom, setLiveRoom] = useState<{ code: string; stream: Stream } | null>(null)
+  const stream = liveRoom ? liveRoom.stream : watching ? streamById(watching) ?? STREAMS[0] : null
 
   type TabDef = [Tab, string, Parameters<typeof Icon>[0]['name']]
   const tabs: TabDef[] = [
@@ -71,7 +73,7 @@ function PhoneApp() {
               : <AuthScreen onBack={() => setFlow('splash')} />
           ) : (
             <BackCtx.Provider value={current === 'explore' ? null : () => setTab('explore')}><div key={current} className={`${dir} absolute inset-0`}>
-              {current === 'explore' && <Explore onWatch={watch} onRooms={() => { setRoomCode(undefined); setRooms(true) }} onLive={(r) => { setRoomCode(r); setRooms(true) }} />}
+              {current === 'explore' && <Explore onWatch={watch} onRooms={() => { setRoomCode(undefined); setRooms(true) }} onLive={(l) => { setLiveRoom({ code: l.room, stream: liveStream(l) }) }} />}
               {current === 'categories' && <CategoriesTab onPick={() => setTab('explore')} />}
               {current === 'events' && <Events />}
               {current === 'hub' && <Hub onWatch={watch} onPick={() => { setTab('explore'); window.setTimeout(() => window.dispatchEvent(new CustomEvent(PICK_EVENT)), 80) }} />}
@@ -79,7 +81,7 @@ function PhoneApp() {
               {current === 'me' && <Me onTrial={() => setOffer(true)} onRooms={() => { setRoomCode(undefined); setRooms(true) }} />}
             </div></BackCtx.Provider>
           )}
-          {user && stream && <Watch key={stream.id} stream={stream} onClose={() => setWatching(null)} onSwitch={watch} onTrial={() => setOffer(true)} onRequest={() => { setWatching(null); setTab('hub'); window.setTimeout(() => window.dispatchEvent(new CustomEvent('vm-hub-open', { detail: 'requests' })), 80) }} />}
+          {user && stream && <Watch key={liveRoom ? liveRoom.code : stream.id} stream={stream} room={liveRoom?.code} onClose={() => { setWatching(null); setLiveRoom(null) }} onSwitch={(id) => { setLiveRoom(null); watch(id) }} onTrial={() => setOffer(true)} onRequest={() => { setWatching(null); setTab('hub'); window.setTimeout(() => window.dispatchEvent(new CustomEvent('vm-hub-open', { detail: 'requests' })), 80) }} />}
           {user && <GroupFab go={watch} cur={watching} browse={() => setWatching(null)} />}
           {user && offer && <TrialSheet onClose={() => setOffer(false)} />}
           {user && rooms && <MobileRooms key={roomCode ?? 'entry'} initialRoom={roomCode} onClose={() => setRooms(false)} />}

@@ -27,6 +27,8 @@ import { VmPause } from '../live/Pause'
 import { Cinema } from '../live/Cinema'
 import { speak } from '../live/tts'
 import { ReportButton } from '../features/kit'
+import { useRoom } from '../rooms/useRoom'
+import { getName } from '../rooms/api'
 
 
 /** Captions button with its small menu: on/off, translate, read aloud, size. Opens upward in Cinema. */
@@ -60,16 +62,23 @@ function Row2({ on, onClick, icon, label }: { on: boolean; onClick: () => void; 
   )
 }
 
-export function Watch({ stream, onClose, onTrial, onSwitch, onRequest }: { stream: Stream; onClose: () => void; onTrial: () => void; onSwitch?: (id: string) => void; onRequest?: () => void }) {
+export function Watch({ stream, room, onClose, onTrial, onSwitch, onRequest }: { stream: Stream; /** a real live room: the video, chat and tools come from the room */ room?: string; onClose: () => void; onTrial: () => void; onSwitch?: (id: string) => void; onRequest?: () => void }) {
   const m = stream.startedMinAgo
-  const host = hostOf(stream.hostId)
+  const hostSim = hostOf(stream.hostId)
   const city = cityOf(stream.cityId)
+  const r = useRoom({ room: room ?? '', role: 'viewer', name: getName() })
+  const joined = useRef(false)
+  useEffect(() => { if (room && !joined.current) { joined.current = true; void r.join() } }, [room, r])
+  const host = room && r.info.meta?.host ? { ...hostSim, name: r.info.meta.host } : hostSim
   const sim = useLiveSim(city.id, host.name)
+  const msgs = room ? r.chat : sim.msgs
+  const sendMsg = (x: string) => (room ? r.sendChat(x) : sim.send(x, 'You'))
+  const watching = room ? String(Math.max(r.info.viewers, 1)) : formatCount(stream.viewers)
   const { coins, isPremium, plan, spend, visit, addMoment, logGift, moments } = useDemo()
   const { followHosts, toggleHost } = useExtra()
   const [mode, setMode] = useMode('mobile')
   const [toast, setToast] = useState<string | null>(null)
-  const eng = useToolEngine({ seedKey: stream.id, category: stream.category, role: 'viewer', mode })
+  const eng = useToolEngine({ seedKey: stream.id, category: stream.category, role: 'viewer', mode, net: room ? r.net : undefined, simAudience: !room })
   const [look, setLook] = useState(false)
   const [looks, setLooks] = useState(0)
   const toggleLook = () => { if (!look && looks >= planOf(plan).looks) return setToast(planOf(plan).looks === 0 ? 'Look here starts with Plus (5 per live).' : `${planOf(plan).name}: ${planOf(plan).looks} Look here per live. Upgrade for more.`); setLook((v) => !v) }
@@ -137,11 +146,12 @@ export function Watch({ stream, onClose, onTrial, onSwitch, onRequest }: { strea
   return (
     <LiveTheme stream={stream} plan={plan} inner="h-full" className="!absolute inset-0 z-30 overflow-hidden bg-ink-900"><div className="slide-in absolute inset-0 flex flex-col bg-ink-900/0 text-fg" data-testid="watch">
       <div className="relative shrink-0">
-        <VideoSlot stream={stream} player audio soundButton={false} showLabel={false} className="!aspect-video !rounded-none">
+        <VideoSlot stream={stream} mediaStream={room ? r.info.remote : undefined} sound={!!room} player audio soundButton={false} showLabel={false} className="!aspect-video !rounded-none">
+          {room && !r.info.remote && <p className="absolute inset-0 z-[4] grid place-items-center px-6 text-center text-sm font-semibold text-white" data-testid="room-wait">{r.phase === 'error' ? r.error : r.phase === 'in' ? (r.info.publisherHere ? 'Starting the video…' : 'Waiting for the host…') : 'Joining the live…'}</p>}
           {pf.captions && (
             <p key={cap} className={`fade-in pointer-events-none absolute inset-x-3 bottom-3 mx-auto w-fit max-w-full rounded-lg bg-ink-950/75 px-3 py-1.5 text-center font-medium backdrop-blur ${pf.captionSize === 'S' ? 'text-[12px]' : pf.captionSize === 'L' ? 'text-[17px]' : 'text-[14px]'}`}>{needs && !translate ? line.orig : line.en}</p>
           )}
-          <button type="button" aria-label="Leave the live" title="Leave the live" data-testid="m-leave" onClick={onClose} className="absolute right-3 top-3 z-[12] grid h-9 w-9 place-items-center rounded-full bg-ink-950/75 text-fg backdrop-blur active:scale-90"><Icon name="close" size={18} /></button>
+          <button type="button" aria-label="Leave the live" title="Leave the live" data-testid="m-leave" onClick={() => { r.leave(); onClose() }} className="absolute right-3 top-3 z-[12] grid h-9 w-9 place-items-center rounded-full bg-ink-950/75 text-fg backdrop-blur active:scale-90"><Icon name="close" size={18} /></button>
           <GiftToast bursts={sim.bursts} />
           <VmPause />
           <VideoEffects e={eng} />
@@ -170,7 +180,7 @@ export function Watch({ stream, onClose, onTrial, onSwitch, onRequest }: { strea
         <div>
           <h1 className="line-clamp-2 text-[15px] font-bold leading-snug">{stream.title}</h1>
           <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-fg-muted">
-            <span className="inline-flex items-center gap-1.5 font-semibold text-sky"><i className="live-dot" style={{ width: 6, height: 6 }} />{formatCount(stream.viewers)} watching</span>
+            <span className="inline-flex items-center gap-1.5 font-semibold text-sky"><i className="live-dot" style={{ width: 6, height: 6 }} />{watching} watching</span>
             <span aria-hidden="true">·</span><span className="tabular-nums">{String(Math.floor(m / 60)).padStart(2, '0')}:{String(m % 60).padStart(2, '0')}</span>
             <span aria-hidden="true">·</span><span className="font-semibold text-sky">{stream.category}</span>
             <span className="rounded-full bg-ink-700 px-2 py-0.5 text-[10.5px] font-semibold text-fg">{stream.language}</span>
@@ -180,7 +190,7 @@ export function Watch({ stream, onClose, onTrial, onSwitch, onRequest }: { strea
           <span className="relative shrink-0"><span className="block rounded-full ring-2 ring-[#e91916]"><Avatar name={host.name} size={36} /></span><span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded bg-[#e91916] px-1 py-px text-[7px] font-extrabold uppercase leading-none text-white">Live</span></span>
           <div className="min-w-0 flex-1">
             <p className="flex items-center gap-1 text-[13.5px] font-bold leading-tight"><span className="truncate">{host.name}</span><svg width="13" height="13" viewBox="0 0 24 24" aria-label="Verified" className="shrink-0 text-sky"><path fill="currentColor" d="M12 2l2.4 2 3.1-.2 1 3 2.7 1.6-.8 3 .8 3-2.7 1.6-1 3-3.1-.2L12 22l-2.4-2-3.1.2-1-3L2.8 15.6 3.6 12.6 2.8 9.6 5.5 8l1-3 3.1.2z" /><path d="M8.5 12.2l2.4 2.4 4.6-4.8" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" /></svg></p>
-            <p className="truncate text-[12px] text-fg-muted">{stream.place}, {city.name}</p>
+            <p className="truncate text-[12px] text-fg-muted">{room ? ([r.info.meta?.city, r.info.meta?.country].filter(Boolean).join(', ') || stream.place) : `${stream.place}, ${city.name}`}</p>
           </div>
           <button type="button" aria-pressed={following} onClick={() => toggleHost(host.id)} className={`inline-flex h-8 shrink-0 items-center rounded-pill px-4 text-[13px] font-bold active:scale-95 ${following ? 'bg-ink-700 text-fg' : 'bg-fg text-ink-900'}`} data-testid="watch-follow">{following ? 'Following' : 'Follow'}</button>
         </div>
@@ -191,14 +201,14 @@ export function Watch({ stream, onClose, onTrial, onSwitch, onRequest }: { strea
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col">
-        <ChatPanel msgs={sim.msgs} selfName="You" coins={coins} onGift={onGift} onSend={(x) => sim.send(x, 'You')} locked={eng.chatLock} off={chatOff} className="min-h-0 flex-1 !rounded-none !border-0 !bg-transparent" />
+        <ChatPanel msgs={msgs} selfName="You" coins={coins} onGift={onGift} onSend={sendMsg} locked={eng.chatLock} off={chatOff} className="min-h-0 flex-1 !rounded-none !border-0 !bg-transparent" />
       </div>
       {cinema && (
         <Landscape><Cinema
-          contained compact overlay={moreSheet} onMore={() => setMore(true)} extra={<CaptionMenu needs={needs} up />} stream={stream} eng={eng} viewers={formatCount(stream.viewers)} hostName={host.name} onExit={leaveCinema}
+          mediaStream={room ? r.info.remote : undefined} contained compact overlay={moreSheet} onMore={() => setMore(true)} extra={<CaptionMenu needs={needs} up />} stream={stream} eng={eng} viewers={watching} hostName={host.name} onExit={leaveCinema}
           bursts={<GiftToast bursts={sim.bursts} />}
           captions={pf.captions ? <p key={cap} className={`fade-in max-w-[90%] rounded-lg bg-ink-950/75 px-3 py-1.5 text-center font-medium backdrop-blur ${pf.captionSize === 'S' ? 'text-[12px]' : pf.captionSize === 'L' ? 'text-[17px]' : 'text-[14px]'}`}>{needs && !translate ? line.orig : line.en}</p> : null}
-          chat={<ChatPanel msgs={sim.msgs} selfName="You" coins={coins} onGift={onGift} onSend={(x) => sim.send(x, 'You')} locked={eng.chatLock} off={chatOff} className="!h-full !rounded-none !border-0" />}
+          chat={<ChatPanel msgs={msgs} selfName="You" coins={coins} onGift={onGift} onSend={sendMsg} locked={eng.chatLock} off={chatOff} className="!h-full !rounded-none !border-0" />}
         /></Landscape>
       )}
       {!cinema && moreSheet}

@@ -90,8 +90,8 @@ function Group({ label, children, className = '' }: { label: string; children: R
   )
 }
 
-export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels, bursts, contained, compact, extra, cc, overlay, onMore, onExit }: {
-  stream: Stream; eng: ToolEngine; viewers: string; hostName: string
+export function Cinema({ mediaStream, stream, eng, viewers, hostName, chat, captions, panels, bursts, contained, compact, extra, cc, overlay, onMore, onExit }: {
+  stream: Stream; eng: ToolEngine; viewers: string; hostName: string; mediaStream?: MediaStream | null
   chat: ReactNode; captions: ReactNode; panels?: ReactNode; bursts?: ReactNode; contained?: boolean; compact?: boolean; extra?: ReactNode; cc?: CC; overlay?: ReactNode; onMore?: () => void; onExit: () => void
 }) {
   const root = useRef<HTMLDivElement>(null)
@@ -162,7 +162,7 @@ export function Cinema({ stream, eng, viewers, hostName, chat, captions, panels,
     <div ref={root} className={`${contained ? 'absolute' : 'fixed'} inset-0 z-[60] overflow-hidden bg-black ${shown ? '' : 'cursor-none'}`} onMouseMove={wake} onClick={wake} role="dialog" aria-label="Full screen" aria-modal="true">
       {/* The browser forbids turning the full-screen element itself, so the sideways turn is done by this inner box. */}
       <div data-rot={rotated ? '1' : '0'} style={rotated ? { position: 'fixed', top: 0, left: '100vw', width: '100dvh', height: '100dvw', transformOrigin: 'top left', transform: 'rotate(90deg)' } : undefined} className={rotated ? 'overflow-hidden bg-black' : 'absolute inset-0'}>
-      <VideoSlot stream={stream} player audio soundButton={false} showLabel={false} fit={compact ? 'contain' : 'cover'} className="!absolute inset-0 !aspect-auto h-full">
+      <VideoSlot stream={stream} mediaStream={mediaStream} sound={!!mediaStream} player audio soundButton={false} showLabel={false} fit={compact ? 'contain' : 'cover'} className="!absolute inset-0 !aspect-auto h-full">
         <VideoEffects e={eng} />
         <PinLayer e={eng} armed={look || eng.pinArmed} onDone={() => setLook(false)} />
         {bursts}

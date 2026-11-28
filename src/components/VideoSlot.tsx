@@ -5,6 +5,15 @@ import { clipFor, useManifest } from '../video/manifest'
 import { SoundToggle, useSound } from '../video/sound'
 import { useLib } from '../video/library'
 
+const posterOf = (clip: string) => (/\/video\.mp4$/.test(clip) ? clip.replace(/video\.mp4$/, 'poster.jpg') : undefined)
+const warmed = new Set<string>()
+/** Starts downloading a clip into the browser cache so it plays at once when opened. */
+export function warm(clip?: string) {
+  if (!clip || warmed.has(clip) || typeof fetch === 'undefined') return
+  warmed.add(clip)
+  fetch(clip, { cache: 'force-cache' }).catch(() => warmed.delete(clip))
+}
+
 function rng(seed: number) {
   let s = seed * 9301 + 49297
   return () => ((s = (s * 9301 + 49297) % 233280) / 233280)
@@ -37,7 +46,7 @@ function ClipPlayer({ clip, onMissing, fit }: { clip: string; onMissing: () => v
     const r = el.play()
     if (r) r.then(() => useSound.setState({ blocked: false })).catch(() => { el.muted = true; useSound.setState({ blocked: on }); void el.play().catch(() => undefined) })
   }, [clip, on, tick, volume])
-  return <video ref={ref} key={clip} className={`absolute inset-0 h-full w-full ${fit}`} src={clip} autoPlay loop playsInline muted preload="auto" onError={onMissing} />
+  return <video ref={ref} key={clip} className={`absolute inset-0 h-full w-full ${fit}`} src={clip} poster={posterOf(clip)} autoPlay loop playsInline muted preload="auto" onError={onMissing} />
 }
 
 /**
@@ -67,27 +76,43 @@ export function VideoSlot({ stream, src, mediaStream, sound = false, audio = fal
     io.observe(el)
     return () => io.disconnect()
   }, [player, seen])
+  useEffect(() => { if (seen && clip && !player) { const t = window.setTimeout(() => warm(clip), 600); return () => window.clearTimeout(t) } }, [seen, clip, player])
   const live = useRef<HTMLVideoElement>(null)
+  const [stuck, setStuck] = useState(false)
   useEffect(() => {
     const el = live.current
-    if (el && mediaStream) {
-      el.srcObject = mediaStream
-      el.muted = !sound
-      // if the browser refuses sound, keep the picture and play muted
-      void el.play().catch(() => { el.muted = true; void el.play().catch(() => undefined) })
+    if (!el || !mediaStream) return
+    el.srcObject = mediaStream
+    el.muted = !sound
+    setStuck(false)
+    let on = true
+    // browsers can refuse sound, or pause a video that has no picture yet: keep retrying, muted if needed
+    const go = () => {
+      if (!on) return
+      el.play().then(() => on && setStuck(false)).catch(() => { el.muted = true; el.play().then(() => on && setStuck(false)).catch(() => on && setStuck(true)) })
     }
-    return () => { if (el) el.srcObject = null }
+    go()
+    const ev = ['loadedmetadata', 'canplay', 'pause', 'stalled'] as const
+    ev.forEach((n) => el.addEventListener(n, go))
+    mediaStream.addEventListener('addtrack', go)
+    const vis = () => { if (!document.hidden) go() }
+    document.addEventListener('visibilitychange', vis)
+    const t = window.setInterval(() => { if (el.paused) go() }, 2000)
+    return () => { on = false; ev.forEach((n) => el.removeEventListener(n, go)); mediaStream.removeEventListener('addtrack', go); document.removeEventListener('visibilitychange', vis); window.clearInterval(t); el.srcObject = null }
   }, [mediaStream, sound])
   const fitCls = fit === 'contain' ? 'object-contain bg-black' : 'object-cover'
   return (
-    <div ref={box} className={`dk relative isolate aspect-video w-full max-w-full overflow-hidden bg-ink-950 ${className}`}>
+    <div ref={box} onPointerEnter={() => warm(clip)} onTouchStart={() => warm(clip)} className={`dk relative isolate aspect-video w-full max-w-full overflow-hidden bg-ink-950 ${className}`}>
       {mediaStream ? (
-        <video ref={live} className="absolute inset-0 h-full w-full object-cover" autoPlay muted={!sound} playsInline />
+        <>
+          <video ref={live} className="absolute inset-0 h-full w-full object-cover" autoPlay muted={!sound} playsInline />
+          {stuck && <button type="button" data-testid="tap-play" onClick={() => { const v = live.current; if (v) { v.muted = !sound; void v.play().then(() => setStuck(false)).catch(() => undefined) } }} className="absolute inset-0 z-[5] grid place-items-center bg-black/40 text-sm font-semibold text-white">Tap to play</button>}
+        </>
       ) : clip && (player || seen) ? (
         player
           ? (audio
             ? <ClipPlayer clip={clip} fit={fitCls} onMissing={() => setMissing(clip)} />
-            : <video key={clip} className={`absolute inset-0 h-full w-full ${fitCls}`} src={clip} autoPlay muted loop playsInline preload="auto" onError={() => setMissing(clip)} />)
+            : <video key={clip} className={`absolute inset-0 h-full w-full ${fitCls}`} src={clip} poster={posterOf(clip)} autoPlay muted loop playsInline preload="auto" onError={() => setMissing(clip)} />)
           : <video key={clip} className="absolute inset-0 h-full w-full object-cover" src={`${clip}#t=0.1`} preload="metadata" muted playsInline aria-hidden="true" onError={() => setMissing(clip)} />
       ) : (
         <svg className="absolute inset-0 h-full w-full" viewBox="0 0 160 90" preserveAspectRatio="xMidYMax slice" aria-hidden="true">

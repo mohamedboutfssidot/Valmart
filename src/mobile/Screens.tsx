@@ -1,6 +1,7 @@
 import { ReplayOverlay, ReplayRow } from './Replays'
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { liveStream, useLiveNow, whereOf } from '../rooms/LiveNow'
+import type { LiveNow } from '../rooms/types'
 import { useExtra } from '../extra'
 import { CATEGORIES, CITIES, audienceOf, cityOf, formatCount, hostOf, STREAMS, streamById, type Stream } from '../data/mock'
 import { EVENTS, eventById, type EventItem } from '../data/events'
@@ -108,7 +109,7 @@ function FeedCard({ s, badge, line, minutes, views, onOpen, hostName, whereText 
   )
 }
 
-export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id: string) => void; onRooms?: () => void; onLive?: (room: string) => void }) {
+export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id: string) => void; onRooms?: () => void; onLive?: (live: LiveNow) => void }) {
   const [searching, setSearching] = useState(false); const [q, setQ] = useState(''); const [f, setF] = useState<Filters>(BASE_FILTERS); const [tab, setTab] = useState<Tab>('you')
   const [fOpen, setFOpen] = useState(false); const [pick, setPick] = useState(false); const [sel, setSel] = useState<Stream | null>(null); const [ev, setEv] = useState<EventItem | null>(null); const [rp, setRp] = useState<string | null>(null)
   const setGroupLive = useGroup((st) => st.setGroupLive)
@@ -128,7 +129,7 @@ export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id
   const feed = useMemo(() => { const out: { key: string; kind: 'live' | 'replay'; id: string }[] = []; let i = 0; let j = 0; while (i < lives.length || j < reps.length) { for (let n = 0; n < 2 && i < lives.length; n++) out.push({ key: `l-${lives[i].id}`, kind: 'live', id: lives[i++].id }); if (j < reps.length) out.push({ key: `r-${reps[j].id}`, kind: 'replay', id: reps[j++].id }); if (out.length >= 24) break } return out }, [lives, reps])
   const n = filterCount(f)
   const tabs: [Tab, string, number | null][] = [['you', 'For you', null], ['live', 'Live now', lives.length + (onLive && !term && n === 0 ? real.length : 0)], ['replays', 'Replays', reps.length], ['cities', 'Cities', CITIES.length], ['events', 'Events', EVENTS.length]]
-  const realCards = onLive && !term && n === 0 ? real.map((l) => <FeedCard key={`room-${l.room}`} s={liveStream(l)} badge="LIVE" line={`Started ${liveStream(l).startedMinAgo} min ago`} hostName={l.host} whereText={whereOf(l)} onOpen={() => onLive(l.room)} />) : null
+  const realCards = onLive && !term && n === 0 ? real.map((l) => <FeedCard key={`room-${l.room}`} s={liveStream(l)} badge="LIVE" line={`Started ${liveStream(l).startedMinAgo} min ago`} hostName={l.host} whereText={whereOf(l)} onOpen={() => onLive(l)} />) : null
   const card = (it: { key: string; kind: 'live' | 'replay'; id: string }) => {
     if (it.kind === 'live') { const st = streamById(it.id); return st ? <FeedCard key={it.key} s={st} badge="LIVE" line={`Started ${st.startedMinAgo} min ago`} onOpen={() => onWatch(st.id)} /> : null }
     const r = replays.find((x) => x.id === it.id); const st = r && streamById(r.streamId)

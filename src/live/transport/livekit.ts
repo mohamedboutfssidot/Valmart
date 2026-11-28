@@ -12,7 +12,9 @@ const AUTHORITY = ['host', 'control']
 const PUBLISHER = ['host', 'camera']
 
 export async function connectLiveKit(s: Session): Promise<Backend> {
-  const room = new Room({ adaptiveStream: true, dynacast: true })
+  // adaptiveStream must stay off: the picture is shown from the raw MediaStream (no attach()), so LiveKit would see no
+  // visible element and pause the video for viewers.
+  const room = new Room({ adaptiveStream: false, dynacast: true })
   let info: RoomInfo = { ...emptyInfo }
   const infoCbs = new Set<(i: RoomInfo) => void>()
   const chatCbs = new Set<(c: ChatItem) => void>()
