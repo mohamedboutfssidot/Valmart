@@ -141,3 +141,136 @@ export const MODE_NOTE: Record<Mode, string> = {
 }
 /** seconds between host tools in the simulated room, per mode */
 export const AUTO_EVERY: Record<Mode, number> = { Immersive: 70, Balanced: 38, Active: 32 }
+
+/**
+ * Ready-made alternatives for each tool, so the host can swap the wording in one tap
+ * (or type their own, or add more options). Only what changes is listed.
+ */
+export interface Suggestion { label: string; prompt?: string; options?: string[]; reveal?: string }
+export const SUGGEST: Record<string, Suggestion[]> = {
+  where: [
+    { label: 'Straight or back', options: ['Keep going straight', 'Turn back'] },
+    { label: 'Street or square', options: ['The busy street', 'The quiet square', 'The side alley'] },
+    { label: 'Eat or explore', prompt: 'What should we do next?', options: ['Find something to eat', 'Keep exploring'] },
+  ],
+  silence: [
+    { label: 'Short pause', prompt: 'Chat is paused for a few seconds' },
+    { label: 'Listen with me', prompt: 'Chat is paused. Listen to the street.' },
+  ],
+  spot: [
+    { label: 'Something old', prompt: 'Find the oldest thing in the scene' },
+    { label: 'A sign', prompt: 'Find a sign in a language you do not read' },
+    { label: 'A colour', prompt: 'Find something blue in the scene' },
+  ],
+  torch: [
+    { label: 'Light on or off', prompt: 'Switch the light off for 10 seconds?', options: ['Off', 'On'] },
+    { label: 'Darker', prompt: 'Should we walk without light?', options: ['Yes, lights out', 'No, keep it'] },
+  ],
+  listen: [
+    { label: 'Footsteps', prompt: 'Where are the footsteps coming from? Tap the image.' },
+    { label: 'A voice', prompt: 'Where did the voice come from? Tap the image.' },
+  ],
+  dontlook: [
+    { label: 'Behind me', prompt: 'Did you hear that behind me?', options: ['Check it', 'Ignore it'] },
+    { label: 'Three choices', prompt: 'A door is open ahead.', options: ['Go in', 'Walk past', 'Close it'] },
+  ],
+  fear: [
+    { label: 'Tension', prompt: 'How tense is this place?' },
+    { label: 'Unease', prompt: 'How uneasy do you feel right now?' },
+  ],
+  entrance: [
+    { label: 'The door', prompt: 'Tap where the door is.' },
+    { label: 'A way in', prompt: 'Tap the way in.' },
+  ],
+  clues: [
+    { label: 'A shop', prompt: 'Clue: “Open at night, smells of sugar.” What is it?', options: ['A pastry shop', 'A bar', 'A market'] },
+    { label: 'A place', prompt: 'Clue: “Stone steps, a hidden garden.” Where are we?', options: ['A park', 'A courtyard', 'A museum'] },
+  ],
+  secret: [
+    { label: 'Locals only', prompt: 'How much does this feel like a local place?' },
+    { label: 'Crowded', prompt: 'How crowded does it feel?' },
+  ],
+  discretion: [
+    { label: 'Longer blur', prompt: 'The exact place stays private' },
+  ],
+  mark: [
+    { label: 'Save it', prompt: 'Save this place to your journal.' },
+    { label: 'Come back', prompt: 'Keep this place for a later trip.' },
+  ],
+  ask: [
+    { label: 'Everyday life', options: ['What do you eat every day?', 'How long is your commute?', 'What changed here lately?'] },
+    { label: 'Visiting', options: ['What should I skip?', 'Best street for a walk?', 'What is a fair price here?'] },
+  ],
+  price: [
+    { label: 'A drink', prompt: 'Guess the price of this drink.' },
+    { label: 'A ticket', prompt: 'Guess the price of the entry ticket.' },
+  ],
+  say: [
+    { label: 'Hello', prompt: 'Repeat after the host: “Hello, good morning”.' },
+    { label: 'Thank you', prompt: 'Repeat after the host: “Thank you very much”.' },
+  ],
+  postcard: [
+    { label: 'Best angle', prompt: 'Tap the best angle for a photo.' },
+    { label: 'Skyline', prompt: 'Tap the best part of the skyline.' },
+  ],
+  order: [
+    { label: 'Hot or sweet', options: ['Something hot', 'Something sweet'] },
+    { label: 'Local picks', options: ['The house special', 'The cheapest dish', 'What the locals order'] },
+  ],
+  spice: [
+    { label: 'Heat', prompt: 'How hot should I go?' },
+    { label: 'Challenge', prompt: 'How brave should I be?' },
+  ],
+  bite: [
+    { label: 'Worth it', prompt: 'Is it worth the queue?' },
+    { label: 'Flavour', prompt: 'How strong is the flavour?' },
+  ],
+  era: [
+    { label: 'Decade', prompt: 'When was this street built?', options: ['Before 1800', '1800-1900', 'After 1900'] },
+    { label: 'Use', prompt: 'What was this building first used for?', options: ['A house', 'A workshop', 'A temple'] },
+  ],
+  story: [
+    { label: 'Local legends', options: ['The founder', 'The legend', 'The last night'] },
+    { label: 'Small stories', options: ['The first shop', 'The old tree', 'The big flood'] },
+  ],
+  detail: [
+    { label: 'A carving', prompt: 'Tap the most detailed carving.' },
+    { label: 'A repair', prompt: 'Tap where it was repaired.' },
+  ],
+  animal: [
+    { label: 'Bird', prompt: 'Tap where you see the bird.' },
+    { label: 'Movement', prompt: 'Something moved. Tap where.' },
+  ],
+  birdsong: [
+    { label: 'Which sound', prompt: 'What is making this sound?', options: ['A bird', 'Wind', 'Water'] },
+    { label: 'Two choices', prompt: 'Is it close or far?', options: ['Close', 'Far'] },
+  ],
+  calmness: [
+    { label: 'Peace', prompt: 'How peaceful is this place?' },
+    { label: 'Rest', prompt: 'Could you rest here?' },
+  ],
+  cheer: [
+    { label: 'Energy', prompt: 'How strong is the energy?' },
+    { label: 'Dance', prompt: 'How much do you want to dance?' },
+  ],
+  nextact: [
+    { label: 'Two stages', options: ['Stage one', 'Stage two'] },
+    { label: 'Music or food', prompt: 'Where next?', options: ['The music', 'The food', 'The crowd'] },
+  ],
+  wave: [
+    { label: 'Clap', prompt: 'Clap together when the countdown ends.' },
+    { label: 'Say hi', prompt: 'Say hi to the crowd in chat when the countdown ends.' },
+  ],
+  go: [
+    { label: 'Climb', prompt: 'Climb to the top?', options: ['Climb', 'Stay down'] },
+    { label: 'Three ways', prompt: 'Which path?', options: ['The high path', 'The river path', 'Turn back'] },
+  ],
+  risk: [
+    { label: 'Weather', prompt: 'How bad does the weather look?' },
+    { label: 'Path', prompt: 'How safe is this path?' },
+  ],
+  gear: [
+    { label: 'Safety', prompt: 'Spot what is missing from the safety kit.' },
+    { label: 'Pack', prompt: 'Spot what I should leave behind.' },
+  ],
+}

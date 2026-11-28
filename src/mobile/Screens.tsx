@@ -1,6 +1,6 @@
 import { ReplayOverlay, ReplayRow } from './Replays'
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { LiveNowList } from '../rooms/LiveNow'
+import { liveStream, useLiveNow, whereOf } from '../rooms/LiveNow'
 import { useExtra } from '../extra'
 import { CATEGORIES, CITIES, audienceOf, cityOf, formatCount, hostOf, STREAMS, streamById, type Stream } from '../data/mock'
 import { EVENTS, eventById, type EventItem } from '../data/events'
@@ -72,7 +72,7 @@ function Row({ s, onWatch }: { s: Stream; onWatch: (id: string) => void }) {
 type Tab = 'you' | 'live' | 'replays' | 'cities' | 'events'
 
 /** One card of the Explore feed: 16:9 video, host avatar, title, meta. Plays muted while on screen. */
-function FeedCard({ s, badge, line, minutes, views, onOpen }: { s: Stream; badge: 'LIVE' | 'REPLAY'; line: string; minutes?: number; views?: number; onOpen: () => void }) {
+function FeedCard({ s, badge, line, minutes, views, onOpen, hostName, whereText }: { s: Stream; badge: 'LIVE' | 'REPLAY'; line: string; minutes?: number; views?: number; onOpen: () => void; hostName?: string; whereText?: string }) {
   const host = hostOf(s.hostId); const city = cityOf(s.cityId)
   const ref = useRef<HTMLButtonElement>(null)
   useEffect(() => {
@@ -81,7 +81,7 @@ function FeedCard({ s, badge, line, minutes, views, onOpen }: { s: Stream; badge
     const io = new IntersectionObserver(([en]) => { const v = el.querySelector('video'); if (!v) return; if (en.isIntersecting && en.intersectionRatio > 0.6) { v.muted = true; v.play().catch(() => undefined) } else v.pause() }, { threshold: [0, 0.6, 1] })
     io.observe(el); return () => io.disconnect()
   }, [])
-  const where = kitFor(s.category) === 'hidden' ? city.country : city.name
+  const where = whereText ?? (kitFor(s.category) === 'hidden' ? city.country : city.name)
   const watching = views ?? s.viewers
   return (
     <article className="flex flex-col gap-2.5" data-testid="feed-card">
@@ -97,10 +97,10 @@ function FeedCard({ s, badge, line, minutes, views, onOpen }: { s: Stream; badge
           : <span className="absolute bottom-2.5 right-2.5 rounded-md bg-black/75 px-2 py-1 text-[11px] font-bold tabular-nums text-white">{minutes ?? 0}:00</span>}
       </button>
       <div className="flex gap-2.5">
-        <Avatar name={host.name} size={32} />
+        <Avatar name={hostName ?? host.name} size={32} />
         <button type="button" onClick={onOpen} className="min-w-0 flex-1 text-left">
           <span className="line-clamp-2 text-[14px] font-semibold leading-snug text-fg">{s.title}</span>
-          <span className="mt-0.5 block truncate text-xs text-fg-muted">{host.name} · {where}</span>
+          <span className="mt-0.5 block truncate text-xs text-fg-muted">{hostName ?? host.name} · {where}</span>
           <span className={`block truncate text-[12.5px] ${badge === 'LIVE' ? 'font-medium text-sun' : 'text-fg-muted'}`}>{line}</span>
         </button>
       </div>
@@ -112,6 +112,7 @@ export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id
   const [searching, setSearching] = useState(false); const [q, setQ] = useState(''); const [f, setF] = useState<Filters>(BASE_FILTERS); const [tab, setTab] = useState<Tab>('you')
   const [fOpen, setFOpen] = useState(false); const [pick, setPick] = useState(false); const [sel, setSel] = useState<Stream | null>(null); const [ev, setEv] = useState<EventItem | null>(null); const [rp, setRp] = useState<string | null>(null)
   const setGroupLive = useGroup((st) => st.setGroupLive)
+  const { lives: real } = useLiveNow()
   useEffect(() => { const h = () => { setPick(true); setSel(null) }; window.addEventListener(PICK_EVENT, h); return () => window.removeEventListener(PICK_EVENT, h) }, [])
   const onWatch = (id: string) => { if (pick) { setSel(streamById(id) ?? null); return } openStream(id) }
   const set = (p: Partial<Filters>) => setF((x) => ({ ...x, ...p }))
@@ -126,7 +127,8 @@ export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id
   useEffect(() => { if (pendingCategory.value) { const c = pendingCategory.value as Filters['cats'][number]; pendingCategory.value = null; setF({ ...BASE_FILTERS, cats: [c] }) } }, [])
   const feed = useMemo(() => { const out: { key: string; kind: 'live' | 'replay'; id: string }[] = []; let i = 0; let j = 0; while (i < lives.length || j < reps.length) { for (let n = 0; n < 2 && i < lives.length; n++) out.push({ key: `l-${lives[i].id}`, kind: 'live', id: lives[i++].id }); if (j < reps.length) out.push({ key: `r-${reps[j].id}`, kind: 'replay', id: reps[j++].id }); if (out.length >= 24) break } return out }, [lives, reps])
   const n = filterCount(f)
-  const tabs: [Tab, string, number | null][] = [['you', 'For you', null], ['live', 'Live now', lives.length], ['replays', 'Replays', reps.length], ['cities', 'Cities', CITIES.length], ['events', 'Events', EVENTS.length]]
+  const tabs: [Tab, string, number | null][] = [['you', 'For you', null], ['live', 'Live now', lives.length + (onLive && !term && n === 0 ? real.length : 0)], ['replays', 'Replays', reps.length], ['cities', 'Cities', CITIES.length], ['events', 'Events', EVENTS.length]]
+  const realCards = onLive && !term && n === 0 ? real.map((l) => <FeedCard key={`room-${l.room}`} s={liveStream(l)} badge="LIVE" line={`Started ${liveStream(l).startedMinAgo} min ago`} hostName={l.host} whereText={whereOf(l)} onOpen={() => onLive(l.room)} />) : null
   const card = (it: { key: string; kind: 'live' | 'replay'; id: string }) => {
     if (it.kind === 'live') { const st = streamById(it.id); return st ? <FeedCard key={it.key} s={st} badge="LIVE" line={`Started ${st.startedMinAgo} min ago`} onOpen={() => onWatch(st.id)} /> : null }
     const r = replays.find((x) => x.id === it.id); const st = r && streamById(r.streamId)
@@ -176,13 +178,14 @@ export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id
       </div>}>
       {tab === 'you' && (
         <section className="flex flex-col gap-5" aria-label="Recommended for you">
+          {realCards}
           {feed.map(card)}
           {feed.length === 0 && <p className="py-10 text-center text-[16px] text-fg-muted">Nothing matches these filters. Remove one to see more.</p>}
         </section>
       )}
       {tab === 'live' && (
         <section className="flex flex-col gap-5" aria-label="Live now">
-          {onLive && !q && n === 0 && <LiveNowList mobile empty={false} onOpen={(l) => onLive(l.room)} />}
+                    {realCards}
           {lives.map((st) => <FeedCard key={st.id} s={st} badge="LIVE" line={`Started ${st.startedMinAgo} min ago`} onOpen={() => onWatch(st.id)} />)}
           {lives.length === 0 && <p className="py-10 text-center text-[16px] text-fg-muted">No live matches. Try another city or topic.</p>}
         </section>

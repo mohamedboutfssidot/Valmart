@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { Mode, ToolDef } from './tools'
 
-export interface Words { prompt: string; options?: string[] }
+export interface Words { prompt: string; options?: string[]; reveal?: string }
 interface ToolRequest { id: number; name: string; note: string; category: string }
 interface LiveStore {
   modeWeb: Mode
@@ -68,5 +68,5 @@ export const useMode = (_surface: 'web' | 'mobile'): [Mode, (m: Mode) => void] =
 export const withSecs = (t: ToolDef, secs: Record<string, number>, words?: Record<string, Words>): ToolDef => {
   const w = words?.[t.id]
   const base = secs[t.id] ? { ...t, seconds: secs[t.id] } : t
-  return w ? { ...base, prompt: w.prompt || base.prompt, options: w.options ?? base.options } : base
+  return w ? { ...base, prompt: w.prompt || base.prompt, options: w.options ?? base.options, reveal: w.reveal ? { ...(base.reveal ?? {}), text: w.reveal } : base.reveal } : base
 }

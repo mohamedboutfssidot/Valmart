@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { LiveNowList } from '../../rooms/LiveNow'
+import { liveStream, useLiveNow, whereOf } from '../../rooms/LiveNow'
 import { CATEGORIES, STREAMS as ALL_LIVES, cityOf, formatCount, type Category } from '../../data/mock'
 import { StreamCard } from '../../components/StreamCard'
 import { WorldMap } from '../../components/WorldMap'
@@ -30,6 +30,7 @@ function Tag({ label, off }: { label: string; off: () => void }) {
 export default function Discover({ liveOnly = false }: { liveOnly?: boolean }) {
   const streams = useFamilyFilter(ALL_LIVES)
   const nav = useNavigate()
+  const { lives: real } = useLiveNow()
   const user = useDemo((s) => s.user)
   const visited = useDemo((s) => s.visited)
   const [params, setParams] = useSearchParams()
@@ -190,7 +191,7 @@ export default function Discover({ liveOnly = false }: { liveOnly?: boolean }) {
         <>
           {!liveOnly && <Hero />}
           {!liveOnly && <TopCategories />}
-          <LiveNowList empty={false} onOpen={(l) => nav(`/app/room/${l.room}?auto=1`)} />
+          {real.length > 0 && <Section title="On air now"><div className={GRID}>{real.map((l) => <StreamCard key={l.room} stream={liveStream(l)} to={`/app/room/${l.room}?auto=1`} hostName={l.host} whereText={whereOf(l)} />)}</div></Section>}
           <Section title={picks.length ? 'For you' : 'Live now'}>
             <div className={GRID}>{forYou.map((x) => <StreamCard key={x.id} stream={x} />)}</div>
           </Section>

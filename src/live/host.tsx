@@ -1,13 +1,13 @@
 import { useState } from 'react'
-import { useLiveTools, withSecs } from './store'
+import { useLiveTools, type Words } from './store'
 import { StarButton, Switch } from './manage'
-import { BRICKS, KITS, kitFor, kitLabel, TOOLS, type BrickId, type Kind, type Kit, type ToolDef } from './tools'
+import { BRICKS, KITS, SUGGEST, kitFor, kitLabel, TOOLS, type BrickId, type Kind, type Kit, type ToolDef } from './tools'
 import type { ToolEngine } from './useToolEngine'
 
 /* ---------- launcher: the host picks a tool, the room answers ---------- */
 export function ToolLauncher({ e, category, onBuild, compact = false, manageHref, onManage }: { e: ToolEngine; category: string; onBuild: () => void; compact?: boolean; manageHref?: string; onManage?: () => void }) {
   const { custom, off, fav, secs, words, toggleTool, toggleFav } = useLiveTools()
-  const [editing, setEditing] = useState<string | null>(null)
+  const [open, setOpen] = useState<string | null>(null)
   const hasFav = [...TOOLS, ...custom].some((t) => fav.includes(t.id))
   const [kit, setKit] = useState<Kit | 'fav'>(hasFav ? 'fav' : kitFor(category))
   const [edit, setEdit] = useState(false)
@@ -36,13 +36,12 @@ export function ToolLauncher({ e, category, onBuild, compact = false, manageHref
           return (
             <li key={t.id} className={`flex flex-wrap items-center gap-3 border-t border-line py-2 ${on ? '' : 'opacity-60'}`}>
               {edit && <StarButton on={fav.includes(t.id)} onChange={() => toggleFav(t.id)} name={t.name} />}
-              <button type="button" disabled={!on} onClick={() => e.launch(withSecs(t, secs, words))} className={`flex min-w-0 flex-1 flex-col items-start rounded-lg px-2 py-1.5 text-left transition-colors ${busy(t.id) ? 'bg-sun/10' : 'hover:bg-ink-700'} disabled:cursor-not-allowed`}>
+              <button type="button" disabled={!on} aria-expanded={open === t.id} onClick={() => setOpen(open === t.id ? null : t.id)} className={`flex min-w-0 flex-1 flex-col items-start rounded-lg px-2 py-1.5 text-left transition-colors ${busy(t.id) ? 'bg-sun/10' : open === t.id ? 'bg-ink-700' : 'hover:bg-ink-700'} disabled:cursor-not-allowed`} data-testid={`tool-${t.id}`}>
                 <span className="flex w-full items-center justify-between gap-2"><span className="font-semibold">{t.name}</span><span className="text-xs text-fg-muted">{busy(t.id) ? (e.active?.def.id === t.id ? 'On air' : 'Queued') : `${secs[t.id] ?? t.seconds}s`}</span></span>
                 <span className="text-[13px] text-fg-muted">{t.summary}</span>
               </button>
-              {edit && t.kind !== 'pin' && <button type="button" aria-expanded={editing === t.id} onClick={() => setEditing(editing === t.id ? null : t.id)} className="shrink-0 rounded-pill border border-line px-2.5 py-1 text-xs font-semibold text-sky-deep hover:bg-ink-700" data-testid={`launch-edit-${t.id}`}>{editing === t.id ? 'Close' : 'Edit words'}</button>}
               {edit && <Switch on={on} onChange={() => toggleTool(t.id)} label={`${t.name} ${on ? 'on' : 'off'}`} />}
-              {editing === t.id && <div className="basis-full"><WordsEditor t={t} /></div>}
+              {open === t.id && on && <div className="basis-full"><ToolSetup t={t} onLaunch={(d) => { e.launch(d); setOpen(null) }} /></div>}
             </li>
           )
         })}
@@ -182,31 +181,99 @@ export function ToolBuilder({ category, onDone, onLaunch }: { category: string; 
   )
 }
 
-/** Edit the wording of one tool, keep it for next time, or save it as a template. */
-function WordsEditor({ t }: { t: ToolDef }) {
-  const { words, setWords, templates, saveTemplate, removeTemplate } = useLiveTools()
-  const w = words[t.id]
-  const prompt = w?.prompt ?? t.prompt
-  const options = w?.options ?? t.options
+/**
+ * Opens when the host taps a tool. Everything the room will see can be changed here before launch:
+ * the question, the options (swap for a suggestion, type your own, add or remove), the reveal and the countdown.
+ * It works the same for every tool; kinds without options simply have no option list.
+ */
+function ToolSetup({ t, onLaunch }: { t: ToolDef; onLaunch: (d: ToolDef) => void }) {
+  const { words, secs, setWords, setSecs, templates, saveTemplate, removeTemplate } = useLiveTools()
+  const saved = words[t.id]
+  const [prompt, setPrompt] = useState(saved?.prompt ?? t.prompt)
+  const [options, setOptions] = useState<string[] | undefined>(saved?.options ?? t.options)
+  const [reveal, setReveal] = useState(saved?.reveal ?? t.reveal?.text ?? '')
+  const [seconds, setSeconds] = useState(secs[t.id] ?? t.seconds)
+  const [keep, setKeep] = useState(true)
   const [name, setName] = useState('')
-  const [saved, setSaved] = useState(false)
+  const [done, setDone] = useState(false)
+  const hasOptions = t.kind === 'choice' || t.kind === 'question'
+  const max = t.kind === 'question' ? 5 : 4
   const mine = templates.filter((x) => x.toolId === t.id)
   const input = 'w-full rounded-lg border border-line bg-ink-900 px-3 py-2 text-sm focus:border-sky focus:outline-none'
+  const label = 'text-xs font-semibold text-fg-muted'
+  const clean = (options ?? []).map((o) => o.trim()).filter(Boolean)
+  const valid = prompt.trim().length > 0 && (!hasOptions || clean.length >= 2)
+  const apply = (w: { prompt?: string; options?: string[]; reveal?: string }) => {
+    if (w.prompt !== undefined) setPrompt(w.prompt)
+    if (w.options) setOptions(w.options)
+    if (w.reveal !== undefined) setReveal(w.reveal)
+  }
+  const original = prompt === t.prompt && JSON.stringify(options) === JSON.stringify(t.options) && reveal === (t.reveal?.text ?? '')
+  const launch = () => {
+    if (!valid) return
+    const w: Words = { prompt: prompt.trim(), options: hasOptions ? clean : undefined, reveal: reveal.trim() || undefined }
+    if (keep) { setWords(t.id, original ? null : w); setSecs(t.id, seconds) }
+    const lean = hasOptions && Array.isArray(t.lean) ? clean.map((_, i) => (t.lean as number[])[i] ?? 2) : t.lean
+    onLaunch({ ...t, seconds, prompt: w.prompt, options: hasOptions ? clean : t.options, lean, reveal: w.reveal ? { ...(t.reveal ?? {}), text: w.reveal } : undefined })
+  }
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-line bg-ink-900/60 p-3" data-testid="words-editor">
-      <label className="text-xs font-semibold text-fg-muted" htmlFor={`w-${t.id}`}>Question</label>
-      <input id={`w-${t.id}`} className={input} value={prompt} maxLength={120} onChange={(e) => setWords(t.id, { prompt: e.target.value, options })} />
-      {options?.map((o, i) => (
-        <input key={i} aria-label={`Option ${i + 1}`} className={input} value={o} maxLength={40} onChange={(e) => setWords(t.id, { prompt, options: options.map((x, j) => (j === i ? e.target.value : x)) })} />
-      ))}
-      <div className="flex flex-wrap items-center gap-2">
-        <input aria-label="Template name" className={`${input} min-w-[160px] flex-1`} value={name} maxLength={30} placeholder="Name, for example Night market" onChange={(e) => setName(e.target.value)} />
-        <button type="button" data-testid="save-template" onClick={() => { saveTemplate(name.trim() || t.name, t.id, { prompt, options }); setName(''); setSaved(true); window.setTimeout(() => setSaved(false), 1500) }} className="rounded-pill bg-sky-deep px-4 py-2 text-sm font-bold text-white hover:opacity-90 active:scale-95">{saved ? 'Saved ✓' : 'Save as template'}</button>
+    <div className="flex flex-col gap-3 rounded-xl border border-line bg-ink-900/60 p-3" data-testid="tool-setup">
+      <div className="flex flex-col gap-1.5">
+        <label className={label} htmlFor={`ts-q-${t.id}`}>{t.kind === 'lock' ? 'Message shown to the room' : 'Question shown to the room'}</label>
+        <input id={`ts-q-${t.id}`} className={input} value={prompt} maxLength={120} onChange={(ev) => setPrompt(ev.target.value)} />
       </div>
-      {mine.length > 0 && <ul className="flex flex-col gap-1.5" data-testid="templates">{mine.map((x) => (
-        <li key={x.id} className="flex items-center gap-2 rounded-lg bg-ink-800 px-3 py-2"><span className="min-w-0 flex-1 truncate text-sm"><b>{x.name}</b> <span className="text-xs text-fg-muted">{x.data.prompt}</span></span><button type="button" onClick={() => setWords(t.id, x.data)} className="rounded-pill border border-line px-3 py-1 text-sm font-semibold hover:border-sky">Use</button><button type="button" aria-label={`Delete ${x.name}`} onClick={() => removeTemplate(x.id)} className="grid h-8 w-8 place-items-center rounded-full text-fg-muted hover:bg-ink-700">✕</button></li>
-      ))}</ul>}
-      <div className="flex items-center justify-between gap-3 border-t border-line pt-2 text-sm"><span className="text-fg-muted">{w ? 'Saved automatically. Used the next time you launch this tool.' : 'Original wording. Change anything above.'}</span>{w && <button type="button" onClick={() => setWords(t.id, null)} className="font-semibold text-sky-deep hover:underline">Back to original</button>}</div>
+
+      {hasOptions && options && (
+        <div className="flex flex-col gap-1.5">
+          <span className={label}>{t.kind === 'question' ? 'Suggestions the room can vote on' : 'Choices'}</span>
+          {options.map((o, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <input aria-label={`Option ${i + 1}`} className={input} value={o} maxLength={48} placeholder={`Option ${i + 1}`} onChange={(ev) => setOptions(options.map((x, j) => (j === i ? ev.target.value : x)))} />
+              {options.length > 2 && <button type="button" aria-label={`Remove option ${i + 1}`} onClick={() => setOptions(options.filter((_, j) => j !== i))} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-fg-muted hover:bg-ink-700 hover:text-fg">×</button>}
+            </div>
+          ))}
+          {options.length < max && <button type="button" onClick={() => setOptions([...options, ''])} className="self-start rounded-lg bg-ink-700 px-3 py-1.5 text-sm font-medium hover:bg-line" data-testid="add-option">Add a suggestion</button>}
+        </div>
+      )}
+
+      {(SUGGEST[t.id]?.length ?? 0) > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <span className={label}>Quick suggestions</span>
+          <div className="flex flex-wrap gap-1.5">
+            {SUGGEST[t.id].map((sg) => <button key={sg.label} type="button" onClick={() => apply(sg)} className="rounded-lg bg-ink-700 px-3 py-1.5 text-sm font-medium hover:bg-line" data-testid="suggestion">{sg.label}</button>)}
+            {!original && <button type="button" onClick={() => apply({ prompt: t.prompt, options: t.options, reveal: t.reveal?.text ?? '' })} className="rounded-lg px-3 py-1.5 text-sm font-semibold text-sky-deep hover:underline">Original</button>}
+          </div>
+        </div>
+      )}
+
+      {t.kind !== 'lock' && (
+        <div className="flex flex-col gap-1.5">
+          <label className={label} htmlFor={`ts-r-${t.id}`}>Reveal after the countdown (optional)</label>
+          <input id={`ts-r-${t.id}`} className={input} value={reveal} maxLength={120} placeholder="What the room learns at the end" onChange={(ev) => setReveal(ev.target.value)} />
+        </div>
+      )}
+
+      <div className="flex flex-col gap-1.5">
+        <span className={label}>Countdown</span>
+        <div className="flex flex-wrap gap-1.5">{[10, 15, 20, 30, 45, 60].map((n) => <button key={n} type="button" aria-pressed={seconds === n} onClick={() => setSeconds(n)} className={`h-8 rounded-lg px-3 text-sm font-medium tabular-nums ${seconds === n ? 'bg-fg text-ink-900' : 'bg-ink-700 hover:bg-line'}`}>{n}s</button>)}</div>
+      </div>
+
+      {mine.length > 0 && (
+        <ul className="flex flex-col gap-1" data-testid="templates">{mine.map((x) => (
+          <li key={x.id} className="flex items-center gap-2 rounded-lg bg-ink-800 px-3 py-1.5"><span className="min-w-0 flex-1 truncate text-sm"><b>{x.name}</b> <span className="text-xs text-fg-muted">{x.data.prompt}</span></span><button type="button" onClick={() => apply(x.data)} className="text-sm font-semibold text-sky-deep hover:underline">Use</button><button type="button" aria-label={`Delete ${x.name}`} onClick={() => removeTemplate(x.id)} className="text-sm text-fg-muted hover:text-fg">Delete</button></li>
+        ))}</ul>
+      )}
+
+      <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3">
+        <input aria-label="Name this set" className={`${input} min-w-[140px] flex-1`} value={name} maxLength={30} placeholder="Save as a set, for example Night market" onChange={(ev) => setName(ev.target.value)} />
+        <button type="button" disabled={!valid} data-testid="save-template" onClick={() => { saveTemplate(name.trim() || t.name, t.id, { prompt: prompt.trim(), options: hasOptions ? clean : undefined, reveal: reveal.trim() || undefined }); setName(''); setDone(true); window.setTimeout(() => setDone(false), 1500) }} className="h-9 rounded-full bg-ink-700 px-4 text-sm font-semibold hover:bg-line disabled:opacity-50">{done ? 'Saved' : 'Save set'}</button>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <label className="flex items-center gap-2 text-sm text-fg-muted"><input type="checkbox" checked={keep} onChange={(ev) => setKeep(ev.target.checked)} /> Keep these changes for next time</label>
+        <button type="button" disabled={!valid} onClick={launch} className="h-10 rounded-full bg-sun px-5 text-sm font-bold text-ink-950 hover:bg-sun-soft disabled:opacity-50" data-testid="tool-launch">Launch</button>
+      </div>
+      {!valid && <p className="text-xs text-fg-muted" role="status">{hasOptions && clean.length < 2 ? 'Add at least two options.' : 'Write the question first.'}</p>}
     </div>
   )
 }

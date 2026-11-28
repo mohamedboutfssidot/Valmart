@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { LiveBadge } from '../components/ui'
 import { listLives } from './api'
 import type { LiveNow } from './types'
+import { STREAMS, type Category, type Stream } from '../data/mock'
 
 /** Polls the Worker while the page is visible. Errors just mean "no list" (the demo catalogue still shows). */
 export function useLiveNow(every = 15000) {
@@ -21,6 +22,13 @@ export function useLiveNow(every = 15000) {
   }, [every])
   return { lives, loaded }
 }
+
+/** A real live (host pressed Go live) shown like any catalogue live: same card, its own title, category, host and place. */
+export function liveStream(l: LiveNow): Stream {
+  const ref = STREAMS.find((s) => s.category === l.category) ?? STREAMS[0]
+  return { ...ref, title: l.title, category: (l.category || ref.category) as Category, viewers: l.viewers, startedMinAgo: Math.max(0, Math.round((Date.now() - l.at) / 60000)) }
+}
+export const whereOf = (l: LiveNow) => [l.city, l.country].filter(Boolean).join(', ')
 
 const where = (l: LiveNow) => [l.city, l.country].filter(Boolean).join(', ')
 
