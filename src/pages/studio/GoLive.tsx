@@ -15,7 +15,10 @@ import { useMode } from '../../live/store'
 import { PinLayer, ToolCard, VideoEffects, GiftToast } from '../../live/ui'
 import { ToolBuilder, ToolLauncher } from '../../live/host'
 import { HostModePicker, OneButton, TeamPanel, WalkingSwitch, useSuggestion, type HostMode } from '../../live/director'
-import { createRoom } from '../../rooms/api'
+import { createRoom, pushThumb } from '../../rooms/api'
+import { saveThumb } from '../../rooms/thumb'
+import { CoverPicker, DEFAULT_COVER, makeCover, type Cover } from './CoverPicker'
+import { CatIcon } from '../../components/icons2'
 import { HostRoom } from '../../rooms/screens'
 import { useResultVoice, useVoice, VoiceBadge, VoiceToggle } from '../../live/tts'
 
@@ -30,6 +33,8 @@ const POLICY: Record<'exact' | 'area' | 'secret', { note: string }> = {
   area: { note: 'Only the area is named. Exact spot kept for safety.' },
   secret: { note: 'The spot stays secret: no map, no exact place, no photos.' },
 }
+
+const POPULAR: Category[] = ['Discovery', 'Cultural Tour', 'Food Journey', 'Night Exploration', 'Hidden Places', 'Travel Guide', 'Adventure', 'Nature Walk', 'Horror']
 
 const field = 'w-full rounded-xl border border-line bg-ink-900 px-4 py-2.5 text-[15px] placeholder:text-fg-muted focus:border-sky focus:outline-none'
 
@@ -75,11 +80,14 @@ function Setup({ defaultCity }: { defaultCity: string }) {
   const sessions = useDemo((st) => st.sessions)
   const user = useDemo((st) => st.user)
   const [phase, setPhase] = useState<'setup' | 'live' | 'real' | 'ended'>('setup')
-  const [real, setReal] = useState<{ room: string; key: string; team: boolean } | null>(null)
+  const [real, setReal] = useState<{ room: string; key: string; team: boolean; keepCover: boolean } | null>(null)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
   const [cfg, setCfg] = useState<Config>({ cityId: defaultCity, title: 'Evening walk along the Seine', place: 'Pont de l’Alma', category: 'Discovery', hostMode: 'auto' })
   const [summary, setSummary] = useState<Summary | null>(null)
+  const [cover, setCover] = useState<Cover>(DEFAULT_COVER)
+  const [catQ, setCatQ] = useState('')
+  const [showAll, setShowAll] = useState(false)
 
   // real live: the room is created with the details above, then it appears in "Live now" for every viewer
   const startReal = async () => {
@@ -88,7 +96,9 @@ function Setup({ defaultCity }: { defaultCity: string }) {
     try {
       const made = await createRoom({ title: cfg.title, city: c.name, country: c.country, category: cfg.category, host: user?.name || 'Host' })
       const team = cfg.hostMode === 'team'
-      setReal({ room: made.room, key: team ? made.keys.control : made.keys.host, team })
+      const still = makeCover(cover, cfg.title, `${cfg.place}, ${c.name}`)
+      if (still) { saveThumb(made.room, still); void pushThumb(made.room, made.keys.host, still) }
+      setReal({ keepCover: !!still, room: made.room, key: team ? made.keys.control : made.keys.host, team })
       setPhase('real')
     } catch (e) { setErr(e instanceof Error ? e.message : 'Could not start the live') }
     finally { setBusy(false) }
@@ -98,7 +108,7 @@ function Setup({ defaultCity }: { defaultCity: string }) {
     return (
       <div className="flex flex-col gap-4">
         <header className="flex flex-col gap-1"><h1 className="text-xl font-bold sm:text-2xl">{cfg.title}</h1><p className="text-fg-muted">{cfg.place}, {CITIES.find((c) => c.id === cfg.cityId)?.name} · you are live in “Live now”.</p></header>
-        <HostRoom room={real.room} role={real.team ? 'control' : 'host'} hostKey={real.key} hostMode={cfg.hostMode} category={cfg.category} autoStart={!real.team} surface="web" onLeave={() => { setReal(null); setPhase('setup') }} />
+        <HostRoom room={real.room} role={real.team ? 'control' : 'host'} hostKey={real.key} hostMode={cfg.hostMode} category={cfg.category} keepCover={real.keepCover} autoStart={!real.team} surface="web" onLeave={() => { setReal(null); setPhase('setup') }} />
       </div>
     )
   }
@@ -160,6 +170,9 @@ function Setup({ defaultCity }: { defaultCity: string }) {
           <div className="flex flex-col gap-2">
             <label htmlFor="host-title" className="text-sm font-medium">Session title</label>
             <input id="host-title" className={field} value={cfg.title} maxLength={80} onChange={(e) => setCfg({ ...cfg, title: e.target.value })} placeholder="What will you show?" required />
+            <div className="flex flex-wrap gap-1.5" data-testid="title-ideas">
+              {[`${cfg.category} in ${city.name}`, `Live from ${cfg.place || city.name}`, `Walk with a local in ${city.name}`].map((t) => <button key={t} type="button" onClick={() => setCfg({ ...cfg, title: t.slice(0, 80) })} className="rounded-full bg-ink-700 px-3 py-1 text-xs font-semibold hover:bg-line">{t}</button>)}
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="host-place" className="text-sm font-medium">Starting point</label>
@@ -169,14 +182,19 @@ function Setup({ defaultCity }: { defaultCity: string }) {
               <span><b>Viewers will see:</b> {policy === 'exact' ? `${cfg.place || 'your starting point'}, ${city.name}` : policy === 'area' ? `${city.name}, ${city.country}` : city.country}. <span className="text-fg-muted">{policy === 'exact' ? 'This type shows the place and a map.' : policy === 'area' ? 'This type shows only the area, never the exact spot.' : 'This type never shows the place. Only the country.'}</span></span>
             </p>
           </div>
-          <fieldset className="flex flex-col gap-2">
-            <legend className="mb-1 text-sm font-medium">Type of experience</legend>
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.filter((c) => ['Discovery', 'Cultural Tour', 'Food Journey', 'Night Exploration', 'Hidden Places', 'Travel Guide', 'Horror'].includes(c)).map((c) => (
-                <Chip key={c} active={cfg.category === c} onClick={() => setCfg({ ...cfg, category: c })}>{c}</Chip>
+          <fieldset className="flex flex-col gap-2.5" data-testid="cat-picker">
+            <legend className="mb-1 text-sm font-medium">Category</legend>
+            <input type="search" aria-label="Search categories" value={catQ} onChange={(e) => setCatQ(e.target.value)} placeholder="Search a category" className={field} />
+            <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Category">
+              {CATEGORIES.filter((c) => c.toLowerCase().includes(catQ.toLowerCase()) && (showAll || catQ || POPULAR.includes(c) || c === cfg.category)).map((c) => (
+                <button key={c} type="button" role="radio" aria-checked={cfg.category === c} onClick={() => setCfg({ ...cfg, category: c })} className={`flex min-w-0 items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-[13px] font-semibold transition ${cfg.category === c ? 'border-sky bg-sky/15 text-fg' : 'border-line hover:border-sky'}`}>
+                  <CatIcon c={c} size={18} className={cfg.category === c ? 'text-sky' : 'text-fg-muted'} /><span className="truncate">{c}</span>
+                </button>
               ))}
             </div>
+            {!catQ && <button type="button" onClick={() => setShowAll((v) => !v)} className="self-start text-[13px] font-semibold text-sky hover:underline">{showAll ? 'Show fewer' : `Show all ${CATEGORIES.length} categories`}</button>}
           </fieldset>
+          <CoverPicker value={cover} onChange={setCover} title={cfg.title} place={`${cfg.place}, ${city.name}`} />
           <div className="flex flex-col gap-2 rounded-xl border border-line px-3.5 py-3" data-testid="kit-preview">
             <p className="text-sm"><b>Tools for this type</b> <span className="text-fg-muted">· {KITS.find((k) => k.id === kit)?.label}</span></p>
             <div className="flex flex-wrap gap-1.5">{TOOLS.filter((t) => t.kit === 'base' || t.kit === kit).map((t) => <span key={t.id} className="rounded-full bg-ink-700 px-2.5 py-1 text-xs font-semibold">{t.name}</span>)}</div>

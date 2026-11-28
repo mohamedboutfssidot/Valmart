@@ -41,6 +41,8 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 export interface Created { room: string; keys: { host: string; control: string; camera: string; moderator: string }; listed?: boolean }
 
 export const createRoom = (meta?: Partial<LiveMeta>) => post<Created>('/create', meta ?? {})
+/** Best effort: the room service may not keep pictures. */
+export const pushThumb = (room: string, key: string, img: string) => post('/thumb', { room, key, img }).catch(() => undefined)
 export const listLives = async () => (await post<{ lives: LiveNow[] }>('/live', {})).lives ?? []
 
 export function parseMeta(raw: string | undefined | null): LiveMeta | null {

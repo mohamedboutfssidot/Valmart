@@ -72,3 +72,9 @@ input[type=checkbox] { width: 16px; height: 16px; }
 .vm-tab { border: 0; background: var(--ink-700); color: var(--fg); border-radius: 8px; height: 32px; padding: 0 12px; display: inline-flex; align-items: center; font-size: 14px; font-weight: 500; }
 .vm-tab:hover { background: var(--line); }
 .vm-tab-on, .vm-tab-on:hover { background: var(--fg); color: var(--ink-900); }
+
+/* voice badge: a line that fills while the voice speaks */
+@keyframes voice-fill { from { width: 0 } to { width: 100% } }
+.voice-line { width: 0; animation: voice-fill linear forwards; }
+@media (prefers-reduced-motion: reduce) { .voice-line { animation: none; width: 100%; } }
+.rm .voice-line { animation: none; width: 100%; }

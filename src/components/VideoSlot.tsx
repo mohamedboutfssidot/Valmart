@@ -54,7 +54,8 @@ function ClipPlayer({ clip, onMissing, fit }: { clip: string; onMissing: () => v
  * Sources, in order: a live `mediaStream` (a camera or a LiveKit track), `src`, the stream's own `video`,
  * the clip the user picked for testing, and finally a stylised city scene with a "Video placement" label.
  */
-export function VideoSlot({ stream, src, mediaStream, sound = false, audio = false, soundButton = true, player = false, fit = 'cover', children, className = '', showLabel = true, label = 'Video placement' }: {
+export function VideoSlot({ stream, src, mediaStream, sound = false, audio = false, soundButton = true, player = false, fit = 'cover', children, className = '', showLabel = true, label = 'Video placement', still }: {
+  /** a picture to show instead of the demo scene (the latest still of a real live) */ still?: string | null
   stream: Stream; src?: string; mediaStream?: MediaStream | null; /** play the sound of a live feed (viewers). Off for your own preview. */ sound?: boolean; /** play the sound of a clip (live pages). Off on the home page and in lists. */ audio?: boolean; /** show the Sound button on the video (clips with audio) */ soundButton?: boolean; /** true where the video really plays (a live room). Cards and lists show a still frame. */ player?: boolean; children?: ReactNode; className?: string; showLabel?: boolean; label?: string; /** 'contain' shows the whole picture (no zoom), 'cover' fills the box */ fit?: 'cover' | 'contain'
 }) {
   const { from, to, seed } = stream.art
@@ -103,7 +104,7 @@ export function VideoSlot({ stream, src, mediaStream, sound = false, audio = fal
   const fitCls = fit === 'contain' ? 'object-contain bg-black' : 'object-cover'
   return (
     <div ref={box} onPointerEnter={() => warm(clip)} onTouchStart={() => warm(clip)} className={`dk relative isolate aspect-video w-full max-w-full overflow-hidden bg-ink-950 ${className}`}>
-      {mediaStream ? (
+      {still && !mediaStream ? <img src={still} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden="true" /> : mediaStream ? (
         <>
           <video ref={live} className="absolute inset-0 h-full w-full object-cover" autoPlay muted={!sound} playsInline />
           {stuck && <button type="button" data-testid="tap-play" onClick={() => { const v = live.current; if (v) { v.muted = !sound; void v.play().then(() => setStuck(false)).catch(() => undefined) } }} className="absolute inset-0 z-[5] grid place-items-center bg-black/40 text-sm font-semibold text-white">Tap to play</button>}

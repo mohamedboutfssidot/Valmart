@@ -12,7 +12,8 @@ import { PaceChips, PinLayer, ToolCard, VideoEffects } from '../live/ui'
 import { ToolBuilder, ToolLauncher } from '../live/host'
 import { HostModePicker, OneButton, WalkingSwitch, useSuggestion, type HostMode } from '../live/director'
 import { useResultVoice, useVoice, VoiceBadge, VoiceToggle } from '../live/tts'
-import { getKeys, getName, links, saveName, type Created } from './api'
+import { getKeys, getName, links, pushThumb, saveName, type Created } from './api'
+import { useThumb, useThumbPublisher } from './thumb'
 import { useRoom, type RoomApi } from './useRoom'
 import type { RoomRole } from './types'
 import { ErrorLine, Qr, VideoNotice, askMotion, field, ghost, primary, roomStream, useCopy, useMotionWalking, useWakeLock } from './parts'
@@ -32,11 +33,13 @@ export function ViewerRoom({ room, role = 'viewer', auto = false, surface, onLea
   const [name, setName] = useState(getName)
   const r = useRoom({ room, role, name })
   const started = useRef(false)
+  const still = useThumb(room)
   // coming from the list of lives: the tap on the card already counts as the tap browsers need, so join at once
   useEffect(() => { if (auto && !started.current) { started.current = true; void r.join() } }, [auto, r])
   if (r.phase !== 'in') {
     return (
       <div className="mx-auto flex w-full max-w-[460px] flex-col gap-4 rounded-card border border-line bg-ink-800 p-5" aria-label="Join">
+        {still && <img src={still} alt="Preview of the live" className="aspect-video w-full rounded-xl object-cover" data-testid="live-preview" />}
         <p className="text-[11px] font-bold uppercase tracking-wider text-sun-soft">{auto && r.phase !== 'error' ? 'Joining the live…' : 'Live room'}</p>
         <h1 className="font-display text-3xl font-bold tracking-wider" data-testid="room-code">{room}</h1>
         <p className="text-sm text-fg-muted">You will see the host’s video and hear them. You can chat and use the live tools.</p>
@@ -88,7 +91,8 @@ function ViewerLive({ r, room, surface, name, onLeave }: { r: RoomApi; room: str
 }
 
 /* ---------------- host: solo or control room ---------------- */
-export function HostRoom({ room, role, hostKey, hostMode, category, surface, autoStart = false, onLeave }: {
+export function HostRoom({ room, role, hostKey, hostMode, category, surface, autoStart = false, keepCover = false, onLeave }: {
+  keepCover?: boolean
   room: string; role: 'host' | 'control'; hostKey: string; hostMode: HostMode; category: Category; surface: 'web' | 'mobile'; autoStart?: boolean; onLeave: () => void
 }) {
   const r = useRoom({ room, role, key: hostKey, name: role === 'host' ? 'Host' : 'Control room' })
@@ -116,6 +120,7 @@ export function HostRoom({ room, role, hostKey, hostMode, category, surface, aut
   // coming from the "Go live" form: that tap already is the user's go-ahead, so start the camera and microphone at once
   const started = useRef(false)
   useEffect(() => { if (autoStart && !team && !started.current) { started.current = true; void start() } })
+  useThumbPublisher(room, team || keepCover ? null : r.info.local, (d) => void pushThumb(room, hostKey, d))
   const retryCam = async () => {
     setCamErr('')
     try { await r.publish({ video: true, audio: true }) } catch (e) { setCamErr(e instanceof Error ? e.message : 'Could not start the camera') }

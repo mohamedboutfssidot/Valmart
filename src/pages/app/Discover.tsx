@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { liveStream, useLiveNow, whereOf } from '../../rooms/LiveNow'
 import { CATEGORIES, STREAMS as ALL_LIVES, cityOf, formatCount, type Category } from '../../data/mock'
 import { StreamCard } from '../../components/StreamCard'
+import { RealLiveCard } from '../../rooms/LiveNow'
 import { WorldMap } from '../../components/WorldMap'
 import { Button, Chip, Section } from '../../components/ui'
 import { useDemo } from '../../store'
@@ -191,7 +192,7 @@ export default function Discover({ liveOnly = false }: { liveOnly?: boolean }) {
         <>
           {!liveOnly && <Hero />}
           {!liveOnly && <TopCategories />}
-          {real.length > 0 && <Section title="On air now"><div className={GRID}>{real.map((l) => <StreamCard key={l.room} stream={liveStream(l)} to={`/app/room/${l.room}?auto=1`} hostName={l.host} whereText={whereOf(l)} />)}</div></Section>}
+          {real.length > 0 && <Section title="On air now"><div className={GRID}>{real.map((l) => <RealLiveCard key={l.room} l={l} />)}</div></Section>}
           <Section title={picks.length ? 'For you' : 'Live now'}>
             <div className={GRID}>{forYou.map((x) => <StreamCard key={x.id} stream={x} />)}</div>
           </Section>

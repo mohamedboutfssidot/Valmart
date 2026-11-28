@@ -29,6 +29,7 @@ import { speak } from '../live/tts'
 import { ReportButton } from '../features/kit'
 import { useRoom } from '../rooms/useRoom'
 import { getName } from '../rooms/api'
+import { useThumb } from '../rooms/thumb'
 
 
 /** Captions button with its small menu: on/off, translate, read aloud, size. Opens upward in Cinema. */
@@ -67,6 +68,7 @@ export function Watch({ stream, room, onClose, onTrial, onSwitch, onRequest }: {
   const hostSim = hostOf(stream.hostId)
   const city = cityOf(stream.cityId)
   const r = useRoom({ room: room ?? '', role: 'viewer', name: getName() })
+  const still = useThumb(room ?? '')
   const joined = useRef(false)
   useEffect(() => { if (room && !joined.current) { joined.current = true; void r.join() } }, [room, r])
   const host = room && r.info.meta?.host ? { ...hostSim, name: r.info.meta.host } : hostSim
@@ -146,7 +148,7 @@ export function Watch({ stream, room, onClose, onTrial, onSwitch, onRequest }: {
   return (
     <LiveTheme stream={stream} plan={plan} inner="h-full" className="!absolute inset-0 z-30 overflow-hidden bg-ink-900"><div className="slide-in absolute inset-0 flex flex-col bg-ink-900/0 text-fg" data-testid="watch">
       <div className="relative shrink-0">
-        <VideoSlot stream={stream} mediaStream={room ? r.info.remote : undefined} sound={!!room} player audio soundButton={false} showLabel={false} className="!aspect-video !rounded-none">
+        <VideoSlot stream={stream} mediaStream={room ? r.info.remote : undefined} still={room ? still : null} sound={!!room} player audio soundButton={false} showLabel={false} className="!aspect-video !rounded-none">
           {room && !r.info.remote && <p className="absolute inset-0 z-[4] grid place-items-center px-6 text-center text-sm font-semibold text-white" data-testid="room-wait">{r.phase === 'error' ? r.error : r.phase === 'in' ? (r.info.publisherHere ? 'Starting the video…' : 'Waiting for the host…') : 'Joining the live…'}</p>}
           {pf.captions && (
             <p key={cap} className={`fade-in pointer-events-none absolute inset-x-3 bottom-3 mx-auto w-fit max-w-full rounded-lg bg-ink-950/75 px-3 py-1.5 text-center font-medium backdrop-blur ${pf.captionSize === 'S' ? 'text-[12px]' : pf.captionSize === 'L' ? 'text-[17px]' : 'text-[14px]'}`}>{needs && !translate ? line.orig : line.en}</p>

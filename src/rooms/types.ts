@@ -4,7 +4,7 @@ export type RoomRole = 'host' | 'control' | 'camera' | 'moderator' | 'viewer'
 
 /** What a host announces when going live; shown in the list of lives. */
 export interface LiveMeta { title: string; city: string; country: string; category: string; host: string }
-export interface LiveNow extends LiveMeta { room: string; viewers: number; at: number }
+export interface LiveNow extends LiveMeta { room: string; viewers: number; at: number; thumb?: string }
 
 export interface Person { identity: string; name: string; role: RoomRole; self: boolean }
 export interface ChatItem { id: string; user: string; text: string; role: RoomRole; self: boolean }
