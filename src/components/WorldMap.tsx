@@ -74,7 +74,7 @@ export function WorldMap({ selected, onSelect }: { selected: string | null; onSe
         </div>
       )}
 
-      <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-pill bg-ink-900/85 px-3 py-1.5 text-xs text-fg-muted">
+      <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-full bg-ink-900/85 px-3 py-1.5 text-xs text-fg-muted">
         <span className="h-2.5 w-2.5 rounded-full bg-sun" /> City with live sessions
       </div>
     </div>

@@ -7,7 +7,7 @@ import { groupLink, useGroup, type Group } from '../groupStore'
 import GroupChat from './GroupChat'
 import { field, ghost, primary, Pill } from './kit'
 
-const chip = 'rounded-pill border border-line px-2.5 py-1 text-xs font-semibold hover:border-sky'
+const chip = 'rounded-full border border-line px-2.5 py-1 text-xs font-semibold hover:border-sky'
 
 export default function GroupRoom({ group, me, onWatch, onPick }: { group: Group; me: string; onWatch?: (id: string) => void; onPick?: () => void }) {
   const { leaveGroup, addToGroup, transferChief, removeFromGroup, regenCode } = useGroup()
@@ -40,7 +40,7 @@ export default function GroupRoom({ group, me, onWatch, onPick }: { group: Group
       </div>
       <ul className="flex flex-wrap gap-2">
         {group.members.map((m) => (
-          <li key={m} className="flex items-center gap-1.5 rounded-pill border border-line px-3 py-1 text-sm">
+          <li key={m} className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1 text-sm">
             {m}
             {m === group.chief && <Pill tone="sun">leader</Pill>}
             {chief && m !== group.chief && (

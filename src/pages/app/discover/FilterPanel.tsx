@@ -4,7 +4,7 @@ import { LANGUAGES, SORTS, toggle, type Filters } from './filters'
 
 function Pill({ on, onClick, children, big }: { on: boolean; onClick: () => void; children: ReactNode; big?: boolean }) {
   return (
-    <button type="button" aria-pressed={on} onClick={onClick} className={`shrink-0 rounded-pill border font-semibold transition active:scale-95 ${big ? 'px-4 py-2.5 text-[15px]' : 'px-3.5 py-1.5 text-sm'} ${on ? 'border-sky bg-sky text-ink-950' : 'border-line bg-ink-800 text-fg hover:border-sky'}`}>{children}</button>
+    <button type="button" aria-pressed={on} onClick={onClick} className={`shrink-0 rounded-full border font-semibold transition active:scale-95 ${big ? 'px-4 py-2.5 text-[15px]' : 'px-3.5 py-1.5 text-sm'} ${on ? 'border-sky bg-sky text-ink-950' : 'border-line bg-ink-800 text-fg hover:border-sky'}`}>{children}</button>
   )
 }
 function Group({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {

@@ -25,7 +25,7 @@ export function CategoriesIndex() {
   return (
     <div className="flex flex-col gap-8">
       <header className="flex flex-col gap-1">
-        <h1 className="text-3xl font-extrabold sm:text-4xl">Categories</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Categories</h1>
         <p className="text-fg-muted">{CATEGORIES.length} types of experience, {STREAMS.length} sessions live now.</p>
       </header>
       <ul className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -71,7 +71,7 @@ export function CategoryPage() {
     <div className="flex flex-col gap-7">
       <header className="flex flex-col gap-2">
         <Link to="/app/categories" className="w-fit text-sm text-sky hover:underline">All categories</Link>
-        <h1 className="text-3xl font-extrabold sm:text-4xl">{cat}</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">{cat}</h1>
         <p className="max-w-[60ch] text-fg-muted">{BLURB[cat]} {list.length} live now, {formatCount(watching)} watching.</p>
       </header>
       <div className="stagger grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">

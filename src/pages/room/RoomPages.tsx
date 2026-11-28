@@ -22,7 +22,7 @@ export function RoomHub() {
   return (
     <FullShell>
       <div className="mx-auto flex w-full max-w-[520px] flex-col gap-5">
-        <header className="flex flex-col gap-1.5"><p className="text-[11px] font-bold uppercase tracking-wider text-sun-soft">Real live test</p><h1 className="font-display text-3xl font-extrabold">Live rooms</h1><p className="text-fg-muted">Pick a live that is on air and watch it, or go live yourself with a real camera. Viewers and the host share the same tools and chat.</p></header>
+        <header className="flex flex-col gap-1.5"><p className="text-[11px] font-bold uppercase tracking-wider text-sun-soft">Real live test</p><h1 className="font-display text-3xl font-bold">Live rooms</h1><p className="text-fg-muted">Pick a live that is on air and watch it, or go live yourself with a real camera. Viewers and the host share the same tools and chat.</p></header>
         <RoomEntry
           onJoin={(code) => nav(`/room/${code}`)}
           onWatch={(room) => nav(`/room/${room}?auto=1`)}

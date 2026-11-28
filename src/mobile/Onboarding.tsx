@@ -1,4 +1,4 @@
-import { CatE3 } from '../live/e3d'
+import { CatIcon } from '../components/icons2'
 import { useEffect, useState } from 'react'
 import { CATEGORIES, type Category } from '../data/mock'
 import { DEMO_HOST, DEMO_VIEWER } from '../data/demo'
@@ -15,7 +15,7 @@ export function Splash({ onDone }: { onDone: () => void }) {
       <span className="pointer-events-none absolute -bottom-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-sky/20 blur-3xl" aria-hidden="true" />
       <div className="logo-in relative"><Logo className="h-14" /></div>
       <p className="fade-up-slow text-[15px] text-fg-muted">Door of Digital Tourism</p>
-      <p className="fade-up-slow mt-2 flex items-center gap-2 rounded-pill border border-line bg-ink-800/80 px-3 py-1.5 text-xs font-semibold"><span className="live-dot" />Live from 40+ cities right now</p>
+      <p className="fade-up-slow mt-2 flex items-center gap-2 rounded-full border border-line bg-ink-800/80 px-3 py-1.5 text-xs font-semibold"><span className="live-dot" />Live from 40+ cities right now</p>
       <div className="absolute bottom-16 h-1 w-28 overflow-hidden rounded-full bg-ink-700" aria-hidden="true"><span className="block h-full rounded-full bg-sun" style={{ animation: 'vm-load 1.9s ease-out forwards' }} /></div>
     </div>
   )
@@ -27,7 +27,7 @@ const SLIDES = [
   { k: 'host', t: 'The host adds the rest', d: 'The host starts a tool. You answer it. One at a time, never over the video.', i: 'studio' },
 ] as const
 
-const pill = 'rounded-pill bg-ink-700 px-3.5 py-2 text-[13px] font-semibold text-fg'
+const pill = 'rounded-full bg-ink-700 px-3.5 py-2 text-[13px] font-semibold text-fg'
 
 function Art({ k }: { k: string }) {
   const [pick, setPick] = useState<number | null>(null)
@@ -86,13 +86,13 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
       <span className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-sun/15 blur-3xl" aria-hidden="true" />
       <div className="relative flex items-center justify-between px-6 pt-12">
         <Logo className="h-7" />
-        <button type="button" onClick={onDone} className="rounded-pill px-3 py-1.5 text-sm font-semibold text-fg-muted active:bg-ink-800">Skip</button>
+        <button type="button" onClick={onDone} className="rounded-full px-3 py-1.5 text-sm font-semibold text-fg-muted active:bg-ink-800">Skip</button>
       </div>
       <p className="relative px-6 pt-6 text-xs font-semibold uppercase tracking-wider text-sun">Step {i + 1} of {SLIDES.length}</p>
       <div key={s.k} className="fade-in relative mx-6 mt-3 rounded-card border border-line bg-ink-800 p-4 shadow-[0_12px_40px_rgba(0,0,0,.35)]" data-testid="intro-art"><Art k={s.k} /></div>
       <div key={`t${i}`} className="fade-in relative flex flex-col gap-2 px-6 pt-7">
         <span className="grid h-10 w-10 place-items-center rounded-xl bg-sun/15 text-sun"><Icon name={s.i} size={22} /></span>
-        <h1 className="font-display text-[26px] font-extrabold leading-tight">{s.t}</h1>
+        <h1 className="font-display text-[26px] font-bold leading-tight">{s.t}</h1>
         <p className="text-[15px] leading-relaxed text-fg-muted">{s.d}</p>
       </div>
       <div className="relative mt-auto flex items-center justify-between px-6 pb-9">
@@ -100,7 +100,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
           {i > 0 && <button type="button" onClick={() => go(i - 1)} aria-label="Previous" className="grid h-11 w-11 place-items-center rounded-full border border-line active:scale-95"><Icon name="back" size={20} /></button>}
           <div className="ml-1 flex gap-2" aria-hidden="true">{SLIDES.map((_, n) => <span key={n} className={`h-2 rounded-full transition-all duration-200 ${n === i ? 'w-6 bg-sun' : 'w-2 bg-line'}`} />)}</div>
         </div>
-        <button type="button" onClick={() => (last ? onDone() : go(i + 1))} className="rounded-pill bg-sun px-7 py-3 font-bold text-ink-950 active:scale-95" data-testid="intro-next">{last ? 'Get started' : 'Next'}</button>
+        <button type="button" onClick={() => (last ? onDone() : go(i + 1))} className="rounded-full bg-sun px-7 py-3 font-bold text-ink-950 active:scale-95" data-testid="intro-next">{last ? 'Get started' : 'Next'}</button>
       </div>
     </div>
   )
@@ -145,12 +145,12 @@ export function AuthScreen({ onBack }: { onBack: () => void }) {
 
   if (step === 'interests') return (
     <div className="slide-in absolute inset-0 flex flex-col bg-ink-900 px-6 pb-8 pt-16">
-      <h1 className="font-display text-[30px] font-extrabold leading-tight">What do you love to explore?</h1>
+      <h1 className="font-display text-[30px] font-bold leading-tight">What do you love to explore?</h1>
       <p className="mt-2 text-fg-muted">Pick a few. We use them to shape your Live feed.</p>
       <div className="no-scrollbar mt-6 flex flex-1 flex-wrap content-start gap-2.5 overflow-y-auto">
-        {CATEGORIES.map((c) => <Chip key={c} active={interests.includes(c)} onClick={() => setInterests((v) => (v.includes(c) ? v.filter((x) => x !== c) : [...v, c]))}><span className="inline-flex items-center gap-1.5"><CatE3 c={c} size={18} />{c}</span></Chip>)}
+        {CATEGORIES.map((c) => <Chip key={c} active={interests.includes(c)} onClick={() => setInterests((v) => (v.includes(c) ? v.filter((x) => x !== c) : [...v, c]))}><span className="inline-flex items-center gap-1.5"><CatIcon c={c} size={18} />{c}</span></Chip>)}
       </div>
-      <button type="button" onClick={() => finish(interests)} className="mt-4 rounded-pill bg-sky py-4 font-display font-bold text-ink-950 active:bg-sky-soft">{interests.length ? `Continue with ${interests.length}` : 'Skip for now'}</button>
+      <button type="button" onClick={() => finish(interests)} className="mt-4 rounded-full bg-sky py-4 font-display font-bold text-ink-950 active:bg-sky-soft">{interests.length ? `Continue with ${interests.length}` : 'Skip for now'}</button>
     </div>
   )
 
@@ -159,13 +159,13 @@ export function AuthScreen({ onBack }: { onBack: () => void }) {
       <div className="aurora pointer-events-none absolute -right-24 -top-10 h-64 w-64 rounded-full bg-sky/20 blur-3xl" />
       <div className="relative flex min-h-full flex-col gap-5 px-6 pb-8 pt-14">
         <button type="button" onClick={onBack} className="flex w-fit items-center gap-1 text-fg-muted"><Icon name="back" size={20} />Back</button>
-        <div className="grid grid-cols-2 rounded-pill border border-line p-1" role="tablist">
+        <div className="grid grid-cols-2 rounded-full border border-line p-1" role="tablist">
           {(['signup', 'signin'] as const).map((m) => (
-            <button key={m} type="button" role="tab" aria-selected={mode === m} onClick={() => { setMode(m); setErr('') }} className={`rounded-pill py-2.5 font-display text-sm font-semibold transition-colors ${mode === m ? 'bg-sky text-ink-950' : 'text-fg-muted'}`}>{m === 'signup' ? 'Create account' : 'Sign in'}</button>
+            <button key={m} type="button" role="tab" aria-selected={mode === m} onClick={() => { setMode(m); setErr('') }} className={`rounded-full py-2.5 font-display text-sm font-semibold transition-colors ${mode === m ? 'bg-sky text-ink-950' : 'text-fg-muted'}`}>{m === 'signup' ? 'Create account' : 'Sign in'}</button>
           ))}
         </div>
         <div key={mode} className="stagger">
-          <h1 className="font-display text-[32px] font-extrabold leading-tight">{mode === 'signup' ? 'Join Valmart' : 'Welcome back'}</h1>
+          <h1 className="font-display text-[32px] font-bold leading-tight">{mode === 'signup' ? 'Join Valmart' : 'Welcome back'}</h1>
           <p className="mt-1 text-fg-muted">{mode === 'signup' ? 'Watch, vote and host with one account.' : 'Pick up where you left off.'}</p>
         </div>
         <form key={`${mode}${shake}`} onSubmit={submit} noValidate className={`flex flex-col gap-3.5 ${shake ? 'shake' : ''}`}>
@@ -178,7 +178,7 @@ export function AuthScreen({ onBack }: { onBack: () => void }) {
             </span>
           </label>
           {err && <p role="alert" className="pop-in rounded-xl px-3.5 py-2.5 text-sm font-medium text-sun-soft" style={{ background: 'rgba(250,143,28,.12)' }}>{err}</p>}
-          <button type="submit" className="mt-1 rounded-pill bg-sky py-4 font-display font-bold text-ink-950 transition-transform active:scale-[.98]">{mode === 'signup' ? 'Create account' : 'Sign in'}</button>
+          <button type="submit" className="mt-1 rounded-full bg-sky py-4 font-display font-bold text-ink-950 transition-transform active:scale-[.98]">{mode === 'signup' ? 'Create account' : 'Sign in'}</button>
           <p className="text-center text-xs text-fg-muted">Prototype: no server. Any valid-looking details open an account on this device.</p>
         </form>
         <div className="flex items-center gap-3 text-xs text-fg-muted"><span className="h-px flex-1 bg-line" />or try a demo account<span className="h-px flex-1 bg-line" /></div>
@@ -200,20 +200,20 @@ export function TrialSheet({ onClose }: { onClose: () => void }) {
         {done || isPremium ? (
           <>
             <span className="pop-in flex h-16 w-16 items-center justify-center rounded-full text-ink-950" style={{ background: 'var(--ok)' }}><Icon name="check" size={34} /></span>
-            <h2 className="font-display text-2xl font-extrabold">{done ? 'Your trial is on' : 'Premium is on'}</h2>
+            <h2 className="font-display text-2xl font-bold">{done ? 'Your trial is on' : 'Premium is on'}</h2>
             <p className="text-fg-muted">Every live plays in 1080p HD+. You can switch it off any time in Me.</p>
-            <button type="button" onClick={onClose} className="w-full rounded-pill bg-sky py-3.5 font-display font-bold text-ink-950">Back to watching</button>
+            <button type="button" onClick={onClose} className="w-full rounded-full bg-sky py-3.5 font-display font-bold text-ink-950">Back to watching</button>
           </>
         ) : (
           <>
-            <span className="rounded-pill bg-sun px-3 py-1 text-xs font-bold text-ink-950">7 days free</span>
-            <h2 className="font-display text-2xl font-extrabold">Try Premium free</h2>
+            <span className="rounded-full bg-sun px-3 py-1 text-xs font-bold text-ink-950">7 days free</span>
+            <h2 className="font-display text-2xl font-bold">Try Premium free</h2>
             <ul className="stagger flex w-full flex-col gap-2 text-left">
               {['1080p HD+ video in every live', 'Sharper picture on long walks', 'Cancel any time, before the trial ends'].map((t) => (
                 <li key={t} className="flex items-center gap-3 rounded-2xl border border-line bg-ink-800 px-4 py-3 text-[15px]"><span className="text-sky"><Icon name="check" size={18} /></span>{t}</li>
               ))}
             </ul>
-            <button type="button" onClick={() => { startTrial(); setDone(true) }} className="shine w-full rounded-pill py-4 font-display text-[16px] font-extrabold text-ink-950">Start 7-day free trial</button>
+            <button type="button" onClick={() => { startTrial(); setDone(true) }} className="shine w-full rounded-full py-4 font-display text-[16px] font-bold text-ink-950">Start 7-day free trial</button>
             <p className="text-xs text-fg-muted">Then $7.99 / month. Sample plan: no card and no payment in this prototype.</p>
           </>
         )}

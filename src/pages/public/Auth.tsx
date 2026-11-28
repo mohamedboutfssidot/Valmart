@@ -40,16 +40,16 @@ export default function Auth() {
   return (
     <div className="mx-auto grid w-full max-w-[920px] gap-8 py-2 md:grid-cols-[1fr_1fr] md:gap-12">
       <section className="flex min-w-0 flex-col gap-5">
-        <div className="flex gap-1 rounded-pill border border-line p-1" role="tablist" aria-label="Account">
+        <div className="flex gap-1 rounded-full border border-line p-1" role="tablist" aria-label="Account">
           {(['signup', 'signin'] as const).map((m) => (
             <button key={m} type="button" role="tab" aria-selected={mode === m} onClick={() => { setMode(m); setErr('') }}
-              className={`flex-1 rounded-pill px-4 py-2 font-display text-sm font-semibold ${mode === m ? 'bg-sky text-ink-950' : 'text-fg-muted hover:text-fg'}`}>
+              className={`flex-1 rounded-full px-4 py-2 font-display text-sm font-semibold ${mode === m ? 'bg-sky text-ink-950' : 'text-fg-muted hover:text-fg'}`}>
               {m === 'signup' ? 'Create account' : 'Sign in'}
             </button>
           ))}
         </div>
         <div>
-          <h1 className="text-3xl font-extrabold sm:text-4xl">{mode === 'signup' ? 'Join Valmart' : 'Welcome back'}</h1>
+          <h1 className="text-3xl font-bold sm:text-4xl">{mode === 'signup' ? 'Join Valmart' : 'Welcome back'}</h1>
           <p className="mt-1 text-fg-muted">{mode === 'signup' ? 'One account to watch, host and manage everything.' : 'Sign in to pick up where you left off.'}</p>
         </div>
         <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
@@ -78,7 +78,7 @@ export default function Auth() {
             </fieldset>
           )}
           {err && <p role="alert" className="text-sm text-sun-soft">{err}</p>}
-          <button type="submit" className="rounded-pill bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft">
+          <button type="submit" className="rounded-full bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft">
             {mode === 'signup' ? 'Create account' : 'Sign in'}
           </button>
           <p className="text-sm text-fg-muted">Prototype: no server and no real email is sent. Details stay on this device.</p>

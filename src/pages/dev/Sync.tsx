@@ -33,7 +33,7 @@ function RoomView({ net, room, role }: { net: Transport; room: string; role: 'ho
     <div className="mx-auto flex max-w-[980px] flex-col gap-5 px-4 py-8">
       <header className="flex flex-col gap-1.5">
         <p className="text-[11px] font-bold uppercase tracking-wider text-sun-soft">Developer test · no network</p>
-        <h1 className="font-display text-3xl font-extrabold">Sync test · room “{room}”</h1>
+        <h1 className="font-display text-3xl font-bold">Sync test · room “{room}”</h1>
         <p className="max-w-[64ch] text-fg-muted">
           This window is the <b className="text-fg" data-testid="role">{role}</b>. Open the same room as {other} in a second tab of this browser:
           {' '}<a className="text-sky hover:underline" href={`#/dev/sync?room=${room}&role=${other}`} target="_blank" rel="noreferrer">open as {other}</a>.

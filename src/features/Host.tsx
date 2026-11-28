@@ -167,7 +167,7 @@ export function TemplatesView() {
         <h2 className="font-display text-xl font-bold">Share your own</h2>
         <input aria-label="Template name" className={field} value={name} maxLength={40} onChange={(e) => setName(e.target.value)} placeholder="Name of the tool" />
         <input aria-label="Template question" className={field} value={prompt} maxLength={100} onChange={(e) => setPrompt(e.target.value)} placeholder="The question viewers see" />
-        <div className="flex flex-wrap gap-2">{BRICKS.map((b) => <button key={b.id} type="button" aria-pressed={bricks.includes(b.id)} onClick={() => toggle(b.id)} className={`rounded-pill border px-3 py-1 text-sm ${bricks.includes(b.id) ? 'border-sky bg-sky text-ink-950' : 'border-line text-fg-muted'}`}>{b.label}</button>)}</div>
+        <div className="flex flex-wrap gap-2">{BRICKS.map((b) => <button key={b.id} type="button" aria-pressed={bricks.includes(b.id)} onClick={() => toggle(b.id)} className={`rounded-full border px-3 py-1 text-sm ${bricks.includes(b.id) ? 'border-sky bg-sky text-ink-950' : 'border-line text-fg-muted'}`}>{b.label}</button>)}</div>
         <div><button className={primary} type="submit">Publish to the library</button></div>
       </form>
     </div>

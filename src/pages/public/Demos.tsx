@@ -4,7 +4,7 @@ import { CITIES, STREAMS, audienceOf, cityOf } from '../../data/mock'
 import { TOOLS } from '../../live/tools'
 import { Seg } from './ui2'
 
-const pill = (on: boolean) => `rounded-pill border px-3.5 py-1.5 text-sm font-semibold transition-colors ${on ? 'border-sky-deep bg-sky-deep text-white' : 'border-line text-fg-muted hover:border-sky-deep hover:text-fg'}`
+const pill = (on: boolean) => `rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${on ? 'border-sky-deep bg-sky-deep text-white' : 'border-line text-fg-muted hover:border-sky-deep hover:text-fg'}`
 
 export function VoteDemo() {
   const [pick, setPick] = useState<0 | 1 | null>(null)
@@ -37,7 +37,7 @@ export function RequestDemo() {
       <div className="flex flex-wrap gap-2">{CITIES.slice(0, 6).map((c) => <button key={c.id} type="button" className={pill(city === c.id)} onClick={() => { setCity(c.id); setSent(false) }}>{c.name}</button>)}</div>
       <label className="flex flex-col gap-1.5 text-sm font-medium">Budget: <b className="text-base tabular-nums">${budget}</b>
         <input type="range" min={10} max={100} step={5} value={budget} onChange={(e) => { setBudget(Number(e.target.value)); setSent(false) }} aria-label="Budget" className="w-full accent-[var(--sky)]" /></label>
-      <button type="button" onClick={() => setSent(true)} className="w-fit rounded-pill bg-sun px-5 py-2.5 font-display text-sm font-bold text-ink-950 hover:bg-sun-soft">Send the request</button>
+      <button type="button" onClick={() => setSent(true)} className="w-fit rounded-full bg-sun px-5 py-2.5 font-display text-sm font-bold text-ink-950 hover:bg-sun-soft">Send the request</button>
       <ol className="flex items-center gap-2 text-sm" aria-live="polite">
         {['Posted', 'A local accepts', 'Live', 'Done'].map((s, i) => <li key={s} className="flex items-center gap-2"><span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${sent && i < 2 ? 'bg-sky text-ink-950' : 'border border-line text-fg-muted'}`}>{i + 1}</span><span className={sent && i < 2 ? 'font-semibold' : 'text-fg-muted'}>{s}</span>{i < 3 && <span className="hidden h-px w-4 bg-line sm:block" />}</li>)}
       </ol>
@@ -54,7 +54,7 @@ export function ToolsDemo() {
     <div className="flex flex-col gap-4" data-testid="tools-demo">
       <Seg options={['Immersive', 'Balanced', 'Active'] as const} value={m} onChange={setM} label="Interaction mode" />
       <p className="text-fg-muted">{m === 'Immersive' ? 'Video first. Only a few tools, small.' : m === 'Balanced' ? 'One tool at a time, calm timing.' : 'Every tool, pins and the map.'}</p>
-      <ul className="flex flex-wrap gap-2">{shown.map((t) => <li key={t.id} className="fade-in rounded-pill border border-line px-3 py-1.5 text-sm font-medium">{t.name}</li>)}</ul>
+      <ul className="flex flex-wrap gap-2">{shown.map((t) => <li key={t.id} className="fade-in rounded-full border border-line px-3 py-1.5 text-sm font-medium">{t.name}</li>)}</ul>
       <p className="text-sm text-fg-muted">{TOOLS.length} tools in total, plus the ones hosts build.</p>
     </div>
   )
@@ -70,7 +70,7 @@ export function EventDemo() {
       <p className="font-display text-xl font-bold">Food walk, old town</p>
       <div className="flex gap-2">{days.map((x, i) => <button key={x} type="button" className={pill(d === i)} onClick={() => setD(i)}>{x}</button>)}</div>
       <div><div className="h-2 overflow-hidden rounded-full bg-ink-700"><div className="h-full bg-sun transition-[width]" style={{ width: `${100 - (seats[d] / 40) * 100}%` }} /></div><p className="mt-1 text-sm text-fg-muted">{seats[d]} of 40 seats left</p></div>
-      <button type="button" disabled={got.includes(d)} onClick={() => { setGot([...got, d]); setSeats(seats.map((s, i) => (i === d ? s - 1 : s))) }} className="w-fit rounded-pill bg-sun px-5 py-2.5 font-display text-sm font-bold text-ink-950 disabled:opacity-60">{got.includes(d) ? 'Seat reserved' : 'Reserve a seat'}</button>
+      <button type="button" disabled={got.includes(d)} onClick={() => { setGot([...got, d]); setSeats(seats.map((s, i) => (i === d ? s - 1 : s))) }} className="w-fit rounded-full bg-sun px-5 py-2.5 font-display text-sm font-bold text-ink-950 disabled:opacity-60">{got.includes(d) ? 'Seat reserved' : 'Reserve a seat'}</button>
     </div>
   )
 }
@@ -115,7 +115,7 @@ export function EarningsDemo() {
       <div className="flex flex-col gap-4">
         {sliders.map(([l, v, set, mn, mx]) => (
           <label key={l} className="flex flex-col gap-1.5 text-sm font-medium">
-            <span className="flex items-center justify-between">{l}<b className="rounded-pill bg-ink-700 px-2.5 py-0.5 text-sm tabular-nums">{v}</b></span>
+            <span className="flex items-center justify-between">{l}<b className="rounded-full bg-ink-700 px-2.5 py-0.5 text-sm tabular-nums">{v}</b></span>
             <input type="range" min={mn} max={mx} value={v} onChange={(e) => set(Number(e.target.value))} aria-label={l} className="w-full accent-[var(--sun)]" />
           </label>
         ))}
@@ -123,7 +123,7 @@ export function EarningsDemo() {
       <div className="flex flex-col gap-4 rounded-card border border-line bg-ink-800 p-5">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-fg-muted">Estimated per month</p>
-          <p className="font-display text-5xl font-extrabold tabular-nums text-sun" data-testid="earn-total">{usd(total)}</p>
+          <p className="font-display text-5xl font-bold tabular-nums text-sun" data-testid="earn-total">{usd(total)}</p>
           <p className="mt-1 text-sm text-fg-muted tabular-nums">About {usd(total / 4.3)} a week, {usd(total * 12)} a year</p>
         </div>
         <div className="flex h-3 overflow-hidden rounded-full bg-ink-700" role="img" aria-label="Income split">

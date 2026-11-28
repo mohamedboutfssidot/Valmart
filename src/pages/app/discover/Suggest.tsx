@@ -52,7 +52,7 @@ export function SuggestPanel({ q, streams, onPick, onOpen, big = false }: { q: s
         <button key={s.id} type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => onOpen(s)} data-testid="suggest-video" className="flex w-full items-center gap-3 rounded-xl p-2 text-left hover:bg-ink-800 active:bg-ink-800">
           <span className="relative block w-[116px] shrink-0 overflow-hidden rounded-lg">
             <VideoSlot stream={s} showLabel={false} className="!aspect-video !w-full !rounded-lg" />
-            <span className="absolute bottom-1 left-1 rounded bg-red-600 px-1.5 py-0.5 text-[10px] font-extrabold leading-none text-white">LIVE</span>
+            <span className="absolute bottom-1 left-1 rounded bg-red-600 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">LIVE</span>
           </span>
           <span className="min-w-0 flex-1">
             <span className="line-clamp-2 text-[14.5px] font-semibold leading-snug">{s.title}</span>

@@ -13,8 +13,8 @@ import { RequestResponses, RequestThread } from './RequestThread'
 import { $day as day, $usd as usd } from './format'
 
 const field = 'w-full rounded-xl border border-line bg-ink-900 px-4 py-2.5 text-[15px] placeholder:text-fg-muted focus:border-sky focus:outline-none'
-const primary = 'inline-flex items-center justify-center rounded-pill bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft disabled:opacity-60'
-const ghost = 'inline-flex items-center justify-center rounded-pill border border-line px-4 py-2 text-sm font-semibold hover:border-sky'
+const primary = 'inline-flex items-center justify-center rounded-full bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft disabled:opacity-60'
+const ghost = 'inline-flex items-center justify-center rounded-full border border-line px-4 py-2 text-sm font-semibold hover:border-sky'
 
 /** A host can respond to an open request sent to them, or an "anyone" request of their own city. */
 export const canAccept = (u: User | null, r: TripRequest) => hostCanSee(u, r)
@@ -158,7 +158,7 @@ export function RequestCard({ r, goLive }: { r: TripRequest; goLive?: string }) 
     <li className="flex min-w-0 flex-col gap-3 rounded-card border border-line bg-ink-800 p-5" data-testid="request-card">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h3 className="min-w-0 font-display text-lg font-bold leading-snug">{r.title}</h3>
-        <span className="font-display text-xl font-extrabold tabular-nums">{r.unlimited && !r.budgetUsd ? 'No limit' : usd(r.budgetUsd)}</span>
+        <span className="font-display text-xl font-bold tabular-nums">{r.unlimited && !r.budgetUsd ? 'No limit' : usd(r.budgetUsd)}</span>
       </div>
       <p className="text-sm text-fg-muted">{city.name}, {city.country} · {day(r.date)}{r.time ? ` · ${r.time}` : ''} · from {r.byName}{r.party ? ` (group of ${r.party.size})` : ''}{r.acceptedBy ? ` · with ${r.acceptedBy}` : r.targets && r.targets.length ? ` · sent to ${r.targets.join(', ')}${r.anyone ? ' and anyone' : ''}` : r.hostName ? ` · for ${r.hostName}` : ' · open to anyone'}</p>
       {r.details && <p className="text-[15px]">{r.details}</p>}
@@ -169,17 +169,17 @@ export function RequestCard({ r, goLive }: { r: TripRequest; goLive?: string }) 
       {r.status === 'countered' && r.counter && (
         <div className="rounded-xl border border-sun p-3 text-sm" data-testid="counter-box">
           <b>{r.counter.by}</b> proposes {usd(r.counter.usd)} on {day(r.counter.date)}.
-          {mine && <span className="ml-2 inline-flex gap-2"><button type="button" onClick={() => answerCounter(r.id, true)} className="rounded-pill bg-sun px-3 py-1 font-bold text-ink-950" data-testid="counter-yes">Accept offer</button><button type="button" onClick={() => answerCounter(r.id, false)} className={ghost}>Decline</button></span>}
+          {mine && <span className="ml-2 inline-flex gap-2"><button type="button" onClick={() => answerCounter(r.id, true)} className="rounded-full bg-sun px-3 py-1 font-bold text-ink-950" data-testid="counter-yes">Accept offer</button><button type="button" onClick={() => answerCounter(r.id, false)} className={ghost}>Decline</button></span>}
         </div>
       )}
       <div className="flex flex-wrap items-center gap-2">
-        <span className={`rounded-pill px-2.5 py-0.5 text-xs font-bold ${r.status === 'open' ? 'bg-sky/20 text-sky' : r.status === 'accepted' || r.status === 'live' || r.status === 'countered' ? 'bg-sun text-ink-950' : 'bg-ink-700 text-fg-muted'}`}>{STATUS[r.status]}{r.acceptedBy && r.status !== 'countered' ? ` by ${r.acceptedBy}` : ''}</span>
+        <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${r.status === 'open' ? 'bg-sky/20 text-sky' : r.status === 'accepted' || r.status === 'live' || r.status === 'countered' ? 'bg-sun text-ink-950' : 'bg-ink-700 text-fg-muted'}`}>{STATUS[r.status]}{r.acceptedBy && r.status !== 'countered' ? ` by ${r.acceptedBy}` : ''}</span>
         <span className="ml-auto flex flex-wrap gap-2">
-          {accept && !rsp && !(r.unlimited && !r.budgetUsd) && <button type="button" onClick={() => acceptRequest(r.id)} className="rounded-pill bg-sun px-4 py-2 text-sm font-bold text-ink-950 hover:bg-sun-soft" data-testid="accept">Accept at this price</button>}
+          {accept && !rsp && !(r.unlimited && !r.budgetUsd) && <button type="button" onClick={() => acceptRequest(r.id)} className="rounded-full bg-sun px-4 py-2 text-sm font-bold text-ink-950 hover:bg-sun-soft" data-testid="accept">Accept at this price</button>}
           {accept && <button type="button" onClick={() => setOffer((v) => !v)} className={ghost} data-testid="counter-open">{rsp ? 'Change my offer' : 'Propose another price or date'}</button>}
           {doing && r.status === 'accepted' && <button type="button" onClick={() => startRequest(r.id)} className={ghost} data-testid="start">Start the trip</button>}
           {doing && goLive && <Link to={goLive} className={ghost}>Go live</Link>}
-          {doing && <button type="button" onClick={() => completeRequest(r.id)} className="rounded-pill bg-sky px-4 py-2 text-sm font-bold text-ink-950 hover:bg-sky-soft" data-testid="complete">Mark as done</button>}
+          {doing && <button type="button" onClick={() => completeRequest(r.id)} className="rounded-full bg-sky px-4 py-2 text-sm font-bold text-ink-950 hover:bg-sky-soft" data-testid="complete">Mark as done</button>}
           {mine && r.status === 'open' && <button type="button" onClick={() => cancelRequest(r.id)} className={ghost}>Cancel and refund</button>}
           {!mine && user && <button type="button" disabled={reported} onClick={() => { report({ kind: 'request', target: r.title, reason: 'Reported from a trip request', by: user.name }); setReported(true) }} className="px-2 text-xs text-fg-muted underline disabled:no-underline">{reported ? 'Reported' : 'Report'}</button>}
         </span>

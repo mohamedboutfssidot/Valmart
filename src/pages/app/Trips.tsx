@@ -16,7 +16,7 @@ export default function Trips() {
   return (
     <div className="flex flex-col gap-10">
       <header className="flex flex-col gap-1">
-        <h1 className="text-3xl font-extrabold sm:text-4xl">My trips</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">My trips</h1>
         <p className="text-fg-muted tabular-nums">{tickets.length} {tickets.length === 1 ? 'ticket' : 'tickets'} · {moments.length} saved {moments.length === 1 ? 'moment' : 'moments'} · {seen.length} {seen.length === 1 ? 'place' : 'places'} visited</p>
       </header>
 

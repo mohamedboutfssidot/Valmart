@@ -8,6 +8,7 @@ import { Events, Hub } from './Hub'
 import { GroupFab } from './GroupFab'
 import { CategoriesTab } from './Categories'
 import '../mobile-extra.css'
+import '../pro.css'
 import { STREAMS, streamById } from '../data/mock'
 import { BackCtx, Explore } from './Screens'
 import { Me } from './Settings'
@@ -58,7 +59,7 @@ function PhoneApp() {
     <div className="yt vm-phone flex min-h-[100dvh] items-center justify-center gap-14 bg-[color:var(--stage)] sm:p-4">
       <aside className="hidden max-w-[300px] flex-col gap-3 lg:flex">
         <Logo className="h-8" />
-        <h1 className="font-display text-3xl font-extrabold leading-tight">Valmart mobile</h1>
+        <h1 className="font-display text-3xl font-bold leading-tight">Valmart mobile</h1>
         <p className="text-fg-muted">The phone version of the prototype. Swipe up and down in Live, open the side buttons for chat, gifts and the route vote.</p>
         <p className="text-sm text-fg-muted">On the sign-in screen you can create an account or use the Nadia (viewer) and Léa (host) demo accounts. Everything is sample data.</p>
       </aside>
@@ -86,7 +87,7 @@ function PhoneApp() {
         {user && !stream && (
           <nav className="relative z-50 shrink-0 border-t border-line bg-ink-800/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur" aria-label="Main">
             <div className="relative flex">
-              <span className="absolute top-0 h-[3px] rounded-b-full bg-sky transition-transform duration-300 [transition-timing-function:cubic-bezier(.3,1.3,.5,1)]" style={{ width: `${100 / tabs.length}%`, transform: `translateX(${idx * 100}%)` }}><span className="mx-auto block h-full w-7 rounded-b-full bg-sky shadow-[0_0_14px_rgba(36,177,244,.8)]" /></span>
+              <span className="absolute top-0 h-[3px] rounded-b-full bg-sky transition-transform duration-200" style={{ width: `${100 / tabs.length}%`, transform: `translateX(${idx * 100}%)` }}><span className="mx-auto block h-full w-7 rounded-b-full bg-sky" /></span>
               {tabs.map(([k, label, icon]) => (
                 <button key={k} type="button" onClick={() => setTab(k)} aria-current={current === k ? 'page' : undefined} aria-label={label} className={`flex flex-1 flex-col items-center gap-1 pb-2 pt-3 transition-colors duration-300 active:scale-90 ${current === k ? 'text-sky' : 'text-fg-muted'}`}>
                   <Icon name={icon} size={22} />

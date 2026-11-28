@@ -24,17 +24,17 @@ export function PublicShell() {
           <NavLink to="/" aria-label="Valmart home"><LogoAdaptive className="h-7" /></NavLink>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
             {LINKS.map((l) => (
-              <NavLink key={l.to} to={l.to} end={'end' in l} className={({ isActive }) => `rounded-pill px-3.5 py-2 text-[15px] font-medium transition-colors ${isActive ? 'bg-ink-700 text-fg' : 'text-fg-muted hover:text-fg'}`}>{l.label}</NavLink>
+              <NavLink key={l.to} to={l.to} end={'end' in l} className={({ isActive }) => `rounded-full px-3.5 py-2 text-[15px] font-medium transition-colors ${isActive ? 'bg-ink-700 text-fg' : 'text-fg-muted hover:text-fg'}`}>{l.label}</NavLink>
             ))}
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
             {user ? (
-              <Link to="/app" className="inline-flex rounded-pill bg-sun px-4 py-2 font-display text-sm font-semibold text-ink-950 hover:bg-sun-soft">Open app</Link>
+              <Link to="/app" className="inline-flex rounded-full bg-sun px-4 py-2 font-display text-sm font-semibold text-ink-950 hover:bg-sun-soft">Open app</Link>
             ) : (
               <>
-                <Link to="/signin" className="hidden rounded-pill px-3 py-2 text-sm font-semibold text-fg-muted hover:text-fg sm:inline-flex">Sign in</Link>
-                <Link to="/signin?mode=signup" className="inline-flex whitespace-nowrap rounded-pill bg-sun px-4 py-2 font-display text-sm font-semibold text-ink-950 hover:bg-sun-soft">Create account</Link>
+                <Link to="/signin" className="hidden rounded-full px-3 py-2 text-sm font-semibold text-fg-muted hover:text-fg sm:inline-flex">Sign in</Link>
+                <Link to="/signin?mode=signup" className="inline-flex whitespace-nowrap rounded-full bg-sun px-4 py-2 font-display text-sm font-semibold text-ink-950 hover:bg-sun-soft">Create account</Link>
               </>
             )}
             <button type="button" aria-label="Menu" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="flex h-9 w-9 items-center justify-center rounded-full border border-line md:hidden">

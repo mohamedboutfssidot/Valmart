@@ -1,4 +1,3 @@
-import { CatE3 } from '../live/e3d'
 import { ReplayOverlay, ReplayRow } from './Replays'
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { LiveNowList } from '../rooms/LiveNow'
@@ -44,7 +43,7 @@ export function Page({ title, sub, children, right, bar }: { title: React.ReactN
     <div className="no-scrollbar absolute inset-0 overflow-y-auto overscroll-contain">
       <header className="sticky top-0 z-10 bg-ink-900/95 pt-8 backdrop-blur">
         <div className="flex items-center justify-between gap-3 px-4 pb-2.5">
-          <div className="flex min-w-0 items-center gap-1.5">{back && <button type="button" onClick={back} aria-label="Back" data-testid="page-back" className="-ml-2 grid h-9 w-9 shrink-0 place-items-center rounded-full text-fg-muted active:bg-ink-800"><Icon name="back" size={22} /></button>}<div className="min-w-0"><h1 className="vm-ptitle font-display text-[26px] font-extrabold leading-none">{title}</h1>{sub && <p className="mt-1.5 text-sm text-fg-muted">{sub}</p>}</div></div>
+          <div className="flex min-w-0 items-center gap-1.5">{back && <button type="button" onClick={back} aria-label="Back" data-testid="page-back" className="-ml-2 grid h-9 w-9 shrink-0 place-items-center rounded-full text-fg-muted active:bg-ink-800"><Icon name="back" size={22} /></button>}<div className="min-w-0"><h1 className="vm-ptitle font-display text-[26px] font-bold leading-none">{title}</h1>{sub && <p className="mt-1.5 text-sm text-fg-muted">{sub}</p>}</div></div>
           {right}
         </div>
         {bar}
@@ -94,7 +93,7 @@ function FeedCard({ s, badge, line, minutes, views, onOpen }: { s: Stream; badge
           {badge === 'LIVE' ? <><i className="live-dot" style={{ width: 7, height: 7 }} />{formatCount(watching)} watching</> : `${formatCount(watching)} views`}
         </span>
         {badge === 'LIVE'
-          ? <span className="absolute bottom-2.5 right-2.5 rounded-md bg-red-600 px-2 py-1 text-[11px] font-extrabold tracking-wide text-white">LIVE</span>
+          ? <span className="absolute bottom-2.5 right-2.5 rounded-md bg-red-600 px-2 py-1 text-[11px] font-bold tracking-wide text-white">LIVE</span>
           : <span className="absolute bottom-2.5 right-2.5 rounded-md bg-black/75 px-2 py-1 text-[11px] font-bold tabular-nums text-white">{minutes ?? 0}:00</span>}
       </button>
       <div className="flex gap-2.5">
@@ -147,7 +146,7 @@ export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id
   return (
     <>
     <Page title={<Logo className="vm-logo h-7" />}
-      right={onRooms ? <button type="button" onClick={onRooms} data-testid="open-rooms" className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-pill bg-sun px-3.5 text-[13px] font-extrabold text-ink-950 active:scale-95"><i className="h-1.5 w-1.5 rounded-full bg-ink-950" aria-hidden="true" />Go live</button> : undefined}
+      right={onRooms ? <button type="button" onClick={onRooms} data-testid="open-rooms" className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-sun px-3.5 text-[13px] font-bold text-ink-950 active:scale-95"><i className="h-1.5 w-1.5 rounded-full bg-ink-950" aria-hidden="true" />Go live</button> : undefined}
       bar={<div className="flex flex-col gap-2 pb-2.5">
         <div className="flex items-center gap-2 px-4">
           <button type="button" onClick={() => setSearching(true)} aria-label="Search" data-testid="m-search" className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-full border border-line bg-ink-800 px-3.5 text-left active:scale-[.99]">
@@ -157,7 +156,7 @@ export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id
           </button>
           <button type="button" onClick={() => setFOpen(true)} aria-label="Filters" data-testid="m-filters" className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border active:scale-90 ${n ? 'border-sky bg-sky text-ink-950' : 'border-line bg-ink-800 text-fg'}`}>
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>
-            {n > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-sun px-1 text-xs font-extrabold text-ink-950">{n}</span>}
+            {n > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-sun px-1 text-xs font-bold text-ink-950">{n}</span>}
           </button>
         </div>
         <div className="no-scrollbar flex gap-1.5 overflow-x-auto px-4" role="tablist" aria-label="Explore sections">
@@ -203,7 +202,7 @@ export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id
               <button key={c.id} type="button" onClick={() => { set({ cities: [c.id] }); setTab('you') }} className="relative overflow-hidden rounded-2xl text-left active:scale-[.97]">
                 <VideoSlot stream={st} showLabel={false} className="!aspect-square !w-full !rounded-2xl" />
                 <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" aria-hidden="true" />
-                <span className="absolute inset-x-0 bottom-0 flex flex-col p-3 text-white"><span className="font-display text-[19px] font-extrabold leading-tight">{c.name}</span><span className="text-[13px] font-bold text-[#ffc266]">{cnt} live now</span></span>
+                <span className="absolute inset-x-0 bottom-0 flex flex-col p-3 text-white"><span className="font-display text-[19px] font-bold leading-tight">{c.name}</span><span className="text-[13px] font-bold text-[#ffc266]">{cnt} live now</span></span>
               </button>
             )
           })}
@@ -217,8 +216,8 @@ export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id
               <button key={e.id} type="button" onClick={() => setEv(e)} className="relative block w-full overflow-hidden rounded-2xl text-left active:scale-[.985]">
                 <VideoSlot stream={st} showLabel={false} className="!aspect-[16/10] !w-full !rounded-2xl" />
                 <span className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/85 to-transparent" aria-hidden="true" />
-                <span className="absolute right-3 top-3 rounded-md bg-sun px-2.5 py-1 font-display text-base font-extrabold text-ink-950">${e.price}</span>
-                <span className="absolute inset-x-0 bottom-0 flex flex-col gap-0.5 p-4 text-white"><span className="line-clamp-2 font-display text-[19px] font-extrabold leading-tight">{e.title}</span><span className="text-[14px] text-white/85">{cityOf(e.cityId).name} · {e.duration}</span></span>
+                <span className="absolute right-3 top-3 rounded-md bg-sun px-2.5 py-1 font-display text-base font-bold text-ink-950">${e.price}</span>
+                <span className="absolute inset-x-0 bottom-0 flex flex-col gap-0.5 p-4 text-white"><span className="line-clamp-2 font-display text-[19px] font-bold leading-tight">{e.title}</span><span className="text-[14px] text-white/85">{cityOf(e.cityId).name} · {e.duration}</span></span>
               </button>
             )
           })}
@@ -231,8 +230,8 @@ export function Explore({ onWatch: openStream, onRooms, onLive }: { onWatch: (id
         <div className="vm-filters flex flex-col gap-3 px-4 pb-4 pt-1">
           <FilterPanel f={f} set={set} />
           <div className="sticky bottom-0 -mx-4 flex gap-2 bg-ink-900 px-4 pb-1 pt-2">
-            <button type="button" onClick={() => setF(BASE_FILTERS)} className="h-10 flex-1 rounded-pill border border-line text-sm font-bold active:scale-95">Clear</button>
-            <button type="button" onClick={() => setFOpen(false)} className="h-10 flex-[1.4] rounded-pill bg-sky text-sm font-extrabold text-ink-950 active:scale-95">Show {lives.length + reps.length} results</button>
+            <button type="button" onClick={() => setF(BASE_FILTERS)} className="h-10 flex-1 rounded-full border border-line text-sm font-bold active:scale-95">Clear</button>
+            <button type="button" onClick={() => setFOpen(false)} className="h-10 flex-[1.4] rounded-full bg-sky text-sm font-bold text-ink-950 active:scale-95">Show {lives.length + reps.length} results</button>
           </div>
         </div>
       </Sheet>
@@ -296,12 +295,12 @@ function EventSheet({ e, onClose }: { e: EventItem; onClose: () => void }) {
           </div>
         ) : (
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 rounded-pill border border-line px-2 py-1">
+            <div className="flex items-center gap-3 rounded-full border border-line px-2 py-1">
               <button type="button" aria-label="Fewer" onClick={() => setQty((n) => Math.max(1, n - 1))} className="h-9 w-9 rounded-full text-xl active:bg-ink-700">−</button>
               <span className="w-5 text-center font-semibold tabular-nums">{qty}</span>
               <button type="button" aria-label="More" onClick={() => setQty((n) => Math.min(6, n + 1))} className="h-9 w-9 rounded-full text-xl active:bg-ink-700">+</button>
             </div>
-            <button type="button" onClick={() => { setRef(code); addTicket({ ref: code, eventId: e.id, qty }) }} className="flex-1 rounded-pill bg-sun px-5 py-3 font-display font-bold text-ink-950 active:bg-sun-soft">Reserve · ${e.price * qty}</button>
+            <button type="button" onClick={() => { setRef(code); addTicket({ ref: code, eventId: e.id, qty }) }} className="flex-1 rounded-full bg-sun px-5 py-3 font-display font-bold text-ink-950 active:bg-sun-soft">Reserve · ${e.price * qty}</button>
           </div>
         )}
       </div>
@@ -316,9 +315,9 @@ export function Trips({ onWatch }: { onWatch: (id: string) => void }) {
   const empty = (t: string) => <p className="rounded-2xl border border-dashed border-line p-6 text-center text-fg-muted">{t}</p>
   return (
     <Page title="My trips" sub="Everything you saw and saved">
-      <div className="grid grid-cols-3 rounded-pill border border-line p-1" role="tablist">
+      <div className="grid grid-cols-3 rounded-full border border-line p-1" role="tablist">
         {tabs.map(([k, l]) => (
-          <button key={k} role="tab" aria-selected={tab === k} type="button" onClick={() => setTab(k)} className={`rounded-pill py-2 text-sm font-semibold transition-colors ${tab === k ? 'bg-sky text-ink-950' : 'text-fg-muted'}`}>{l}</button>
+          <button key={k} role="tab" aria-selected={tab === k} type="button" onClick={() => setTab(k)} className={`rounded-full py-2 text-sm font-semibold transition-colors ${tab === k ? 'bg-sky text-ink-950' : 'text-fg-muted'}`}>{l}</button>
         ))}
       </div>
       {tab === 'm' && (moments.length ? <div className="flex flex-col gap-4">{moments.map((m) => { const s = streamById(m.streamId); return s ? <div key={m.id}><Row s={s} onWatch={onWatch} /><p className="ml-[104px] mt-1 text-xs text-fg-muted">Saved {when(m.at)}</p></div> : null })}</div> : empty('Tap Save on any live to keep a moment here.'))}
@@ -351,13 +350,13 @@ export function HostLive({ onClose, defaultCity }: { onClose: () => void; defaul
       {phase === 'setup' && (
         <div className="no-scrollbar flex h-full flex-col gap-5 overflow-y-auto px-5 pb-8 pt-14">
           <button type="button" onClick={onClose} className="flex w-fit items-center gap-1 text-fg-muted"><Icon name="back" size={20} />Back</button>
-          <h1 className="font-display text-[28px] font-extrabold leading-tight">Set up your live</h1>
+          <h1 className="font-display text-[28px] font-bold leading-tight">Set up your live</h1>
           <label className="flex flex-col gap-1.5 text-sm text-fg-muted">Title<input value={title} onChange={(e) => setTitle(e.target.value.slice(0, 80))} className="rounded-2xl border border-line bg-ink-900 px-4 py-3 text-[16px] text-fg focus:border-sky focus:outline-none" /></label>
           <label className="flex flex-col gap-1.5 text-sm text-fg-muted">City<select value={cityId} onChange={(e) => setCityId(e.target.value)} className="rounded-2xl border border-line bg-ink-900 px-4 py-3 text-[16px] text-fg">{CITIES.map((c) => <option key={c.id} value={c.id}>{c.name}, {c.country}</option>)}</select></label>
           <VideoSlot stream={stream} label="Your camera" className="shrink-0 rounded-2xl ring-1 ring-line" />
           <div className="flex flex-col gap-1.5"><span className="text-sm text-fg-muted">Type of experience</span><div className="no-scrollbar flex gap-2 overflow-x-auto">{(['Discovery', 'Horror', 'Hidden Places', 'Travel Guide', 'Night Exploration', 'Food Journey'] as const).map((c) => <Chip key={c} active={category === c} onClick={() => setCategory(c)}>{c}</Chip>)}</div></div>
           <div className="flex flex-col gap-1.5"><span className="text-sm text-fg-muted">How do you run this live?</span><HostModePicker mobile compact value={hostMode} onChange={setHostMode} /></div>
-          <button type="button" disabled={!title.trim()} onClick={() => setPhase(hostMode === 'team' ? 'camera' : 'live')} className="mt-auto shrink-0 rounded-pill bg-sun py-4 font-display text-lg font-extrabold text-ink-950 disabled:opacity-40 active:bg-sun-soft">{hostMode === 'team' ? 'Join as the camera' : 'Start streaming'}</button>
+          <button type="button" disabled={!title.trim()} onClick={() => setPhase(hostMode === 'team' ? 'camera' : 'live')} className="mt-auto shrink-0 rounded-full bg-sun py-4 font-display text-lg font-bold text-ink-950 disabled:opacity-40 active:bg-sun-soft">{hostMode === 'team' ? 'Join as the camera' : 'Start streaming'}</button>
         </div>
       )}
       {phase === 'camera' && (
@@ -370,14 +369,14 @@ export function HostLive({ onClose, defaultCity }: { onClose: () => void; defaul
       {phase === 'ended' && (
         <div className="flex h-full flex-col items-center justify-center gap-5 px-6 text-center">
           <span className="pop-in flex h-16 w-16 items-center justify-center rounded-full text-ink-950" style={{ background: 'var(--ok)' }}><Icon name="check" size={34} /></span>
-          <h1 className="font-display text-3xl font-extrabold">Session ended</h1>
+          <h1 className="font-display text-3xl font-bold">Session ended</h1>
           <dl className="grid w-full grid-cols-2 gap-3">
             {[['Length', clock(sum.seconds)], ['Peak audience', String(sum.peak)], ['Gifts', String(sum.gifts)], ['Earned', money(giftUsd(sum.coins))]].map(([k, v]) => (
               <div key={k} className="rounded-2xl border border-line bg-ink-900 p-4"><dt className="text-sm text-fg-muted">{k}</dt><dd className="mt-1 font-display text-2xl font-bold tabular-nums">{v}</dd></div>
             ))}
           </dl>
           <p className="text-sm text-fg-muted">Added to Studio and your earnings. Sample figures.</p>
-          <button type="button" onClick={onClose} className="w-full rounded-pill bg-sky py-3.5 font-display font-bold text-ink-950 active:bg-sky-soft">Done</button>
+          <button type="button" onClick={onClose} className="w-full rounded-full bg-sky py-3.5 font-display font-bold text-ink-950 active:bg-sky-soft">Done</button>
         </div>
       )}
     </div>
@@ -413,10 +412,10 @@ function HostRoom({ stream, hostMode, onEnd }: { stream: Stream; hostMode: 'auto
       <VideoEffects e={eng} />
       <PinLayer e={eng} armed={false} />
       <div className="absolute inset-x-3 top-14 z-10 flex items-center justify-between">
-        <div className="flex items-center gap-2"><LiveBadge viewers={String(viewers)} /><span className="rounded-pill bg-ink-950/75 px-2.5 py-1 text-xs font-semibold tabular-nums">{clock(seconds)}</span></div>
+        <div className="flex items-center gap-2"><LiveBadge viewers={String(viewers)} /><span className="rounded-full bg-ink-950/75 px-2.5 py-1 text-xs font-semibold tabular-nums">{clock(seconds)}</span></div>
         <div className="flex items-center gap-2">
-          <button type="button" aria-pressed={hostVoice} onClick={() => setPref('hostVoice', !hostVoice)} className={`rounded-pill px-3 py-1.5 text-xs font-semibold backdrop-blur ${hostVoice ? 'bg-sky text-ink-950' : 'bg-ink-950/75'}`}>Voice {hostVoice ? 'on' : 'off'}</button>
-          <button type="button" onClick={() => onEnd({ seconds, peak, gifts: sim.giftCount, coins: sim.giftCoins })} className="rounded-pill bg-sun px-4 py-1.5 font-display text-sm font-bold text-ink-950 active:bg-sun-soft">End</button>
+          <button type="button" aria-pressed={hostVoice} onClick={() => setPref('hostVoice', !hostVoice)} className={`rounded-full px-3 py-1.5 text-xs font-semibold backdrop-blur ${hostVoice ? 'bg-sky text-ink-950' : 'bg-ink-950/75'}`}>Voice {hostVoice ? 'on' : 'off'}</button>
+          <button type="button" onClick={() => onEnd({ seconds, peak, gifts: sim.giftCount, coins: sim.giftCoins })} className="rounded-full bg-sun px-4 py-1.5 font-display text-sm font-bold text-ink-950 active:bg-sun-soft">End</button>
         </div>
       </div>
       <VoiceBadge className="absolute left-3 top-[6.4rem] z-20" />
@@ -439,7 +438,7 @@ function HostRoom({ stream, hostMode, onEnd }: { stream: Stream; hostMode: 'auto
             <div className="rounded-2xl bg-ink-950/80 px-2 py-2 backdrop-blur"><p className="text-[11px] text-fg-muted">Gifts</p><p className="font-display font-bold tabular-nums">{sim.giftCount}</p></div>
             <div className="rounded-2xl bg-ink-950/80 px-2 py-2 backdrop-blur"><p className="text-[11px] text-fg-muted">Earned</p><p className="font-display font-bold tabular-nums">{money(giftUsd(sim.giftCoins))}</p></div>
           </div>
-          <button type="button" onClick={() => setSheet('tools')} className="flex h-12 items-center rounded-pill bg-sun px-4 font-display font-bold text-ink-950 active:bg-sun-soft">{hostMode === 'auto' ? 'More' : 'Tools'}</button>
+          <button type="button" onClick={() => setSheet('tools')} className="flex h-12 items-center rounded-full bg-sun px-4 font-display font-bold text-ink-950 active:bg-sun-soft">{hostMode === 'auto' ? 'More' : 'Tools'}</button>
           <button type="button" onClick={() => setSheet('chat')} aria-label="Chat" className="flex h-12 w-12 items-center justify-center rounded-full bg-sky text-ink-950 active:bg-sky-soft"><Icon name="chat" size={20} /></button>
         </div>
       </div>

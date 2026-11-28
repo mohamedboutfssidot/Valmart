@@ -34,7 +34,7 @@ export default function City() {
         <VideoSlot stream={streams[0]} showLabel={false} className="!aspect-[16/7] rounded-[24px] ring-1 ring-line sm:!aspect-[3/1]">
           <div className="absolute left-4 top-4"><LiveBadge viewers={formatCount(watching)} /></div>
           <div className="absolute inset-x-5 bottom-5">
-            <h1 className="text-4xl font-extrabold sm:text-6xl">{city.name}</h1>
+            <h1 className="text-4xl font-bold sm:text-6xl">{city.name}</h1>
             <p className="mt-1 max-w-[52ch] text-fg/85">{CITY_BLURBS[city.id]}</p>
           </div>
         </VideoSlot>
@@ -55,7 +55,7 @@ export default function City() {
                 <div className="min-w-0 flex-1">
                   <p className="flex flex-wrap items-center gap-x-2 font-display text-lg font-semibold leading-tight">
                     {h.name}
-                    {h.founding && <span className="rounded-pill bg-sun/15 px-2 py-0.5 text-xs font-semibold text-sun-soft">Founding host</span>}
+                    {h.founding && <span className="rounded-full bg-sun/15 px-2 py-0.5 text-xs font-semibold text-sun-soft">Founding host</span>}
                   </p>
                   <p className="truncate text-sm text-fg-muted">{h.languages.join(', ')}</p>
                 </div>
@@ -89,7 +89,7 @@ export default function City() {
         <ul className="flex flex-wrap gap-2.5">
           {others.map((c) => (
             <li key={c.id}>
-              <Link to={`/app/city/${c.id}`} className="inline-flex rounded-pill border border-line px-4 py-2 font-medium transition-colors hover:bg-ink-800">{c.name}</Link>
+              <Link to={`/app/city/${c.id}`} className="inline-flex rounded-full border border-line px-4 py-2 font-medium transition-colors hover:bg-ink-800">{c.name}</Link>
             </li>
           ))}
         </ul>

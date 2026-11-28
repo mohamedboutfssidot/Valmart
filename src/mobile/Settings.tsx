@@ -70,13 +70,13 @@ export function Me({ onTrial, onRooms }: { onTrial: () => void; onRooms?: () => 
           <span className="flex items-end gap-3.5 px-4"><span className="relative z-10 -mt-8 rounded-full bg-ink-900 p-1"><Avatar name={user.name} size={64} /></span>
             <span className="min-w-0 flex-1 pb-1"><span className="block truncate font-display text-lg font-bold">{user.name}</span><span className="block truncate text-xs text-fg-muted">{user.isHost ? 'Host' : 'Viewer'} · Level {stats.level}</span></span>
             <span className="mb-2 rotate-180 text-fg-muted"><Icon name="back" size={18} /></span></span>
-          <span className="grid grid-cols-3 gap-2 p-4 text-center">{[['Lives', stats.visited], ['Moments', stats.moments], ['Badges', stats.earned]].map(([k, v]) => <span key={k} className="rounded-xl bg-ink-800 py-2"><span className="block font-display text-lg font-extrabold tabular-nums">{v}</span><span className="text-[11px] text-fg-muted">{k}</span></span>)}</span>
+          <span className="grid grid-cols-3 gap-2 p-4 text-center">{[['Lives', stats.visited], ['Moments', stats.moments], ['Badges', stats.earned]].map(([k, v]) => <span key={k} className="rounded-xl bg-ink-800 py-2"><span className="block font-display text-lg font-bold tabular-nums">{v}</span><span className="text-[11px] text-fg-muted">{k}</span></span>)}</span>
         </button>
 
         <div className="grid grid-cols-2 gap-3">
-          <button type="button" onClick={() => setRoute('wallet')} className="rounded-2xl border border-line bg-ink-900 p-4 text-left transition-transform active:scale-[.97]"><p className="text-xs text-fg-muted">Demo coins</p><p className="font-display text-2xl font-extrabold tabular-nums">{Math.round(shown).toLocaleString()}</p></button>
+          <button type="button" onClick={() => setRoute('wallet')} className="rounded-2xl border border-line bg-ink-900 p-4 text-left transition-transform active:scale-[.97]"><p className="text-xs text-fg-muted">Demo coins</p><p className="font-display text-2xl font-bold tabular-nums">{Math.round(shown).toLocaleString()}</p></button>
           <button type="button" onClick={() => setRoute('wallet')} className="rounded-2xl border p-4 text-left transition-transform active:scale-[.97]" style={isPremium ? { borderColor: 'rgba(36,177,244,.6)', background: 'rgba(36,177,244,.1)' } : { borderColor: 'rgba(250,143,28,.6)', background: 'rgba(250,143,28,.08)' }}>
-            <p className="text-xs text-fg-muted">Plan</p><p className="font-display text-lg font-extrabold leading-tight">{planOf(planId).name}</p>{planId === 'free' && <p className="text-xs text-sun-soft">See Plus and Premium</p>}
+            <p className="text-xs text-fg-muted">Plan</p><p className="font-display text-lg font-bold leading-tight">{planOf(planId).name}</p>{planId === 'free' && <p className="text-xs text-sun-soft">See Plus and Premium</p>}
           </button>
         </div>
 
@@ -145,7 +145,7 @@ function AccountPage({ onBack }: { onBack: () => void }) {
   const planId = useDemo((st) => st.plan)
   if (!user) return null
   const toggle = (arr: string[], v: string) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v])
-  const chip = (on: boolean) => `rounded-pill border px-3.5 py-1.5 text-sm transition-colors ${on ? 'border-sky bg-sky font-semibold text-ink-950' : 'border-line text-fg-muted'}`
+  const chip = (on: boolean) => `rounded-full border px-3.5 py-1.5 text-sm transition-colors ${on ? 'border-sky bg-sky font-semibold text-ink-950' : 'border-line text-fg-muted'}`
   return (
     <Sub title="Profile" onBack={onBack}>
       <div className="flex flex-col items-center gap-2"><span className="rounded-full p-1" style={{ background: PLAN_BG[planId] }}><span className="block rounded-full bg-ink-900 p-1"><Avatar name={user.name} size={84} /></span></span>
@@ -197,8 +197,8 @@ function WalletPage({ onBack, onTrial }: { onBack: () => void; onTrial: () => vo
   const shown = useAnimatedNumber(coins, 700)
   return (
     <Sub title="Wallet and plan" onBack={onBack}>
-      <div className="rounded-2xl border border-line bg-ink-900 p-5"><p className="text-sm text-fg-muted">Demo coins</p><p className="font-display text-4xl font-extrabold tabular-nums">{Math.round(shown).toLocaleString()}</p><p className="mt-1 text-xs text-fg-muted">{COINS_PER_USD} coins equal $1. No real payments here.</p>
-        <div className="mt-4 grid grid-cols-3 gap-2">{[100, 500, 1000].map((n) => <button key={n} type="button" onClick={() => topUp(n)} className="rounded-pill border border-sky py-2.5 text-sm font-semibold text-sky-soft transition-transform active:scale-95">+{n}</button>)}</div></div>
+      <div className="rounded-2xl border border-line bg-ink-900 p-5"><p className="text-sm text-fg-muted">Demo coins</p><p className="font-display text-4xl font-bold tabular-nums">{Math.round(shown).toLocaleString()}</p><p className="mt-1 text-xs text-fg-muted">{COINS_PER_USD} coins equal $1. No real payments here.</p>
+        <div className="mt-4 grid grid-cols-3 gap-2">{[100, 500, 1000].map((n) => <button key={n} type="button" onClick={() => topUp(n)} className="rounded-full border border-sky py-2.5 text-sm font-semibold text-sky-soft transition-transform active:scale-95">+{n}</button>)}</div></div>
       <Group title="Plan">
         {PLANS.map((p) => <Item key={p.id} label={`${p.name} · ${price(p)}`} detail={`${p.quality} · ${p.looks === Infinity ? 'unlimited' : p.looks === 0 ? 'no' : p.looks} Look here · group of ${p.group}`} right={<Switch on={plan === p.id} onChange={() => setPlan(p.id)} label={p.name} />} />)}
       </Group>
@@ -216,9 +216,9 @@ function HostPage({ onBack }: { onBack: () => void }) {
       {!user.isHost && <p className="text-[15px] leading-relaxed text-fg-muted">Show your city live. Viewers send gifts and book your events, and you keep 70% of gifts.</p>}
       <Group title="Your city"><label className="flex items-center gap-3 px-4 py-3"><span className="w-16 text-sm text-fg-muted">City</span><select value={city} onChange={(e) => { setCity(e.target.value); if (user.isHost) patchUser({ hostCity: e.target.value }) }} className="min-w-0 flex-1 bg-transparent text-[15px] focus:outline-none">{CITIES.map((c) => <option key={c.id} value={c.id} className="bg-ink-900">{c.name}, {c.country}</option>)}</select></label></Group>
       <section className="flex flex-col gap-2"><h2 className="px-1 text-xs font-semibold uppercase tracking-wider text-fg-muted">Languages you host in</h2>
-        <div className="flex flex-wrap gap-2">{LANGS.map((l) => { const on = user.languages.includes(l); return <button key={l} type="button" onClick={() => patchUser({ languages: toggle(user.languages, l) })} className={`rounded-pill border px-3.5 py-1.5 text-sm transition-colors ${on ? 'border-sky bg-sky font-semibold text-ink-950' : 'border-line text-fg-muted'}`}>{l}</button> })}</div></section>
+        <div className="flex flex-wrap gap-2">{LANGS.map((l) => { const on = user.languages.includes(l); return <button key={l} type="button" onClick={() => patchUser({ languages: toggle(user.languages, l) })} className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${on ? 'border-sky bg-sky font-semibold text-ink-950' : 'border-line text-fg-muted'}`}>{l}</button> })}</div></section>
       {user.isHost && <Group title="Voice"><Toggle k="hostVoice" label="Voice for results" detail="You hear each result in your earphones, no need to look" /></Group>}
-      {!user.isHost && <button type="button" onClick={() => becomeHost(city, user.languages.length ? user.languages : ['English'])} className="rounded-pill bg-sun py-4 font-display font-extrabold text-ink-950 active:bg-sun-soft">Become a host</button>}
+      {!user.isHost && <button type="button" onClick={() => becomeHost(city, user.languages.length ? user.languages : ['English'])} className="rounded-full bg-sun py-4 font-display font-bold text-ink-950 active:bg-sun-soft">Become a host</button>}
       {user.isHost && <Group note="Gifts split: you keep 70%."><Item label="Payouts" detail="Not part of this prototype" /></Group>}
     </Sub>
   )

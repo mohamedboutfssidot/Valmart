@@ -11,7 +11,7 @@ export default function Pricing() {
   return (
     <div className="flex flex-col gap-14">
       <header className="flex max-w-[62ch] flex-col gap-3">
-        <h1 className="text-4xl font-extrabold sm:text-5xl">Pricing</h1>
+        <h1 className="text-4xl font-bold sm:text-5xl">Pricing</h1>
         <p className="text-lg text-fg-muted">Free, Plus or Premium. The plan changes your comfort and your limits, never your vote. Hosts never pay a subscription.</p>
       </header>
       <PlanCards cta={<Button to="/signin?mode=signup" variant="ghost">Start with an account</Button>} />

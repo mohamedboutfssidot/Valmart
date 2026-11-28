@@ -21,7 +21,7 @@ export default function Viewers() {
   return (
     <div className="flex flex-col gap-24 md:gap-32">
       <header className="stagger flex max-w-[68ch] flex-col gap-4">
-        <p className="w-fit rounded-pill border border-line px-3.5 py-1 text-sm font-medium text-sky-soft">For viewers</p>
+        <p className="w-fit rounded-full border border-line px-3.5 py-1 text-sm font-medium text-sky-soft">For viewers</p>
         <h1 className="text-3xl sm:text-5xl">Explore places live, at your own pace</h1>
         <p className="text-lg text-fg-muted">Free to watch. You decide where the walk goes.</p>
         <div className="flex flex-wrap gap-3"><Button to="/signin?mode=signup" variant="sun">Create free account</Button><Button to="/" variant="ghost">See everything on the home page</Button></div>

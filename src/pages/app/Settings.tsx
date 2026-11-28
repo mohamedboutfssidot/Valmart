@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { CATEGORIES, cityOf, type Category } from '../../data/mock'
 import { useDemo } from '../../store'
 import { Avatar, Chip } from '../../components/ui'
-import { CatE3 } from '../../live/e3d'
+import { CatIcon } from '../../components/icons2'
 import { BadgeRow, PlanBadge, useStats } from '../../features/ProfileBits'
 import { useReplays, isOpen } from '../../replays'
 
@@ -40,13 +40,13 @@ export default function Settings() {
           <div className="-mt-10 flex flex-wrap items-end gap-4">
             <span className="relative z-10 rounded-full bg-ink-800 p-1.5 shadow-lg"><Avatar name={user.name} size={80} /></span>
             <div className="min-w-0 flex-1 pb-1">
-              <h1 className="truncate text-2xl font-extrabold sm:text-3xl">{user.name}</h1>
+              <h1 className="truncate text-xl font-bold sm:text-2xl">{user.name}</h1>
               <p className="truncate text-sm text-fg-muted">{user.email} · {user.isHost ? `Host in ${cityOf(user.hostCity ?? 'paris').name}` : 'Viewer'} · Level {st.level}</p>
             </div>
           </div>
           {user.bio ? <p className="mt-4 max-w-[60ch]">{user.bio}</p> : <p className="mt-4 text-sm text-fg-muted">Add a short bio below so hosts know who you are.</p>}
           <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {stats.map(([k, v]) => <div key={k} className="rounded-2xl bg-ink-900 p-3"><dt className="text-xs text-fg-muted">{k}</dt><dd className="font-display text-2xl font-extrabold tabular-nums">{v}</dd></div>)}
+            {stats.map(([k, v]) => <div key={k} className="rounded-2xl bg-ink-900 p-3"><dt className="text-xs text-fg-muted">{k}</dt><dd className="font-display text-2xl font-bold tabular-nums">{v}</dd></div>)}
           </dl>
         </div>
       </section>
@@ -65,7 +65,7 @@ export default function Settings() {
           <input id="s-name" className={field} value={name} maxLength={40} onChange={(e) => setName(e.target.value)} />
           <label htmlFor="s-bio" className="text-sm font-medium">Bio <span className="font-normal text-fg-muted">({bio.length}/140)</span></label>
           <textarea id="s-bio" rows={2} className={field} value={bio} maxLength={140} placeholder="What do you like to discover?" onChange={(e) => setBio(e.target.value)} />
-          <div><button type="submit" className="rounded-pill bg-sky px-5 py-2.5 font-display text-sm font-bold text-ink-950 hover:bg-sky-soft">{saved ? 'Saved' : 'Save profile'}</button></div>
+          <div><button type="submit" className="rounded-full bg-sky px-5 py-2.5 font-display text-sm font-bold text-ink-950 hover:bg-sky-soft">{saved ? 'Saved' : 'Save profile'}</button></div>
         </form>
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-1 text-sm font-medium">Languages you speak</legend>
@@ -73,14 +73,14 @@ export default function Settings() {
         </fieldset>
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-1 text-sm font-medium">Interests, used for your Discover picks</legend>
-          <div className="flex flex-wrap gap-2">{CATEGORIES.map((c) => <Chip key={c} active={user.interests.includes(c)} onClick={() => toggle(c)}><span className="inline-flex items-center gap-1.5"><CatE3 c={c} size={16} />{c}</span></Chip>)}</div>
+          <div className="flex flex-wrap gap-2">{CATEGORIES.map((c) => <Chip key={c} active={user.interests.includes(c)} onClick={() => toggle(c)}><span className="inline-flex items-center gap-1.5"><CatIcon c={c} size={16} />{c}</span></Chip>)}</div>
         </fieldset>
       </section>
 
       {user.isHost && (
         <section className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-line bg-ink-800 p-5">
           <div><h2 className="text-lg font-bold">Your host profile</h2><p className="text-sm text-fg-muted">{open} replays open for 48 hours · {st.sessions} sessions</p></div>
-          <div className="flex flex-wrap gap-2"><Link to="/app/host/me" className="rounded-pill border border-line px-4 py-2 text-sm font-semibold hover:border-sky">Public page</Link><Link to="/studio/replays" className="rounded-pill border border-line px-4 py-2 text-sm font-semibold hover:border-sky">Replays</Link><Link to="/studio" className="rounded-pill bg-sun px-4 py-2 text-sm font-bold text-ink-950">Studio</Link></div>
+          <div className="flex flex-wrap gap-2"><Link to="/app/host/me" className="rounded-full border border-line px-4 py-2 text-sm font-semibold hover:border-sky">Public page</Link><Link to="/studio/replays" className="rounded-full border border-line px-4 py-2 text-sm font-semibold hover:border-sky">Replays</Link><Link to="/studio" className="rounded-full bg-sun px-4 py-2 text-sm font-bold text-ink-950">Studio</Link></div>
         </section>
       )}
 
@@ -102,8 +102,8 @@ export default function Settings() {
       </section>
 
       <div className="flex flex-wrap gap-3">
-        <button type="button" onClick={() => { signOut(); nav('/') }} className="rounded-pill border border-line px-5 py-2.5 font-display text-sm font-semibold hover:bg-ink-800">Sign out</button>
-        <button type="button" onClick={() => { reset(); nav('/') }} className="rounded-pill px-5 py-2.5 text-sm text-fg-muted hover:text-fg">Reset demo</button>
+        <button type="button" onClick={() => { signOut(); nav('/') }} className="rounded-full border border-line px-5 py-2.5 font-display text-sm font-semibold hover:bg-ink-800">Sign out</button>
+        <button type="button" onClick={() => { reset(); nav('/') }} className="rounded-full px-5 py-2.5 text-sm text-fg-muted hover:text-fg">Reset demo</button>
       </div>
     </div>
   )

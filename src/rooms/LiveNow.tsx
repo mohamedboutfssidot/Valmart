@@ -29,7 +29,7 @@ function LiveCard({ l, onOpen, compact }: { l: LiveNow; onOpen: (l: LiveNow) => 
     <button type="button" onClick={() => onOpen(l)} data-testid="live-card" className={`group flex flex-col gap-2 rounded-card border border-line bg-ink-800 p-3 text-left transition hover:border-sky active:scale-[0.99] ${compact ? 'w-[230px] shrink-0' : ''}`}>
       <span className="relative flex aspect-video items-center justify-center overflow-hidden rounded-[12px] bg-gradient-to-br from-sky/30 via-ink-900 to-sun/30">
         <span className="absolute left-2 top-2"><LiveBadge viewers={String(l.viewers)} /></span>
-        <span className="font-display text-2xl font-extrabold text-fg-muted/70">{(l.city || l.host).slice(0, 18)}</span>
+        <span className="font-display text-2xl font-bold text-fg-muted/70">{(l.city || l.host).slice(0, 18)}</span>
       </span>
       <span className="line-clamp-2 text-[15px] font-bold leading-snug">{l.title}</span>
       <span className="text-xs text-fg-muted">{[where(l), l.category].filter(Boolean).join(' · ')}</span>

@@ -46,7 +46,7 @@ export default function Earnings() {
   return (
     <div className="flex flex-col gap-10">
       <header className="flex flex-col gap-1">
-        <h1 className="text-3xl font-extrabold sm:text-4xl">Earnings</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Earnings</h1>
         <p className="text-fg-muted">Sample figures. 100 coins equal $1 and you keep 70% of gifts.</p>
       </header>
 

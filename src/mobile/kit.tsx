@@ -29,10 +29,10 @@ export function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boo
 export function Seg<T extends string>({ options, value, onChange, label }: { options: readonly T[]; value: T; onChange: (v: T) => void; label?: string }) {
   const i = Math.max(0, options.indexOf(value))
   return (
-    <div className="relative grid rounded-pill border border-line p-1" style={{ gridTemplateColumns: `repeat(${options.length}, 1fr)` }} role="tablist" aria-label={label}>
-      <span className="absolute bottom-1 left-1 top-1 rounded-pill bg-sky transition-transform duration-300 [transition-timing-function:cubic-bezier(.3,1.2,.5,1)]" style={{ width: `calc((100% - 8px) / ${options.length})`, transform: `translateX(${i * 100}%)` }} />
+    <div className="relative grid rounded-full border border-line p-1" style={{ gridTemplateColumns: `repeat(${options.length}, 1fr)` }} role="tablist" aria-label={label}>
+      <span className="absolute bottom-1 left-1 top-1 rounded-full bg-sky transition-transform duration-300 [transition-timing-function:cubic-bezier(.3,1.2,.5,1)]" style={{ width: `calc((100% - 8px) / ${options.length})`, transform: `translateX(${i * 100}%)` }} />
       {options.map((o) => (
-        <button key={o} type="button" role="tab" aria-selected={o === value} onClick={() => onChange(o)} className={`relative z-10 rounded-pill py-2 text-sm font-semibold transition-colors duration-300 ${o === value ? 'text-ink-950' : 'text-fg-muted'}`}>{o}</button>
+        <button key={o} type="button" role="tab" aria-selected={o === value} onClick={() => onChange(o)} className={`relative z-10 rounded-full py-2 text-sm font-semibold transition-colors duration-300 ${o === value ? 'text-ink-950' : 'text-fg-muted'}`}>{o}</button>
       ))}
     </div>
   )

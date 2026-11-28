@@ -1,0 +1,74 @@
+/*
+  Professional finish. Loaded last, so it wins over the older decorative rules.
+  Principles: flat surfaces, one radius scale (8 / 12 / full), state changes by color only,
+  no entrance choreography, sentence case everywhere. The live page keeps its own .lt-* / .steer / .vm-p* styles.
+*/
+
+/* --- surfaces: no dotted paper, no colour wash, no mesh --- */
+.yt { background-image: none; }
+.mesh::before { display: none; }
+.aurora { display: none !important; }
+
+/* --- motion: nothing moves on its own; pages simply appear --- */
+.page-enter > * { animation: none !important; }
+.page-enter { animation: fade-in .15s ease-out; }
+.reveal { opacity: 1; transform: none; transition: none; }
+.stagger > * { animation: none; }
+button:active:not(:disabled), a.btn:active { transform: none; }
+.e3-float, [data-tilt] { animation: none; transform: none; }
+
+/* --- buttons (<Button>): colour change only --- */
+.btn { overflow: visible; transition: background-color .15s, color .15s; }
+.btn:hover, .btn:active, .btn.bg-sun:hover { transform: none; box-shadow: none; }
+.btn.bg-sky::after, .btn.bg-sun::after { display: none; }
+.btn:focus-visible { outline-offset: 2px; }
+
+/* --- cards: no lift, no glow, no zoom; the only hover signal is a calmer surface --- */
+a.rounded-card:hover, button.rounded-card:hover, [data-card]:hover, .card-hover:hover { transform: none; box-shadow: none; border-color: rgb(var(--fg-muted-rgb) / .55); }
+a.rounded-card:active, button.rounded-card:active, [data-card]:active, .card-hover:active { transform: none; }
+.rounded-card:hover { background-image: none; }
+a:hover > .thumb, .thumb:hover, a.rounded-card:hover video, a.rounded-card:hover img { transform: none; }
+.lift:hover { transform: none; box-shadow: none; }
+
+/* --- navigation: active = filled row, no stripe, no slide --- */
+.side-link::before { display: none; }
+aside nav a:hover { transform: none; }
+aside nav a[aria-current="page"] { box-shadow: none; }
+.side-link { border-radius: 8px; }
+[aria-current="page"] > svg { animation: none; }
+
+/* --- icons: 3D art stays out of the product chrome --- */
+.e3 { filter: none; }
+
+/* --- inputs: one height, one radius, a plain focus ring --- */
+input:not([type=checkbox]):not([type=radio]):not([type=range]), select { min-height: 40px; border-radius: 8px; }
+textarea { border-radius: 8px; }
+input:not([type=checkbox]):not([type=radio]):focus, textarea:focus, select:focus { box-shadow: none; }
+input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid rgb(var(--sky-rgb)); outline-offset: 0; }
+input[type=checkbox], input[type=radio], input[type=range] { accent-color: rgb(var(--sky-rgb)); }
+input[type=checkbox] { width: 16px; height: 16px; }
+::placeholder { color: rgb(var(--fg-muted-rgb) / .8); }
+
+/* --- type: sentence case, steady weights --- */
+.yt h1 { line-height: 1.2; }
+.tabular-nums, [data-testid*="price"] { font-variant-numeric: tabular-nums; }
+
+/* --- phone: flat category tiles, sentence-case legends, calmer chips --- */
+.yt .vm-cat { background: var(--ink-700); border: 0; border-radius: 12px; min-height: 92px; transition: background-color .15s; }
+.yt .vm-cat:active { transform: none; background: var(--line); }
+.yt .vm-cat-ico { color: var(--fg-muted); }
+.yt .vm-cat-n { color: var(--fg-muted); font-size: 12px; }
+.yt .vm-fblock legend { text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 600; color: var(--fg); }
+.yt .vm-mchip { border-radius: 8px; padding: 0 12px; height: 32px; font-weight: 500; }
+.yt .vm-mchip-on { background: var(--fg); color: var(--ink-900); }
+.yt .vm-fpill { border-radius: 8px; border: 0; background: var(--ink-700); }
+.yt .vm-fpill-on { background: var(--fg); color: var(--ink-900); }
+.yt .vm-ffoot button { border-radius: 999px; height: 40px; }
+.yt .vm-mbadge { font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) { .page-enter { animation: none; } }
+
+/* tab pills (Profile / Wallet / Plan) match the chips */
+.vm-tab { border: 0; background: var(--ink-700); color: var(--fg); border-radius: 8px; height: 32px; padding: 0 12px; display: inline-flex; align-items: center; font-size: 14px; font-weight: 500; }
+.vm-tab:hover { background: var(--line); }
+.vm-tab-on, .vm-tab-on:hover { background: var(--fg); color: var(--ink-900); }

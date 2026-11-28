@@ -5,8 +5,8 @@ import { STREAMS, type Stream } from '../data/mock'
 import type { RoomInfo } from './types'
 
 export const field = 'w-full rounded-xl border border-line bg-ink-900 px-4 py-2.5 text-[15px] placeholder:text-fg-muted focus:border-sky focus:outline-none'
-export const primary = 'rounded-pill bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft active:scale-[.98] disabled:opacity-60'
-export const ghost = 'rounded-pill border border-line px-4 py-2 text-sm font-semibold hover:border-sky active:scale-[.98]'
+export const primary = 'rounded-full bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft active:scale-[.98] disabled:opacity-60'
+export const ghost = 'rounded-full border border-line px-4 py-2 text-sm font-semibold hover:border-sky active:scale-[.98]'
 
 export const roomStream = (room: string): Stream => ({
   id: 'host-room', cityId: STREAMS[0].cityId, hostId: STREAMS[0].hostId, title: 'Live room', place: room,
@@ -43,7 +43,7 @@ export function VideoNotice({ info, role, code }: { info: RoomInfo; role: 'viewe
   else if (!info.publisherHere) text = role === 'viewer' ? (late && code ? `No live yet with the code ${code}. Check the code, or wait for the host.` : 'Waiting for the host to start…') : 'Waiting for the camera…'
   else if (!info.streaming) text = 'Connecting to the video…'
   if (!text) return null
-  return <span className="pointer-events-none absolute inset-0 z-[8] flex items-center justify-center bg-ink-950/60 px-6 text-center"><span className="rounded-pill bg-ink-950/90 px-5 py-2.5 font-display text-base font-bold">{text}</span></span>
+  return <span className="pointer-events-none absolute inset-0 z-[8] flex items-center justify-center bg-ink-950/60 px-6 text-center"><span className="rounded-full bg-ink-950/90 px-5 py-2.5 font-display text-base font-bold">{text}</span></span>
 }
 
 export function ErrorLine({ text }: { text: string }) {

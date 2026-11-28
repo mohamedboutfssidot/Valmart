@@ -17,7 +17,7 @@ export default function HostEvents() {
 
   return (
     <div className="flex flex-col gap-10">
-      <header><h1 className="text-3xl font-extrabold sm:text-4xl">Events</h1><p className="text-fg-muted">Schedule a paid walk with limited seats.</p></header>
+      <header><h1 className="text-2xl font-bold sm:text-[28px]">Events</h1><p className="text-fg-muted">Schedule a paid walk with limited seats.</p></header>
       <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
         <form className="flex min-w-0 flex-col gap-4 rounded-card border border-line bg-ink-800 p-5 sm:p-6" onSubmit={(e) => {
           e.preventDefault()
@@ -33,7 +33,7 @@ export default function HostEvents() {
             <div className="flex flex-col gap-2"><label htmlFor="ev-s" className="text-sm font-medium">Seats</label><input id="ev-s" type="number" min={5} max={500} className={field} value={seats} onChange={(e) => setSeats(Math.max(5, Number(e.target.value)))} /></div>
           </div>
           <p className="text-sm text-fg-muted">If every seat sells: <b className="text-fg tabular-nums">${(price * seats).toLocaleString('en-US')}</b>. Sample figures, no payment is taken.</p>
-          <button type="submit" disabled={!title.trim() || !date} className="rounded-pill bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft disabled:opacity-40">{done ? 'Event scheduled' : 'Schedule event'}</button>
+          <button type="submit" disabled={!title.trim() || !date} className="rounded-full bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft disabled:opacity-40">{done ? 'Event scheduled' : 'Schedule event'}</button>
         </form>
 
         <section className="flex min-w-0 flex-col gap-3">

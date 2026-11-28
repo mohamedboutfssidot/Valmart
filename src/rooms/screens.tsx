@@ -38,7 +38,7 @@ export function ViewerRoom({ room, role = 'viewer', auto = false, surface, onLea
     return (
       <div className="mx-auto flex w-full max-w-[460px] flex-col gap-4 rounded-card border border-line bg-ink-800 p-5" aria-label="Join">
         <p className="text-[11px] font-bold uppercase tracking-wider text-sun-soft">{auto && r.phase !== 'error' ? 'Joining the live…' : 'Live room'}</p>
-        <h1 className="font-display text-3xl font-extrabold tracking-wider" data-testid="room-code">{room}</h1>
+        <h1 className="font-display text-3xl font-bold tracking-wider" data-testid="room-code">{room}</h1>
         <p className="text-sm text-fg-muted">You will see the host’s video and hear them. You can chat and use the live tools.</p>
         <input aria-label="Your name" value={name} maxLength={24} onChange={(e) => setName(e.target.value)} className={field} />
         <button type="button" disabled={r.phase === 'joining'} onClick={() => { saveName(name); void r.join() }} className={primary}>{r.phase === 'joining' ? 'Connecting…' : 'Join the live'}</button>
@@ -61,14 +61,14 @@ function ViewerLive({ r, room, surface, name, onLeave }: { r: RoomApi; room: str
       <div className="flex min-w-0 flex-col gap-3">
         {r.info.meta && (
           <div className="flex flex-col gap-0.5" data-testid="live-title">
-            <h1 className="font-display text-xl font-extrabold leading-tight">{r.info.meta.title}</h1>
+            <h1 className="font-display text-xl font-bold leading-tight">{r.info.meta.title}</h1>
             <p className="text-sm text-fg-muted">{[r.info.meta.host, [r.info.meta.city, r.info.meta.country].filter(Boolean).join(', '), r.info.meta.category].filter(Boolean).join(' · ')}</p>
           </div>
         )}
         <VideoSlot stream={roomStream(room)} mediaStream={r.info.remote} sound={sound} showLabel={false} className="rounded-[20px] ring-1 ring-line">
           <div className="absolute left-3 top-3 z-10 flex items-center gap-2">
             <LiveBadge viewers={String(Math.max(r.info.viewers, 1))} />
-            <span className="max-w-[60%] truncate rounded-pill bg-ink-950/75 px-2.5 py-1 text-xs font-semibold backdrop-blur" data-testid="viewer-room">{r.info.meta?.host || room}</span>
+            <span className="max-w-[60%] truncate rounded-full bg-ink-950/75 px-2.5 py-1 text-xs font-semibold backdrop-blur" data-testid="viewer-room">{r.info.meta?.host || room}</span>
           </div>
           <VideoEffects e={eng} />
           <PinLayer e={eng} armed={look || eng.pinArmed} onDone={() => setLook(false)} />
@@ -76,9 +76,9 @@ function ViewerLive({ r, room, surface, name, onLeave }: { r: RoomApi; room: str
         </VideoSlot>
         <div className="flex flex-wrap items-center gap-2">
           <PaceChips e={eng} compact />
-          <button type="button" aria-pressed={look} onClick={() => setLook((v) => !v)} className={`rounded-pill border px-3 py-1.5 text-[13px] font-semibold ${look ? 'border-sky bg-sky text-ink-950' : 'border-line hover:border-sky'}`}>Look here</button>
-          <button type="button" aria-pressed={sound} onClick={() => setSound((v) => !v)} className={`rounded-pill border px-3 py-1.5 text-[13px] font-semibold ${sound ? 'border-line hover:border-sky' : 'border-sun'}`}>{sound ? 'Sound on' : 'Sound off'}</button>
-          <button type="button" onClick={onLeave} className="ml-auto rounded-pill border border-line px-3 py-1.5 text-[13px] font-semibold hover:border-sun">Leave</button>
+          <button type="button" aria-pressed={look} onClick={() => setLook((v) => !v)} className={`rounded-full border px-3 py-1.5 text-[13px] font-semibold ${look ? 'border-sky bg-sky text-ink-950' : 'border-line hover:border-sky'}`}>Look here</button>
+          <button type="button" aria-pressed={sound} onClick={() => setSound((v) => !v)} className={`rounded-full border px-3 py-1.5 text-[13px] font-semibold ${sound ? 'border-line hover:border-sky' : 'border-sun'}`}>{sound ? 'Sound on' : 'Sound off'}</button>
+          <button type="button" onClick={onLeave} className="ml-auto rounded-full border border-line px-3 py-1.5 text-[13px] font-semibold hover:border-sun">Leave</button>
         </div>
         <ToolCard e={eng} />
       </div>
@@ -125,7 +125,7 @@ export function HostRoom({ room, role, hostKey, hostMode, category, surface, aut
     return (
       <div className="mx-auto flex w-full max-w-[520px] flex-col gap-4 rounded-card border border-line bg-ink-800 p-5">
         <p className="text-[11px] font-bold uppercase tracking-wider text-sun-soft">{team ? 'Control room' : 'Your live'}</p>
-        <h1 className="font-display text-3xl font-extrabold tracking-wider" data-testid="room-code">{room}</h1>
+        <h1 className="font-display text-3xl font-bold tracking-wider" data-testid="room-code">{room}</h1>
         <p className="text-sm text-fg-muted">{team ? 'You run the tools and the chat from here. Someone else films with a phone.' : 'Your phone or computer camera and microphone will start when you tap the button. Allow them when your browser asks.'}</p>
         <button type="button" disabled={starting || r.phase === 'joining'} onClick={start} className={primary} data-testid="go-live">{starting || r.phase === 'joining' ? 'Starting…' : team ? 'Open the control room' : 'Go live'}</button>
         <ErrorLine text={r.error || err} />
@@ -167,10 +167,10 @@ function HostLive({ r, room, role, hostMode: initial, category, surface, links: 
         <VideoSlot stream={roomStream(room)} mediaStream={feed} sound={false} showLabel={false} className="rounded-[20px] ring-1 ring-line">
           <div className="absolute left-3 top-3 z-10 flex items-center gap-2">
             <LiveBadge viewers={String(r.info.viewers)} />
-            <span className="rounded-pill bg-ink-950/75 px-2.5 py-1 text-xs font-semibold tabular-nums backdrop-blur" data-testid="host-clock">{clock(secs)}</span>
+            <span className="rounded-full bg-ink-950/75 px-2.5 py-1 text-xs font-semibold tabular-nums backdrop-blur" data-testid="host-clock">{clock(secs)}</span>
           </div>
           <VoiceBadge className="absolute bottom-3 left-3 z-10" />
-          {team ? <VideoNotice info={r.info} role="control" /> : paused && <span className="pointer-events-none absolute inset-0 z-[8] flex items-center justify-center bg-ink-950/60"><span className="rounded-pill bg-ink-950/90 px-5 py-2.5 font-display font-bold">Paused</span></span>}
+          {team ? <VideoNotice info={r.info} role="control" /> : paused && <span className="pointer-events-none absolute inset-0 z-[8] flex items-center justify-center bg-ink-950/60"><span className="rounded-full bg-ink-950/90 px-5 py-2.5 font-display font-bold">Paused</span></span>}
           <VideoEffects e={eng} />
           <PinLayer e={eng} armed={false} />
         </VideoSlot>
@@ -178,12 +178,12 @@ function HostLive({ r, room, role, hostMode: initial, category, surface, links: 
         {camError && !team && (
           <div role="alert" className="flex flex-wrap items-center gap-3 rounded-xl border border-sun bg-ink-800 px-3.5 py-3 text-sm" data-testid="cam-error">
             <span className="min-w-0 flex-1">{camError}</span>
-            <button type="button" onClick={onRetryCamera} className="rounded-pill bg-sun px-4 py-1.5 font-bold text-ink-950 active:scale-95">Retry camera</button>
+            <button type="button" onClick={onRetryCamera} className="rounded-full bg-sun px-4 py-1.5 font-bold text-ink-950 active:scale-95">Retry camera</button>
           </div>
         )}
         <div className="flex flex-wrap items-center gap-1.5" data-testid="host-bar">
-          <span className="flex h-9 items-center gap-1.5 rounded-pill border border-line px-3 text-[13px]" data-testid="host-viewers" title="Watching" aria-label={`Watching: ${r.info.viewers}`}><Eye size={16} /><b className="tabular-nums">{r.info.viewers}</b></span>
-          <span className="flex h-9 items-center gap-1.5 rounded-pill border border-line px-3 text-[13px]" title="Stay here / Move on" aria-label={`Stay ${Math.round(eng.stay)}, move on ${100 - Math.round(eng.stay)}`}><PauseCircle size={16} /><b className="tabular-nums">{Math.round(eng.stay)}</b><span className="text-fg-muted">/</span><CaretDoubleRight size={16} /><b className="tabular-nums">{100 - Math.round(eng.stay)}</b></span>
+          <span className="flex h-9 items-center gap-1.5 rounded-full border border-line px-3 text-[13px]" data-testid="host-viewers" title="Watching" aria-label={`Watching: ${r.info.viewers}`}><Eye size={16} /><b className="tabular-nums">{r.info.viewers}</b></span>
+          <span className="flex h-9 items-center gap-1.5 rounded-full border border-line px-3 text-[13px]" title="Stay here / Move on" aria-label={`Stay ${Math.round(eng.stay)}, move on ${100 - Math.round(eng.stay)}`}><PauseCircle size={16} /><b className="tabular-nums">{Math.round(eng.stay)}</b><span className="text-fg-muted">/</span><CaretDoubleRight size={16} /><b className="tabular-nums">{100 - Math.round(eng.stay)}</b></span>
           {!team && (
             <>
               <button type="button" title={paused ? 'Resume' : 'Pause'} aria-label={paused ? 'Resume' : 'Pause'} aria-pressed={paused} onClick={() => { const p = !paused; setPaused(p); void r.setPaused(p) }} className={`${ibtn} ${paused ? '!border-sky !bg-sky !text-ink-950' : ''}`}>{paused ? <Play size={18} weight="fill" /> : <Pause size={18} weight="fill" />}</button>
@@ -192,7 +192,7 @@ function HostLive({ r, room, role, hostMode: initial, category, surface, links: 
           )}
           <VoiceToggle who="host" label="Voice for results" icon className={ibtn} />
           <button type="button" aria-pressed={crowd} title={`Demo crowd: ${crowd ? 'on' : 'off'}`} aria-label={`Demo crowd: ${crowd ? 'on' : 'off'}`} onClick={() => setCrowd((v) => !v)} className={`${ibtn} ${crowd ? '!border-sky !bg-sky !text-ink-950' : ''}`} data-testid="crowd"><UsersThree size={18} /></button>
-          <button type="button" title="End live" aria-label="End live" onClick={onEnd} className="ml-auto flex h-9 items-center gap-1.5 rounded-pill border border-sun px-3.5 font-display text-[13px] font-bold text-sun-soft hover:bg-sun hover:text-ink-950"><Stop size={16} weight="fill" />End</button>
+          <button type="button" title="End live" aria-label="End live" onClick={onEnd} className="ml-auto flex h-9 items-center gap-1.5 rounded-full border border-sun px-3.5 font-display text-[13px] font-bold text-sun-soft hover:bg-sun hover:text-ink-950"><Stop size={16} weight="fill" />End</button>
         </div>
 
         <InvitePanel l={l} room={room} team={team && keysReady} camHere={camHere} copied={copied} copy={copy} error={keysError} />
@@ -205,7 +205,7 @@ function HostLive({ r, room, role, hostMode: initial, category, surface, links: 
             <OneButton s={sug} e={eng} />
             <div className="flex flex-wrap items-center gap-2.5">
               <WalkingSwitch on={walkManual} onChange={setWalkManual} />
-              <button type="button" onClick={() => setMore((v) => !v)} aria-expanded={more} className="rounded-pill border border-line px-3.5 py-1.5 text-[13px] font-semibold hover:border-sky">{more ? 'Hide' : 'More'} tools</button>
+              <button type="button" onClick={() => setMore((v) => !v)} aria-expanded={more} className="rounded-full border border-line px-3.5 py-1.5 text-[13px] font-semibold hover:border-sky">{more ? 'Hide' : 'More'} tools</button>
             </div>
           </section>
         )}
@@ -215,7 +215,7 @@ function HostLive({ r, room, role, hostMode: initial, category, surface, links: 
         {pending && (
           <div className="flex flex-wrap items-center gap-2 rounded-xl border border-sun bg-ink-800 px-3.5 py-2.5 text-sm" role="alert" data-testid="walk-confirm">
             <span className="min-w-0 flex-1">You are moving. Launch “{pending.name}” anyway?</span>
-            <button type="button" onClick={() => { eng.launch(pending); setPending(null) }} className="rounded-pill bg-sun px-3.5 py-1.5 font-bold text-ink-950">Launch</button>
+            <button type="button" onClick={() => { eng.launch(pending); setPending(null) }} className="rounded-full bg-sun px-3.5 py-1.5 font-bold text-ink-950">Launch</button>
             <button type="button" onClick={() => setPending(null)} className={ghost}>Not now</button>
           </div>
         )}
@@ -241,7 +241,7 @@ function InvitePanel({ l, room, team, camHere, copied, copy, error }: {
 }) {
   const row = (key: string, label: string, url: string, hint: string) => (
     <li className="flex flex-col gap-1.5 rounded-xl border border-line px-3.5 py-2.5">
-      <span className="flex items-center justify-between gap-2"><span className="font-semibold">{label}</span><button type="button" onClick={() => copy(key, url)} className="rounded-pill bg-sun px-3 py-1 text-xs font-bold text-ink-950 active:scale-95">{copied === key ? 'Copied' : 'Copy link'}</button></span>
+      <span className="flex items-center justify-between gap-2"><span className="font-semibold">{label}</span><button type="button" onClick={() => copy(key, url)} className="rounded-full bg-sun px-3 py-1 text-xs font-bold text-ink-950 active:scale-95">{copied === key ? 'Copied' : 'Copy link'}</button></span>
       <span className="text-xs text-fg-muted">{hint}</span>
       <span className="break-all font-mono text-[12px] text-sky-soft">{url}</span>
     </li>
@@ -257,7 +257,7 @@ function InvitePanel({ l, room, team, camHere, copied, copy, error }: {
             <div className="min-w-0 flex-1 basis-[200px]">
               <p className="font-semibold">Camera <span className={`ml-1 text-xs font-semibold ${camHere ? 'text-[color:var(--ok)]' : 'text-fg-muted'}`} data-testid="camera-state">{camHere ? 'Connected' : 'Waiting for a phone'}</span></p>
               <p className="text-xs text-fg-muted">The person who films scans this on their phone and allows the camera.</p>
-              <button type="button" onClick={() => copy('cam', l.camera)} className="mt-2 rounded-pill bg-sun px-3 py-1 text-xs font-bold text-ink-950 active:scale-95">{copied === 'cam' ? 'Copied' : 'Copy camera link'}</button>
+              <button type="button" onClick={() => copy('cam', l.camera)} className="mt-2 rounded-full bg-sun px-3 py-1 text-xs font-bold text-ink-950 active:scale-95">{copied === 'cam' ? 'Copied' : 'Copy camera link'}</button>
               <span className="mt-1.5 block break-all font-mono text-[11px] text-sky-soft">{l.camera}</span>
             </div>
           </li>
@@ -295,7 +295,7 @@ export function CameraRoom({ room, camKey, onLeave }: { room: string; camKey: st
     return (
       <div className="mx-auto flex w-full max-w-[460px] flex-col gap-4 rounded-card border border-line bg-ink-800 p-5">
         <p className="text-[11px] font-bold uppercase tracking-wider text-sun-soft">Camera role</p>
-        <h1 className="font-display text-3xl font-extrabold tracking-wider" data-testid="room-code">{room}</h1>
+        <h1 className="font-display text-3xl font-bold tracking-wider" data-testid="room-code">{room}</h1>
         <p className="text-sm text-fg-muted">You only film. The control room runs the tools and the chat. Allow the camera and the microphone when asked, then keep this screen on.</p>
         <button type="button" disabled={starting || r.phase === 'joining'} onClick={start} className={primary} data-testid="start-camera">{starting || r.phase === 'joining' ? 'Starting…' : 'Start the camera'}</button>
         <ErrorLine text={r.error || err} />
@@ -307,20 +307,20 @@ export function CameraRoom({ room, camKey, onLeave }: { room: string; camKey: st
     <div className="fixed inset-0 z-50 bg-black">
       <video ref={video} className="absolute inset-0 h-full w-full object-cover" autoPlay muted playsInline />
       <div className="absolute inset-x-3 top-3 z-10 flex items-center justify-between gap-2">
-        <span className="flex items-center gap-2 rounded-pill bg-ink-950/80 px-3 py-1.5 text-xs font-semibold backdrop-blur" data-testid="camera-status"><span className="h-2 w-2 rounded-full" style={{ background: paused ? 'var(--fg-muted)' : 'var(--ok)' }} />{paused ? 'Paused' : controlHere ? 'Connected to the control room' : 'Live, waiting for the control room'}</span>
-        <span className="rounded-pill bg-ink-950/80 px-2.5 py-1 text-xs font-semibold tabular-nums backdrop-blur">{clock(secs)}</span>
+        <span className="flex items-center gap-2 rounded-full bg-ink-950/80 px-3 py-1.5 text-xs font-semibold backdrop-blur" data-testid="camera-status"><span className="h-2 w-2 rounded-full" style={{ background: paused ? 'var(--fg-muted)' : 'var(--ok)' }} />{paused ? 'Paused' : controlHere ? 'Connected to the control room' : 'Live, waiting for the control room'}</span>
+        <span className="rounded-full bg-ink-950/80 px-2.5 py-1 text-xs font-semibold tabular-nums backdrop-blur">{clock(secs)}</span>
       </div>
       {err && (
         <div role="alert" className="absolute inset-x-3 top-16 z-10 flex flex-col gap-2 rounded-xl border border-sun bg-ink-950/90 p-3 text-sm backdrop-blur">
           <span>{err}</span>
-          <button type="button" onClick={retry} className="rounded-pill bg-sun py-2 font-bold text-ink-950 active:scale-95">Retry camera</button>
+          <button type="button" onClick={retry} className="rounded-full bg-sun py-2 font-bold text-ink-950 active:scale-95">Retry camera</button>
         </div>
       )}
       <div className="absolute inset-x-3 bottom-5 z-10 flex flex-col gap-3">
-        <button type="button" onClick={() => { const p = !paused; setPaused(p); void r.setPaused(p) }} className={`rounded-pill py-4 font-display text-lg font-extrabold active:scale-[.98] ${paused ? 'bg-sky text-ink-950' : 'bg-sun text-ink-950'}`}>{paused ? 'Resume' : 'Pause'}</button>
+        <button type="button" onClick={() => { const p = !paused; setPaused(p); void r.setPaused(p) }} className={`rounded-full py-4 font-display text-lg font-bold active:scale-[.98] ${paused ? 'bg-sky text-ink-950' : 'bg-sun text-ink-950'}`}>{paused ? 'Resume' : 'Pause'}</button>
         <div className="flex gap-3">
-          <button type="button" onClick={() => void r.flip()} className="flex-1 rounded-pill border border-line bg-ink-950/60 py-2.5 text-sm font-semibold backdrop-blur">Flip camera</button>
-          <button type="button" onClick={() => { r.leave(); onLeave() }} className="flex-1 rounded-pill border border-line bg-ink-950/60 py-2.5 text-sm font-semibold backdrop-blur">Leave</button>
+          <button type="button" onClick={() => void r.flip()} className="flex-1 rounded-full border border-line bg-ink-950/60 py-2.5 text-sm font-semibold backdrop-blur">Flip camera</button>
+          <button type="button" onClick={() => { r.leave(); onLeave() }} className="flex-1 rounded-full border border-line bg-ink-950/60 py-2.5 text-sm font-semibold backdrop-blur">Leave</button>
         </div>
       </div>
     </div>

@@ -14,14 +14,14 @@ export default function Features() {
   return (
     <div className="flex flex-col gap-24 md:gap-32">
       <header className="stagger flex max-w-[68ch] flex-col gap-4">
-        <p className="w-fit rounded-pill border border-line px-3.5 py-1 text-sm font-medium text-sky-soft">Features</p>
+        <p className="w-fit rounded-full border border-line px-3.5 py-1 text-sm font-medium text-sky-soft">Features</p>
         <h1 className="text-3xl sm:text-5xl">What you can do on Valmart</h1>
         <p className="text-lg text-fg-muted">Pick an area. Open a line.</p>
       </header>
 
       <section className="grid items-start gap-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-14" data-testid="guide">
         <div role="tablist" aria-label="Areas" aria-orientation="vertical" className="no-scrollbar flex gap-2 overflow-x-auto lg:flex-col lg:gap-0 lg:overflow-visible lg:sticky lg:top-24">
-          {GUIDE.map((x) => <button key={x.id} role="tab" type="button" aria-selected={g === x.id} onClick={() => setG(x.id)} className={`shrink-0 rounded-pill border px-4 py-2 text-left font-display text-lg font-bold transition-colors lg:rounded-none lg:border-0 lg:border-l-2 lg:py-3 ${g === x.id ? 'border-sky text-fg' : 'border-line text-fg-muted hover:text-fg lg:border-line'}`}>{x.label}</button>)}
+          {GUIDE.map((x) => <button key={x.id} role="tab" type="button" aria-selected={g === x.id} onClick={() => setG(x.id)} className={`shrink-0 rounded-full border px-4 py-2 text-left font-display text-lg font-bold transition-colors lg:rounded-none lg:border-0 lg:border-l-2 lg:py-3 ${g === x.id ? 'border-sky text-fg' : 'border-line text-fg-muted hover:text-fg lg:border-line'}`}>{x.label}</button>)}
         </div>
         <div key={g} className="fade-in flex min-w-0 flex-col gap-5"><p className="text-xl text-fg-muted">{group.intro}</p><Rows items={group.items} /></div>
       </section>

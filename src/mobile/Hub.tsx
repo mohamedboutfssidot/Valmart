@@ -72,7 +72,7 @@ export function Following({ onWatch }: { onWatch: (id: string) => void }) {
                 return (
                   <button key={h.id} type="button" onClick={() => (s ? onWatch(s.id) : setHost(h.id))} className="flex w-[68px] shrink-0 flex-col items-center gap-1.5 active:scale-95">
                     <span className={`relative rounded-full p-[3px] ${s ? 'bg-gradient-to-tr from-sun to-sky' : 'bg-ink-700'}`}><span className="block rounded-full bg-ink-900 p-[2px]"><Avatar name={h.name} size={54} /></span>
-                      {s && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-pill bg-sun px-1.5 text-[9px] font-extrabold uppercase text-ink-950">Live</span>}</span>
+                      {s && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-sun px-1.5 text-[9px] font-bold uppercase text-ink-950">Live</span>}</span>
                     <span className="w-full truncate text-center text-[11px] font-medium">{h.name.split(' ')[0]}</span>
                   </button>
                 )
@@ -94,9 +94,9 @@ export function Following({ onWatch }: { onWatch: (id: string) => void }) {
                 const on = x.remind.includes(me)
                 return (
                   <li key={x.id} className="flex items-center gap-3 rounded-2xl border border-line bg-ink-900 p-3.5">
-                    <span className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-ink-700 text-center leading-tight"><span className="text-[10px] font-semibold uppercase text-fg-muted">{day(x.date).split(',')[0]}</span><span className="font-display text-base font-extrabold">{new Date(x.date + 'T00:00').getDate()}</span></span>
+                    <span className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-ink-700 text-center leading-tight"><span className="text-[10px] font-semibold uppercase text-fg-muted">{day(x.date).split(',')[0]}</span><span className="font-display text-base font-bold">{new Date(x.date + 'T00:00').getDate()}</span></span>
                     <span className="min-w-0 flex-1"><span className="block truncate font-semibold">{x.title}</span><span className="block truncate text-xs text-fg-muted">{x.hostName} · {x.time}</span></span>
-                    <button type="button" aria-pressed={on} onClick={() => toggleRemind(x.id, me)} className={`shrink-0 rounded-pill px-3 py-1.5 text-xs font-bold active:scale-95 ${on ? 'bg-sky text-ink-950' : 'border border-line text-fg-muted'}`}>{on ? 'Reminder on' : 'Remind me'}</button>
+                    <button type="button" aria-pressed={on} onClick={() => toggleRemind(x.id, me)} className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold active:scale-95 ${on ? 'bg-sky text-ink-950' : 'border border-line text-fg-muted'}`}>{on ? 'Reminder on' : 'Remind me'}</button>
                   </li>
                 )
               })}
@@ -115,7 +115,7 @@ export function Following({ onWatch }: { onWatch: (id: string) => void }) {
                   <button type="button" onClick={() => setHost(h.id)} className="flex min-w-0 flex-1 items-center gap-3 text-left"><Avatar name={h.name} size={44} />
                     <span className="min-w-0"><span className="block truncate font-semibold">{h.name}</span><span className="block truncate text-xs text-fg-muted">{cityOf(h.cityId).name} · {h.rating.toFixed(1)} ★ · {h.languages.slice(0, 2).join(', ')}</span></span>
                   </button>
-                  <button type="button" aria-pressed={on} onClick={() => toggleHost(h.id)} data-testid={`m-follow-${h.id}`} className={`shrink-0 rounded-pill px-3.5 py-1.5 text-xs font-bold active:scale-95 ${on ? 'border border-line text-fg-muted' : 'bg-sky text-ink-950'}`}>{on ? 'Following' : 'Follow'}</button>
+                  <button type="button" aria-pressed={on} onClick={() => toggleHost(h.id)} data-testid={`m-follow-${h.id}`} className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold active:scale-95 ${on ? 'border border-line text-fg-muted' : 'bg-sky text-ink-950'}`}>{on ? 'Following' : 'Follow'}</button>
                 </li>
               )
             })}
@@ -124,7 +124,7 @@ export function Following({ onWatch }: { onWatch: (id: string) => void }) {
 
         <section className="flex flex-col gap-3">
           <h2 className="font-display text-lg font-bold">Cities</h2>
-          <div className="flex flex-wrap gap-2">{CITIES.map((c) => <button key={c.id} type="button" aria-pressed={followCities.includes(c.id)} onClick={() => toggleCity(c.id)} className={`rounded-pill border px-3.5 py-1.5 text-sm active:scale-95 ${followCities.includes(c.id) ? 'border-sky bg-sky font-semibold text-ink-950' : 'border-line text-fg-muted'}`}>{c.name}</button>)}</div>
+          <div className="flex flex-wrap gap-2">{CITIES.map((c) => <button key={c.id} type="button" aria-pressed={followCities.includes(c.id)} onClick={() => toggleCity(c.id)} className={`rounded-full border px-3.5 py-1.5 text-sm active:scale-95 ${followCities.includes(c.id) ? 'border-sky bg-sky font-semibold text-ink-950' : 'border-line text-fg-muted'}`}>{c.name}</button>)}</div>
         </section>
 
         {alerts.length > 0 && (

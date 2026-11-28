@@ -1,4 +1,5 @@
-import { E3, PLAN_E3 } from '../live/e3d'
+import { Check } from '@phosphor-icons/react'
+import { PlanIcon } from './icons2'
 import { PLANS, ROWS, SAME_FOR_ALL, price, type Plan, type PlanId } from '../data/plans'
 
 /** Three viewer plans side by side. In the app, `onPick` switches plan. On the public site, `cta` is the one button. */
@@ -8,14 +9,14 @@ export function PlanCards({ current, onPick, cta }: { current?: PlanId; onPick?:
       {PLANS.map((p) => {
         const on = current === p.id
         return (
-          <section key={p.id} data-tilt aria-label={p.name} className={`flex min-w-0 flex-col gap-3 rounded-card border p-5 ${on ? 'border-sky-deep' : 'border-line'} bg-ink-800`}>
-            <div className="flex items-baseline justify-between gap-2"><h2 className="flex items-center gap-2 text-xl font-semibold"><E3 k={PLAN_E3[p.id]} size={34} float />{p.name}</h2>{on && <span className="text-sm font-semibold text-sky-deep">Your plan</span>}</div>
+          <section key={p.id} aria-label={p.name} className={`flex min-w-0 flex-col gap-3 rounded-card border p-5 ${on ? 'border-sky-deep' : 'border-line'} bg-ink-800`}>
+            <div className="flex items-baseline justify-between gap-2"><h2 className="flex items-center gap-2 text-xl font-semibold"><PlanIcon id={p.id} size={26} className="text-sky-deep" />{p.name}</h2>{on && <span className="text-sm font-semibold text-sky-deep">Your plan</span>}</div>
             <p className="text-3xl font-semibold tabular-nums">{price(p)}{p.price > 0 && <span className="ml-1 text-base font-normal text-fg-muted">a month</span>}</p>
             <p className="text-fg-muted">{p.blurb}</p>
-            <ul className="flex flex-col gap-1.5 text-[15px]">{highlights(p).map((h) => <li key={h} className="flex gap-2"><span aria-hidden="true" className="text-sky-deep">+</span>{h}</li>)}</ul>
+            <ul className="flex flex-col gap-1.5 text-[15px]">{highlights(p).map((h) => <li key={h} className="flex gap-2"><Check size={16} weight="bold" aria-hidden="true" className="mt-1 shrink-0 text-sky-deep" />{h}</li>)}</ul>
             <div className="mt-auto pt-2">
               {onPick ? (
-                <button type="button" disabled={on} onClick={() => onPick(p.id)} data-testid={`pick-${p.id}`} className={`w-full rounded-pill px-5 py-2.5 text-[15px] font-semibold ${on ? 'border border-line text-fg-muted' : 'bg-sky-deep text-white hover:opacity-90'}`}>{on ? 'Current plan' : p.price === 0 ? 'Switch to Free' : `Switch to ${p.name}`}</button>
+                <button type="button" disabled={on} onClick={() => onPick(p.id)} data-testid={`pick-${p.id}`} className={`w-full rounded-full px-5 py-2.5 text-[15px] font-semibold ${on ? 'border border-line text-fg-muted' : 'bg-sky-deep text-white hover:opacity-90'}`}>{on ? 'Current plan' : p.price === 0 ? 'Switch to Free' : `Switch to ${p.name}`}</button>
               ) : cta}
             </div>
           </section>

@@ -69,14 +69,14 @@ export function StudioTab() {
       <Page title={`${hello}, ${user?.name.split(' ')[0] ?? ''}`} sub={`Studio · ${cityOf(user?.hostCity ?? 'paris').name}`}>
         <section className="rounded-3xl border border-line bg-gradient-to-b from-ink-800 to-ink-900 p-5">
           <p className="text-sm text-fg-muted">Balance</p>
-          <p className="font-display text-[40px] font-extrabold leading-none tabular-nums">{money(shown)}</p>
+          <p className="font-display text-[40px] font-bold leading-none tabular-nums">{money(shown)}</p>
           <p className="mt-1.5 text-sm text-[color:var(--ok)]">+{money(total)} in the last {range}</p>
           <div className="mt-4"><Seg options={['7 days', '30 days'] as const} value={range} onChange={setRange} label="Range" /></div>
           <div className="mt-4" key={range}><Bars values={values} labels={labels} /></div>
         </section>
 
         <button type="button" onClick={() => setLive(true)} className="group flex items-center justify-between rounded-3xl bg-sun p-5 text-left text-ink-950 transition-transform active:scale-[.98]">
-          <span><span className="block font-display text-2xl font-extrabold">Go live</span><span className="text-sm opacity-80">Start streaming from your phone</span></span>
+          <span><span className="block font-display text-2xl font-bold">Go live</span><span className="text-sm opacity-80">Start streaming from your phone</span></span>
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-ink-950 text-sun transition-transform group-active:scale-90"><span className="live-dot h-3 w-3 rounded-full bg-sun" /></span>
         </button>
 
@@ -156,8 +156,8 @@ function EventForm({ onClose }: { onClose: () => void }) {
       {done ? (
         <div className="flex flex-col items-center gap-3 px-6 pb-8 pt-4 text-center">
           <span className="pop-in flex h-16 w-16 items-center justify-center rounded-full text-ink-950" style={{ background: 'var(--ok)' }}><Icon name="check" size={34} /></span>
-          <h3 className="font-display text-2xl font-extrabold">Event created</h3><p className="text-fg-muted">It now shows in your Studio. Sample data.</p>
-          <button type="button" onClick={onClose} className="mt-2 w-full rounded-pill bg-sky py-3.5 font-display font-bold text-ink-950">Done</button>
+          <h3 className="font-display text-2xl font-bold">Event created</h3><p className="text-fg-muted">It now shows in your Studio. Sample data.</p>
+          <button type="button" onClick={onClose} className="mt-2 w-full rounded-full bg-sky py-3.5 font-display font-bold text-ink-950">Done</button>
         </div>
       ) : (
         <form className="flex flex-col gap-3 px-5 pb-6 pt-1" onSubmit={(e) => { e.preventDefault(); if (!ok) return; addHostEvent({ title: title.trim(), cityId, date, price, seats }); setDone(true) }}>
@@ -169,7 +169,7 @@ function EventForm({ onClose }: { onClose: () => void }) {
             <label className="flex flex-col gap-1 text-xs text-fg-muted">Seats<input type="number" min={5} max={500} className={field} value={seats} onChange={(e) => setSeats(Math.max(5, Number(e.target.value)))} /></label>
           </div>
           <p className="text-xs text-fg-muted">You keep your ticket income. Sample numbers, no payments.</p>
-          <button type="submit" disabled={!ok} className="rounded-pill bg-sun py-3.5 font-display font-extrabold text-ink-950 transition-opacity disabled:opacity-40">Create event</button>
+          <button type="submit" disabled={!ok} className="rounded-full bg-sun py-3.5 font-display font-bold text-ink-950 transition-opacity disabled:opacity-40">Create event</button>
         </form>
       )}
     </Sheet>
@@ -186,7 +186,7 @@ function BoostSheet({ onClose }: { onClose: () => void }) {
           <div key={b.name} className="rounded-2xl border border-line bg-ink-800 p-4">
             <div className="flex items-baseline justify-between"><p className="font-display font-bold">{b.name}</p><p className="font-display font-bold tabular-nums">${b.price}</p></div>
             <p className="text-sm text-sun-soft">{b.length}</p><p className="mt-0.5 text-sm text-fg-muted">{b.effect}</p>
-            <button type="button" onClick={() => { buyBoost(b.name, b.price); setBought(b.name) }} className="mt-3 w-full rounded-pill border border-sky py-2.5 text-sm font-semibold text-sky-soft transition-transform active:scale-[.97]">{bought === b.name ? 'Added' : `Buy for $${b.price}`}</button>
+            <button type="button" onClick={() => { buyBoost(b.name, b.price); setBought(b.name) }} className="mt-3 w-full rounded-full border border-sky py-2.5 text-sm font-semibold text-sky-soft transition-transform active:scale-[.97]">{bought === b.name ? 'Added' : `Buy for $${b.price}`}</button>
           </div>
         ))}
         <p className="text-center text-xs text-fg-muted">Pay only when you want it. No subscription. Sample prices.</p>

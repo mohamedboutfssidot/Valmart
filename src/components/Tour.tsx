@@ -25,7 +25,7 @@ export function TourButton({ className = '' }: { className?: string }) {
       type="button"
       onClick={() => { setTour(!tourOpen, 0); if (!tourOpen) nav(TOUR[0].route) }}
       aria-pressed={tourOpen}
-      className={`rounded-pill border px-3.5 py-1.5 text-sm font-semibold transition-colors ${tourOpen ? 'border-sky bg-sky text-ink-950' : 'border-sky text-sky-soft hover:bg-ink-800'} ${className}`}
+      className={`rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${tourOpen ? 'border-sky bg-sky text-ink-950' : 'border-sky text-sky-soft hover:bg-ink-800'} ${className}`}
     >
       <span className="sm:hidden">Tour</span><span className="max-sm:hidden">Demo tour</span>
     </button>
@@ -83,11 +83,11 @@ export function TourPanel() {
           Reset demo{user ? ' and sign out' : ''}
         </button>
         <div className="flex gap-2">
-          <button type="button" disabled={tourStep === 0} onClick={() => go(tourStep - 1)} className="rounded-pill border border-line px-4 py-1.5 text-sm font-semibold hover:bg-ink-700 disabled:opacity-40">Back</button>
+          <button type="button" disabled={tourStep === 0} onClick={() => go(tourStep - 1)} className="rounded-full border border-line px-4 py-1.5 text-sm font-semibold hover:bg-ink-700 disabled:opacity-40">Back</button>
           {tourStep === last ? (
-            <button type="button" onClick={() => setTour(false)} className="rounded-pill bg-sun px-5 py-1.5 font-display text-sm font-bold text-ink-950 hover:bg-sun-soft">Finish</button>
+            <button type="button" onClick={() => setTour(false)} className="rounded-full bg-sun px-5 py-1.5 font-display text-sm font-bold text-ink-950 hover:bg-sun-soft">Finish</button>
           ) : (
-            <button type="button" onClick={() => go(tourStep + 1)} className="rounded-pill bg-sky px-5 py-1.5 font-display text-sm font-bold text-ink-950 hover:bg-sky-soft">Next</button>
+            <button type="button" onClick={() => go(tourStep + 1)} className="rounded-full bg-sky px-5 py-1.5 font-display text-sm font-bold text-ink-950 hover:bg-sky-soft">Next</button>
           )}
         </div>
       </div>

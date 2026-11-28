@@ -13,7 +13,7 @@ export function Events() {
   return (
     <div className="flex flex-col gap-10">
       <header className="flex max-w-[62ch] flex-col gap-3">
-        <h1 className="text-4xl font-extrabold sm:text-5xl">Events</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Events</h1>
         <p className="text-lg text-fg-muted">Scheduled live events with a host. Some are co-hosted by brands.</p>
       </header>
       <MyTickets />
@@ -24,9 +24,9 @@ export function Events() {
           return (
             <Link key={e.id} to={`/app/events/${e.id}`} className="group flex min-w-0 flex-col gap-3">
               <VideoSlot stream={artFor(e.cityId)} showLabel={false} className="rounded-card ring-1 ring-line transition group-hover:ring-sky">
-                {e.boosted && <span className="absolute left-3 top-3 rounded-pill bg-sun px-3 py-1 text-xs font-bold text-ink-950">Boosted</span>}
+                {e.boosted && <span className="absolute left-3 top-3 rounded-full bg-sun px-3 py-1 text-xs font-bold text-ink-950">Boosted</span>}
                 <span className="absolute bottom-3 left-3 font-display text-sm font-semibold drop-shadow">{city.name}, {city.country}</span>
-                <span className="absolute bottom-3 right-3 rounded-pill bg-ink-950/80 px-3 py-1 font-display text-sm font-bold tabular-nums backdrop-blur">${e.price}</span>
+                <span className="absolute bottom-3 right-3 rounded-full bg-ink-950/80 px-3 py-1 font-display text-sm font-bold tabular-nums backdrop-blur">${e.price}</span>
               </VideoSlot>
               <div className="min-w-0">
                 <h2 className="font-display text-xl font-bold leading-snug">{e.title}</h2>
@@ -94,7 +94,7 @@ export function EventDetail() {
         <Link to="/app/events" className="w-fit text-sm text-sky hover:underline">All events</Link>
         <VideoSlot stream={artFor(e.cityId)} label="Event preview" className="rounded-[20px] ring-1 ring-line" />
         <div className="flex flex-col gap-3">
-          <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl">{e.title}</h1>
+          <h1 className="text-3xl font-bold leading-tight sm:text-4xl">{e.title}</h1>
           <p className="text-sun-soft">{e.when}, {e.duration}</p>
           <p className="flex items-center gap-2 text-fg-muted"><Avatar name={host.name} size={32} /><span className="text-fg">{host.name}</span>in {city.name}</p>
           <p className="max-w-[62ch] text-lg text-fg-muted">{e.blurb}</p>
@@ -124,7 +124,7 @@ export function EventDetail() {
           <>
             <div className="flex items-baseline justify-between">
               <h2 className="font-display text-xl font-bold">Get tickets</h2>
-              <span className="font-display text-2xl font-extrabold tabular-nums">${e.price}</span>
+              <span className="font-display text-2xl font-bold tabular-nums">${e.price}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Tickets</span>
@@ -138,7 +138,7 @@ export function EventDetail() {
               <span className="text-fg-muted">Total</span>
               <span className="font-display text-xl font-bold tabular-nums">${e.price * qty}</span>
             </div>
-            <button type="button" onClick={() => { setReserved(ref); addTicket({ ref, eventId: e.id, qty }) }} className="rounded-pill bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft">Reserve seats</button>
+            <button type="button" onClick={() => { setReserved(ref); addTicket({ ref, eventId: e.id, qty }) }} className="rounded-full bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft">Reserve seats</button>
             <p className="text-sm text-fg-muted">Demo only. Reserving takes no payment.</p>
           </>
         )}

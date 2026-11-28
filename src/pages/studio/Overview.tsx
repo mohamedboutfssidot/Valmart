@@ -26,7 +26,7 @@ export default function Overview() {
     <div className="flex flex-col gap-10">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold sm:text-4xl">Host overview</h1>
+          <h1 className="text-2xl font-bold sm:text-[28px]">Host overview</h1>
           <p className="text-fg-muted">{user.hostCity ? `Streaming from ${cityOf(user.hostCity).name}` : 'Your host workspace'}</p>
         </div>
         <Button to="/studio/go-live" variant="sun">Go live</Button>

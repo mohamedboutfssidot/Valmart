@@ -37,7 +37,7 @@ export function ChartCard({ title, subtitle, rows, unit, children }: {
           <h3 className="font-display text-lg font-bold">{title}</h3>
           <p className="text-sm text-fg-muted">{subtitle}</p>
         </div>
-        <button type="button" onClick={() => setTable((t) => !t)} aria-pressed={table} className="shrink-0 rounded-pill border border-line px-3 py-1 text-xs hover:bg-ink-700">
+        <button type="button" onClick={() => setTable((t) => !t)} aria-pressed={table} className="shrink-0 rounded-full border border-line px-3 py-1 text-xs hover:bg-ink-700">
           {table ? 'View chart' : 'View as table'}
         </button>
       </div>

@@ -33,8 +33,8 @@ export function GroupFab({ go, cur, browse }: { go: (id: string) => void; cur: s
         <div data-testid="group-choose" className={`${panel} flex flex-col gap-2.5`}>
           <div><p className="text-[11px] font-bold uppercase tracking-wider text-fg-muted">You lead the group</p><p className="text-[15px] font-semibold leading-snug">Choose this live for the group?</p><p className="truncate text-xs text-fg-muted">{cs.title}</p></div>
           <div className="flex gap-2">
-            <button type="button" data-testid="group-choose-yes" onClick={() => { setGroupLive(cs.id, cs.title); setOk(true) }} className="h-11 flex-[1.3] rounded-pill bg-sun text-sm font-extrabold text-ink-950 active:scale-95">Yes, choose it</button>
-            <button type="button" data-testid="group-choose-no" onClick={() => { window.dispatchEvent(new CustomEvent(PICK_EVENT)); browse() }} className="h-11 flex-1 rounded-pill border border-line text-sm font-semibold active:scale-95">No, browse again</button>
+            <button type="button" data-testid="group-choose-yes" onClick={() => { setGroupLive(cs.id, cs.title); setOk(true) }} className="h-11 flex-[1.3] rounded-full bg-sun text-sm font-bold text-ink-950 active:scale-95">Yes, choose it</button>
+            <button type="button" data-testid="group-choose-no" onClick={() => { window.dispatchEvent(new CustomEvent(PICK_EVENT)); browse() }} className="h-11 flex-1 rounded-full border border-line text-sm font-semibold active:scale-95">No, browse again</button>
           </div>
         </div>
       )}
@@ -48,7 +48,7 @@ export function GroupFab({ go, cur, browse }: { go: (id: string) => void; cur: s
       {follow && !open && (
         <div data-testid="group-follow" className={`${panel} flex items-center gap-3`}>
           <div className="min-w-0 flex-1"><p className="text-[11px] font-bold uppercase tracking-wider text-fg-muted">{group.chief} chose a live</p><p className="truncate text-sm font-semibold">{group.liveTitle}</p></div>
-          <button type="button" onClick={() => go(group.liveId!)} className="h-10 shrink-0 rounded-pill bg-sky px-4 text-sm font-extrabold text-ink-950 active:scale-95">Join</button>
+          <button type="button" onClick={() => go(group.liveId!)} className="h-10 shrink-0 rounded-full bg-sky px-4 text-sm font-bold text-ink-950 active:scale-95">Join</button>
         </div>
       )}
       {open && (

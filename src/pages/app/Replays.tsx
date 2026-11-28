@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { CATEGORIES, type Category } from '../../data/mock'
 import { useDemo } from '../../store'
 import { Chip } from '../../components/ui'
-import { CatE3 } from '../../live/e3d'
+import { CatIcon } from '../../components/icons2'
 import { ReplayCard, ReplayPlayer, useOpenReplays } from '../../features/Replays'
 import { useReplays } from '../../replays'
 import { Empty } from '../../features/kit'
@@ -22,7 +22,7 @@ export function ReplaysPage() {
   return (
     <div className="flex flex-col gap-7">
       <header>
-        <h1 className="text-3xl font-extrabold sm:text-4xl">Replays</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Replays</h1>
         <p className="text-fg-muted">Missed a live? Watch it again for 48 hours after it ended.{ending > 0 && <> <button type="button" onClick={() => setSort('soon')} className="font-semibold text-sun-soft underline">{ending} {ending === 1 ? 'replay ends' : 'replays end'} within 6 hours</button></>}</p>
       </header>
       <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Sort replays">
@@ -32,7 +32,7 @@ export function ReplaysPage() {
       </div>
       <div className="scroll-x flex gap-2" role="tablist" aria-label="Replay categories">
         <Chip active={cat === 'All'} onClick={() => setCat('All')}>All</Chip>
-        {cats.map((c) => <Chip key={c} active={cat === c} onClick={() => setCat(c)}><span className="inline-flex items-center gap-1.5"><CatE3 c={c} size={16} />{c}</span></Chip>)}
+        {cats.map((c) => <Chip key={c} active={cat === c} onClick={() => setCat(c)}><span className="inline-flex items-center gap-1.5"><CatIcon c={c} size={16} />{c}</span></Chip>)}
       </div>
       {list.length ? (
         <div className="stagger grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">{list.map((r) => <ReplayCard key={r.id} r={r} to={`/app/replay/${r.id}`} me={user?.name} />)}</div>

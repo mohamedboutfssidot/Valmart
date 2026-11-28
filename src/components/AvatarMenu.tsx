@@ -41,7 +41,7 @@ export function AvatarMenu({ inStudio = false }: { inStudio?: boolean }) {
           ) : (
             <Link role="menuitem" to="/studio" className={`${item} !text-fg`}>
               <span className="font-semibold">Studio</span>
-              <span className="rounded-pill bg-sun px-2 py-0.5 text-[11px] font-bold text-ink-950">For hosts</span>
+              <span className="rounded-full bg-sun px-2 py-0.5 text-[11px] font-bold text-ink-950">For hosts</span>
             </Link>
           )}
           <Link role="menuitem" to="/app/settings" className={item}>Settings</Link>

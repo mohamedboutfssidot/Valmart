@@ -12,7 +12,7 @@ export default function Sessions() {
   return (
     <div className="flex flex-col gap-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
-        <div><h1 className="text-3xl font-extrabold sm:text-4xl">Sessions</h1><p className="text-fg-muted">Every walk you streamed, with its audience and income.</p></div>
+        <div><h1 className="text-2xl font-bold sm:text-[28px]">Sessions</h1><p className="text-fg-muted">Every walk you streamed, with its audience and income.</p></div>
         <Button to="/studio/go-live" variant="sun">Go live</Button>
       </header>
       {sessions.length ? (

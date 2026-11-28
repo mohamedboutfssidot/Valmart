@@ -27,8 +27,8 @@ export default function GroupLiveBar({ streamId, streamTitle }: { streamId: stri
       {chief && !here && (
         <div className="flex flex-wrap items-center gap-2" data-testid="group-choose">
           <span className="font-semibold">Choose this live for the group?</span>
-          <button type="button" className="rounded-pill bg-sun px-3 py-1 text-xs font-bold text-ink-950" data-testid="group-choose-yes" onClick={() => setGroupLive(streamId, streamTitle)}>Yes, choose it</button>
-          <button type="button" className="rounded-pill border border-line px-3 py-1 text-xs font-semibold hover:border-sky" data-testid="group-choose-no" onClick={() => nav('/app/live')}>No, browse again</button>
+          <button type="button" className="rounded-full bg-sun px-3 py-1 text-xs font-bold text-ink-950" data-testid="group-choose-yes" onClick={() => setGroupLive(streamId, streamTitle)}>Yes, choose it</button>
+          <button type="button" className="rounded-full border border-line px-3 py-1 text-xs font-semibold hover:border-sky" data-testid="group-choose-no" onClick={() => nav('/app/live')}>No, browse again</button>
         </div>
       )}
       {chief && here && <p className="text-xs text-fg-muted">This is the live of your group.</p>}

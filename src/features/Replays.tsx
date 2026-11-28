@@ -4,7 +4,7 @@ import { ALL_STREAMS, CATEGORIES, CITIES, cityOf, formatCount, HOSTS, type Categ
 import { useDemo } from '../store'
 
 import { VideoSlot } from '../components/VideoSlot'
-import { CatE3 } from '../live/e3d'
+import { CatIcon } from '../components/icons2'
 import { ago, isOpen, left, order, useReplays, REPLAY_HOURS, type Replay } from '../replays'
 import { card, ghost, primary, field } from './kit'
 
@@ -23,7 +23,7 @@ export function ReplayThumb({ r, className = '' }: { r: Replay; className?: stri
     <div className={`relative overflow-hidden rounded-xl ${className}`}>
       <VideoSlot stream={streamOf(r)} showLabel={false} className="!rounded-none" />
       <span className="absolute bottom-1.5 right-1.5 rounded-md bg-ink-950/75 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-white">{r.minutes} min</span>
-      {r.pinned && <span className="absolute left-1.5 top-1.5 rounded-pill bg-sun px-2 py-0.5 text-[11px] font-bold text-ink-950">Pinned</span>}
+      {r.pinned && <span className="absolute left-1.5 top-1.5 rounded-full bg-sun px-2 py-0.5 text-[11px] font-bold text-ink-950">Pinned</span>}
     </div>
   )
 }
@@ -61,7 +61,7 @@ export function ReplayPlayer({ r, me }: { r: Replay; me?: string }) {
     <div className="flex flex-col gap-3" data-testid="replay-player">
       <div className="relative overflow-hidden rounded-card">
         <VideoSlot stream={streamOf(r)} player showLabel={false} />
-        <span className="absolute left-3 top-3 rounded-pill bg-ink-950/70 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">Replay · {left(r)}</span>
+        <span className="absolute left-3 top-3 rounded-full bg-ink-950/70 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">Replay · {left(r)}</span>
       </div>
       <div className="flex items-center gap-3">
         <button type="button" onClick={() => { if (t >= total) setT(0); setPlaying((v) => !v) }} aria-label={playing ? 'Pause' : 'Play'} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sky text-ink-950" data-testid="replay-play">{playing ? '❚❚' : '▶'}</button>
@@ -172,7 +172,7 @@ export function ReplayManager({ onView }: { onView?: (id: string) => void }) {
                   ) : (
                     <>
                       <p className="line-clamp-2 font-semibold leading-snug">{r.title}</p>
-                      <p className="mt-0.5 flex items-center gap-1.5 text-sm text-fg-muted"><CatE3 c={r.category} size={16} /><span className="truncate">{r.category} · {cityOf(r.cityId).name}</span></p>
+                      <p className="mt-0.5 flex items-center gap-1.5 text-sm text-fg-muted"><CatIcon c={r.category} size={16} /><span className="truncate">{r.category} · {cityOf(r.cityId).name}</span></p>
                       <p className={`mt-1 text-xs font-semibold ${on ? 'text-sky-deep' : 'text-[color:var(--warn,#b45309)]'}`}>{on ? left(r) : 'Expired, hidden from viewers'} · {formatCount(r.views)} views</p>
                     </>
                   )}
@@ -187,7 +187,7 @@ export function ReplayManager({ onView }: { onView?: (id: string) => void }) {
                 ) : del === r.id ? (
                   <>
                     <span className="text-sm">Delete this replay?</span>
-                    <button type="button" className="rounded-pill bg-red-600 px-4 py-2 text-sm font-bold text-white" onClick={() => { remove(r.id); setDel(null) }} data-testid="replay-confirm-delete">Delete</button>
+                    <button type="button" className="rounded-full bg-red-600 px-4 py-2 text-sm font-bold text-white" onClick={() => { remove(r.id); setDel(null) }} data-testid="replay-confirm-delete">Delete</button>
                     <button type="button" className={ghost} onClick={() => setDel(null)}>Keep</button>
                   </>
                 ) : (

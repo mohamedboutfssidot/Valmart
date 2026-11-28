@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CatE3 } from '../../../live/e3d'
+import { CatIcon } from '../../../components/icons2'
 import { Avatar } from '../../../components/ui'
 import { VideoSlot } from '../../../components/VideoSlot'
 import { CATEGORIES, STREAMS, audienceOf, cityOf, formatCount, hostOf, slugOf } from '../../../data/mock'
@@ -70,7 +70,7 @@ export function TopCategories() {
       <div className="scroll-x flex gap-3 pb-1">
         {rows.map(({ c, n }) => (
           <Link key={c} to={`/app/category/${slugOf(c)}`} className="group w-[150px] shrink-0">
-            <div className="grid h-[170px] place-items-center rounded-card bg-gradient-to-b from-ink-700 to-ink-800 transition duration-200 group-hover:-translate-y-1 group-hover:shadow-[0_0_0_2px_rgba(17,170,255,.9)]"><CatE3 c={c} size={64} /></div>
+            <div className="grid h-[120px] place-items-center rounded-card bg-ink-700 text-fg-muted transition-colors group-hover:bg-ink-800 group-hover:text-fg"><CatIcon c={c} size={40} /></div>
             <p className="mt-2 truncate text-sm font-semibold">{c}</p>
             <p className="text-xs text-fg-muted"><span className="live-dot mr-1.5 align-middle" />{formatCount(n)}</p>
           </Link>

@@ -76,7 +76,7 @@ export default function Library() {
     <div className="mx-auto flex max-w-[980px] flex-col gap-5 px-4 py-8">
       <header className="flex flex-col gap-1.5">
         <p className="text-[11px] font-bold uppercase tracking-wider text-sun-soft">Developer tool · on your computer</p>
-        <h1 className="font-display text-3xl font-extrabold">Video library</h1>
+        <h1 className="font-display text-3xl font-bold">Video library</h1>
         <p className="max-w-[70ch] text-fg-muted">Put your clips in <code className="rounded bg-ink-800 px-1.5">public/videos/</code> (any sub-folder). Here, choose what each clip is: a <b className="text-fg">new live</b> with its own title, city and category, or the video of an <b className="text-fg">existing live</b>. Then save and open the app.</p>
       </header>
 
@@ -93,7 +93,7 @@ export default function Library() {
             <div className="flex min-w-0 flex-1 flex-col gap-2.5">
               <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Use this clip as">
                 {([['none', 'Not used'], ['attach', 'Video of an existing live'], ['new', 'New live']] as [Mode, string][]).map(([m, label]) => (
-                  <button key={m} type="button" role="radio" aria-checked={r.mode === m} onClick={() => set(i, { mode: m })} className={`rounded-pill border px-3.5 py-1.5 text-[13px] font-semibold ${r.mode === m ? 'border-sun bg-sun text-ink-950' : 'border-line hover:border-sky'}`}>{label}</button>
+                  <button key={m} type="button" role="radio" aria-checked={r.mode === m} onClick={() => set(i, { mode: m })} className={`rounded-full border px-3.5 py-1.5 text-[13px] font-semibold ${r.mode === m ? 'border-sun bg-sun text-ink-950' : 'border-line hover:border-sky'}`}>{label}</button>
                 ))}
               </div>
               {r.mode === 'attach' && (

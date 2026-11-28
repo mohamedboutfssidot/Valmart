@@ -17,7 +17,7 @@ export function VoteCard({ round, onVote, mode = 'viewer' }: { round: Round; onV
             {done ? 'Voting closed' : mode === 'host' ? 'Follow the lead when the timer ends.' : 'The host follows the room. One vote each round.'}
           </p>
         </div>
-        <span className="rounded-pill border border-line px-3 py-1 text-sm font-semibold tabular-nums" aria-live="off">
+        <span className="rounded-full border border-line px-3 py-1 text-sm font-semibold tabular-nums" aria-live="off">
           {done ? 'Closed' : `${round.left}s left`}
         </span>
       </div>

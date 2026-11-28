@@ -23,7 +23,7 @@ export default function Premium() {
   return (
     <div className="flex flex-col gap-14">
       <header className="flex max-w-[62ch] flex-col gap-3">
-        <h1 className="text-3xl font-extrabold sm:text-4xl">Plan</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Plan</h1>
         <p className="text-lg text-fg-muted">Three plans for viewers. Hosts never pay a subscription.</p>
       </header>
 
@@ -42,7 +42,7 @@ export default function Premium() {
               <p className="text-sm text-sun-soft">{b.length}</p>
               <p className="text-fg-muted">{b.effect}</p>
               {user?.isHost && (
-                <button type="button" onClick={() => { buyBoost(b.name, b.price); setBought(b.name) }} className="mt-2 rounded-pill border border-line px-4 py-2 text-sm font-semibold hover:bg-ink-700">Buy {b.name}</button>
+                <button type="button" onClick={() => { buyBoost(b.name, b.price); setBought(b.name) }} className="mt-2 rounded-full border border-line px-4 py-2 text-sm font-semibold hover:bg-ink-700">Buy {b.name}</button>
               )}
             </div>
           ))}
@@ -60,7 +60,7 @@ export default function Premium() {
               const isBoosted = boost !== 'none' && s.id === sample[2].id
               return (
                 <div key={s.id} className={`relative min-w-0 rounded-card p-2 ${isBoosted ? 'ring-2 ring-sun' : ''}`}>
-                  {isBoosted && <span className="absolute -top-3 left-4 z-10 rounded-pill bg-sun px-3 py-0.5 text-xs font-bold text-ink-950">Boosted</span>}
+                  {isBoosted && <span className="absolute -top-3 left-4 z-10 rounded-full bg-sun px-3 py-0.5 text-xs font-bold text-ink-950">Boosted</span>}
                   <span className="mb-2 block text-xs text-fg-muted">Position {i + 1} in the feed</span>
                   <StreamCard stream={s} />
                 </div>

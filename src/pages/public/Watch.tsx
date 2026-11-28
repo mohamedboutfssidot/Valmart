@@ -49,7 +49,7 @@ function Preview({ id }: { id: string }) {
         <VideoSlot stream={stream} player audio className="rounded-[20px] ring-1 ring-line">
           <div className="absolute left-4 top-4 z-10 flex flex-wrap items-center gap-2">
             <LiveBadge viewers={formatCount(stream.viewers)} />
-            <span className="rounded-pill bg-sun px-3 py-1 text-xs font-bold text-ink-950">Free preview</span>
+            <span className="rounded-full bg-sun px-3 py-1 text-xs font-bold text-ink-950">Free preview</span>
           </div>
           {!done && (
             <div className="pointer-events-none absolute inset-x-3 bottom-4 z-10 flex justify-center">
@@ -60,7 +60,7 @@ function Preview({ id }: { id: string }) {
           )}
           {done && (
             <div className="pop-in absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-ink-950/85 p-6 text-center backdrop-blur-sm">
-              <h2 className="max-w-[20ch] font-display text-2xl font-extrabold sm:text-4xl">Keep walking through {city.name} with {host.name.split(' ')[0]}</h2>
+              <h2 className="max-w-[20ch] font-display text-2xl font-bold sm:text-4xl">Keep walking through {city.name} with {host.name.split(' ')[0]}</h2>
               <p className="max-w-[44ch] text-fg-muted">Create a free account to watch the whole session, chat, vote on the route and save moments.</p>
               <div className="flex flex-wrap justify-center gap-3">
                 <Button to="/signin?mode=signup" variant="sun">Create free account</Button>
@@ -99,7 +99,7 @@ function Preview({ id }: { id: string }) {
           <h2 className="mb-3 font-display text-lg font-bold">More free previews</h2>
           <ul className="flex flex-wrap gap-2.5">
             {others.map((o) => { const s = streamById(o)!; return (
-              <li key={o}><Link to={`/watch/${o}`} className="inline-flex rounded-pill border border-line px-4 py-2 font-medium hover:bg-ink-800">{s.title}</Link></li>
+              <li key={o}><Link to={`/watch/${o}`} className="inline-flex rounded-full border border-line px-4 py-2 font-medium hover:bg-ink-800">{s.title}</Link></li>
             ) })}
           </ul>
         </div>

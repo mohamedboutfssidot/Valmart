@@ -1,3 +1,4 @@
+import { NavIcon } from './icons2'
 import { useEffect, useState } from 'react'
 import { planOf } from '../data/plans'
 import ReqNotif from './ReqNotif'
@@ -47,12 +48,9 @@ const TABS: Item[] = [
 ]
 
 const SideLink = ({ it }: { it: Item }) => (
-  <NavLink to={it.to} end={it.end} title={it.label} className={({ isActive }) => `side-link flex items-center gap-3 rounded-md px-3 py-2 text-[14px] font-semibold ${isActive ? 'bg-ink-700 text-fg' : 'text-fg hover:bg-ink-800'}`}><Icon d={it.d} /><span>{it.label}</span></NavLink>
+  <NavLink to={it.to} end={it.end} title={it.label} className={({ isActive }) => `side-link flex items-center gap-3 rounded-md px-3 py-2 text-[14px] font-semibold ${isActive ? 'bg-ink-700 text-fg' : 'text-fg hover:bg-ink-800'}`}><NavIcon label={it.label} /><span>{it.label}</span></NavLink>
 )
 
-const Icon = ({ d }: { d: string }) => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d} /></svg>
-)
 
 /** Layout for the signed-in app. No explanations here, only things to use. */
 export function AppShell() {
@@ -68,7 +66,7 @@ export function AppShell() {
     <div className="yt flex min-h-screen flex-col bg-ink-900 text-fg md:flex-row">
       <RailBackdrop show={small && rail} onClose={closeRail} />
       <aside className={`border-r border-line bg-ink-900 ${railClass(rail, small, 'sticky top-0 h-screen w-[256px] shrink-0')}`} data-testid="rail" aria-hidden={small && !rail}>
-        <Link to="/app" aria-label="Valmart app" className="flex h-16 items-center px-5"><Logo className="h-7" /><span className="hidden h-8 w-8 rounded-xl bg-sky text-center font-display text-lg font-extrabold leading-8 text-white">V</span></Link>
+        <Link to="/app" aria-label="Valmart app" className="flex h-16 items-center px-5"><Logo className="h-7" /><span className="hidden h-8 w-8 rounded-xl bg-sky text-center font-display text-lg font-bold leading-8 text-white">V</span></Link>
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-2.5 pb-4" aria-label="App">
           {[...MAIN, ...MORE].filter((it) => !it.host || user.isHost).map((it) => <SideLink key={it.to} it={it} />)}
           <div className="my-2 border-t border-line" />
@@ -105,8 +103,8 @@ export function AppShell() {
           </form>
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <Link to="/app" aria-label="Search" className="grid h-9 w-9 place-items-center rounded-full hover:bg-ink-700 sm:hidden"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="M16 16l5 5" /></svg></Link>
-            {user.isHost && <Link to="/studio/live" className="hidden items-center gap-1.5 rounded-pill bg-ink-700 px-3.5 py-2 text-sm font-semibold hover:bg-line sm:inline-flex"><span className="h-2 w-2 rounded-full bg-sun" aria-hidden="true" />Go live</Link>}
-            <Link to="/app/wallet" className="inline-flex items-center gap-2 rounded-pill bg-ink-700 px-3 py-1.5 text-sm font-semibold tabular-nums hover:bg-line" aria-label={`${coins} coins, open wallet`}><span className="h-2.5 w-2.5 rounded-full bg-sun" aria-hidden="true" />{coins.toLocaleString('en-US')}</Link>
+            {user.isHost && <Link to="/studio/live" className="hidden items-center gap-1.5 rounded-full bg-ink-700 px-3.5 py-2 text-sm font-semibold hover:bg-line sm:inline-flex"><span className="h-2 w-2 rounded-full bg-sun" aria-hidden="true" />Go live</Link>}
+            <Link to="/app/wallet" className="inline-flex items-center gap-2 rounded-full bg-ink-700 px-3 py-1.5 text-sm font-semibold tabular-nums hover:bg-line" aria-label={`${coins} coins, open wallet`}><span className="h-2.5 w-2.5 rounded-full bg-sun" aria-hidden="true" />{coins.toLocaleString('en-US')}</Link>
             <AvatarMenu />
           </div>
         </header>
@@ -121,7 +119,7 @@ export function AppShell() {
           {TABS.map((t) => (
             <li key={t.to}>
               <NavLink to={t.to} end={t.end} className={({ isActive }) => `flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium ${isActive ? 'text-sky' : 'text-fg-muted'}`}>
-                <Icon d={t.d} />{t.label}
+                <NavIcon label={t.label} />{t.label}
               </NavLink>
             </li>
           ))}

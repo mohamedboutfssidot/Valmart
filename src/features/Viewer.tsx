@@ -17,7 +17,7 @@ function Place({ s, note }: { s: Stream; note?: string }) {
   const c = cityOf(s.cityId)
   return (
     <li className={`${card} flex flex-col gap-1.5 !p-4`} data-testid="journal-place">
-      <span className="flex aspect-[16/6] items-center justify-center rounded-xl bg-gradient-to-br from-sky/30 via-ink-900 to-sun/30 font-display text-2xl font-extrabold text-fg-muted/70">{c.name}</span>
+      <span className="flex aspect-[16/6] items-center justify-center rounded-xl bg-gradient-to-br from-sky/30 via-ink-900 to-sun/30 font-display text-2xl font-bold text-fg-muted/70">{c.name}</span>
       <span className="font-semibold leading-snug">{s.place}</span>
       <span className="text-sm text-fg-muted">{c.name}, {c.country} · {s.category}</span>
       {note && <span className="text-xs text-fg-muted">{note}</span>}
@@ -35,7 +35,7 @@ export function JournalView() {
   return (
     <div className="flex flex-col gap-6" data-testid="journal">
       <div className="grid gap-3 sm:grid-cols-3">
-        {[['Moments', moments.length], ['Places', streams.length], ['Countries', countries.size]].map(([l, v]) => <div key={l as string} className={card}><p className="text-sm text-fg-muted">{l}</p><p className="font-display text-3xl font-extrabold">{v}</p></div>)}
+        {[['Moments', moments.length], ['Places', streams.length], ['Countries', countries.size]].map(([l, v]) => <div key={l as string} className={card}><p className="text-sm text-fg-muted">{l}</p><p className="font-display text-3xl font-bold">{v}</p></div>)}
       </div>
       {streams.length ? (
         <>
@@ -57,7 +57,7 @@ export function PublicJournal({ by, ids }: { by: string; ids: string[] }) {
   const streams = ids.map((id) => STREAMS.find((s) => s.id === id)).filter(Boolean) as Stream[]
   return (
     <div className="flex flex-col gap-6" data-testid="public-journal">
-      <header className="flex flex-col gap-1"><p className="text-sm font-semibold text-sky">Travel journal</p><h1 className="text-3xl font-extrabold sm:text-5xl">{by}’s journal</h1><p className="text-fg-muted">{streams.length} place{streams.length === 1 ? '' : 's'} saved from live walks on Valmart.</p></header>
+      <header className="flex flex-col gap-1"><p className="text-sm font-semibold text-sky">Travel journal</p><h1 className="text-3xl font-bold sm:text-5xl">{by}’s journal</h1><p className="text-fg-muted">{streams.length} place{streams.length === 1 ? '' : 's'} saved from live walks on Valmart.</p></header>
       {streams.length ? <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{streams.map((s) => <Place key={s.id} s={s} />)}</ul> : <Empty>This journal is empty.</Empty>}
     </div>
   )
@@ -86,7 +86,7 @@ export function FollowingView({ onHost }: { onHost?: (id: string) => void }) {
         </ul>
       </Block>
       <Block title="Cities you follow">
-        <div className="flex flex-wrap gap-2">{CITIES.map((c) => <button key={c.id} type="button" aria-pressed={followCities.includes(c.id)} onClick={() => toggleCity(c.id)} className={`rounded-pill border px-3.5 py-1.5 text-sm font-medium ${followCities.includes(c.id) ? 'border-sky bg-sky text-ink-950' : 'border-line text-fg-muted hover:border-sky'}`}>{c.name}</button>)}</div>
+        <div className="flex flex-wrap gap-2">{CITIES.map((c) => <button key={c.id} type="button" aria-pressed={followCities.includes(c.id)} onClick={() => toggleCity(c.id)} className={`rounded-full border px-3.5 py-1.5 text-sm font-medium ${followCities.includes(c.id) ? 'border-sky bg-sky text-ink-950' : 'border-line text-fg-muted hover:border-sky'}`}>{c.name}</button>)}</div>
       </Block>
       <Block title="Coming up" hint="Scheduled lives from hosts and cities you follow. Tap Remind me to get an alert.">
         {upcoming.length ? <ul className="grid gap-2 sm:grid-cols-2">{upcoming.map((x) => <li key={x.id} className={`${card} flex flex-col gap-1 !p-3`}><span className="font-semibold">{x.title}</span><span className="text-sm text-fg-muted">{x.hostName} · {cityOf(x.cityId).name} · {day(x.date)} {x.time}</span><button type="button" className={`${x.remind.includes(me) ? primary : ghost} mt-1 self-start`} onClick={() => toggleRemind(x.id, me)} data-testid="remind">{x.remind.includes(me) ? 'Reminder on' : 'Remind me'}</button></li>)}</ul> : <Empty>Follow a host or a city to see their scheduled lives here.</Empty>}
@@ -196,7 +196,7 @@ export function HostProfileView({ hostId, onRequest, onReplay }: { hostId: strin
     <div className="flex flex-col gap-6" data-testid="host-profile">
       <section className={`${card} flex flex-col gap-4`}>
         <div className="flex flex-wrap items-center gap-4"><Avatar name={h.name} size={72} />
-          <div className="min-w-0 flex-1"><h2 className="font-display text-2xl font-extrabold">{h.name}</h2><p className="text-fg-muted">{cityOf(h.cityId).name} · {h.languages.join(', ')}</p><p className="mt-1 flex items-center gap-2"><Stars n={avg} /><span className="text-sm text-fg-muted tabular-nums">{avg.toFixed(1)} · {rs.length} review{rs.length === 1 ? '' : 's'}{h.sessions ? ` · ${h.sessions} sessions` : ''}</span></p></div>
+          <div className="min-w-0 flex-1"><h2 className="font-display text-2xl font-bold">{h.name}</h2><p className="text-fg-muted">{cityOf(h.cityId).name} · {h.languages.join(', ')}</p><p className="mt-1 flex items-center gap-2"><Stars n={avg} /><span className="text-sm text-fg-muted tabular-nums">{avg.toFixed(1)} · {rs.length} review{rs.length === 1 ? '' : 's'}{h.sessions ? ` · ${h.sessions} sessions` : ''}</span></p></div>
         </div>
         <ul className="flex flex-wrap gap-2">{h.founding && <Pill tone="sun">Founding host</Pill>}</ul>
         <p>{p.bio}</p>

@@ -18,7 +18,7 @@ const GRID = 'stagger grid gap-x-4 gap-y-7 sm:grid-cols-2 lg:grid-cols-3 2xl:gri
 
 function Tag({ label, off }: { label: string; off: () => void }) {
   return (
-    <button type="button" onClick={off} className="inline-flex shrink-0 items-center gap-1.5 rounded-pill bg-sky/15 px-3 py-1 text-sm font-semibold text-sky-deep hover:bg-sky/25">
+    <button type="button" onClick={off} className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-sky/15 px-3 py-1 text-sm font-semibold text-sky-deep hover:bg-sky/25">
       {label}
       <svg width="10" height="10" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
       <span className="sr-only">Remove filter</span>
@@ -110,7 +110,7 @@ export default function Discover({ liveOnly = false }: { liveOnly?: boolean }) {
     <div className="flex flex-col gap-9">
       <div ref={box} className={`sticky top-0 z-20 -mx-4 bg-ink-900/90 px-4 py-2.5 backdrop-blur sm:-mx-6 sm:px-6 ${liveOnly || searching || suggest || panel ? '' : 'hidden'}`}>
         <div className="relative flex items-center justify-center gap-2.5">
-          <form role="search" onSubmit={(e) => { e.preventDefault(); submit() }} className={`relative flex h-10 w-[420px] min-w-0 max-w-[calc(100%-6.5rem)] flex-none items-center overflow-hidden rounded-pill border bg-ink-900 shadow-[0_1px_3px_rgba(15,26,34,.12)] transition-all duration-200 ${suggest ? 'border-sky shadow-[0_0_0_4px_rgba(17,170,255,.18)]' : 'border-line hover:border-ink-500'}`}>
+          <form role="search" onSubmit={(e) => { e.preventDefault(); submit() }} className={`relative flex h-10 w-[420px] min-w-0 max-w-[calc(100%-6.5rem)] flex-none items-center overflow-hidden rounded-full border bg-ink-900 shadow-[0_1px_3px_rgba(15,26,34,.12)] transition-all duration-200 ${suggest ? 'border-sky shadow-[0_0_0_4px_rgba(17,170,255,.18)]' : 'border-line hover:border-ink-500'}`}>
             <input ref={input} value={q} onChange={(e) => setQ(e.target.value)} onFocus={() => { setSuggest(true); setPanel(false) }} type="text" autoComplete="off" aria-label="Search live sessions, replays, hosts and cities" placeholder={SEARCH_HINTS[hint]} data-testid="discover-search" className="!outline-none !shadow-none h-full min-w-0 flex-1 bg-transparent px-4 text-[14px] outline-none placeholder:text-fg-muted" />
             {q ? (
               <button type="button" onClick={() => { setQ(''); input.current?.focus() }} aria-label="Clear search" className="mr-1 grid h-8 w-8 place-items-center rounded-full text-fg-muted hover:bg-ink-700 hover:text-fg">
@@ -121,7 +121,7 @@ export default function Discover({ liveOnly = false }: { liveOnly?: boolean }) {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="M16 16l5 5" /></svg>
             </button>
           </form>
-          <button type="button" onClick={() => { setPanel((v) => !v); setSuggest(false) }} aria-expanded={panel} data-testid="discover-filters" className={`relative flex h-10 shrink-0 items-center gap-2 rounded-pill border px-3.5 text-[14px] font-semibold transition ${panel || count ? 'border-sky bg-sky/10 text-sky-deep' : 'border-line bg-ink-800 hover:border-ink-500'}`}>
+          <button type="button" onClick={() => { setPanel((v) => !v); setSuggest(false) }} aria-expanded={panel} data-testid="discover-filters" className={`relative flex h-10 shrink-0 items-center gap-2 rounded-full border px-3.5 text-[14px] font-semibold transition ${panel || count ? 'border-sky bg-sky/10 text-sky-deep' : 'border-line bg-ink-800 hover:border-ink-500'}`}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>
             <span className="max-sm:hidden">Filters</span>
             {count > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-sky px-1 text-xs font-bold text-white">{count}</span>}
@@ -150,7 +150,7 @@ export default function Discover({ liveOnly = false }: { liveOnly?: boolean }) {
         )}
         {count === 0 && !q && (
           <div className="no-scrollbar mt-2.5 flex justify-center gap-2 overflow-x-auto" aria-label="Quick searches">
-            {quick.map(([l, fn]) => <button key={l} type="button" onClick={fn} className="shrink-0 rounded-pill bg-ink-700 px-3.5 py-1.5 text-[13px] font-semibold transition hover:bg-line active:scale-95">{l}</button>)}
+            {quick.map(([l, fn]) => <button key={l} type="button" onClick={fn} className="shrink-0 rounded-full bg-ink-700 px-3.5 py-1.5 text-[13px] font-semibold transition hover:bg-line active:scale-95">{l}</button>)}
           </div>
         )}
         {count > 0 && (

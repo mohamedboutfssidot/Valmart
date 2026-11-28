@@ -15,14 +15,14 @@ export default function Boosts() {
   const mine = ledger.filter((l) => l.kind === 'boost')
   return (
     <div className="flex flex-col gap-10">
-      <header><h1 className="text-3xl font-extrabold sm:text-4xl">Boosts</h1><p className="text-fg-muted">Pay only when you want more visibility. No subscription. Sample prices.</p></header>
+      <header><h1 className="text-2xl font-bold sm:text-[28px]">Boosts</h1><p className="text-fg-muted">Pay only when you want more visibility. No subscription. Sample prices.</p></header>
       <div className="stagger grid gap-4 md:grid-cols-3">
         {BOOSTS.map((b) => (
           <div key={b.name} className="lift flex min-w-0 flex-col gap-2 rounded-card border border-line bg-ink-800 p-5">
             <div className="flex items-baseline justify-between gap-3"><h2 className="font-display text-lg font-bold">{b.name}</h2><span className="font-display text-lg font-bold tabular-nums">${b.price}</span></div>
             <p className="text-sm text-sun-soft">{b.length}</p>
             <p className="text-fg-muted">{b.effect}</p>
-            <button type="button" onClick={() => { buyBoost(b.name, b.price); setLast(b.name) }} className="mt-auto rounded-pill border border-sky px-4 py-2 font-display text-sm font-semibold text-sky-soft hover:bg-ink-700">{last === b.name ? 'Added' : `Buy for $${b.price}`}</button>
+            <button type="button" onClick={() => { buyBoost(b.name, b.price); setLast(b.name) }} className="mt-auto rounded-full border border-sky px-4 py-2 font-display text-sm font-semibold text-sky-soft hover:bg-ink-700">{last === b.name ? 'Added' : `Buy for $${b.price}`}</button>
           </div>
         ))}
       </div>

@@ -38,7 +38,7 @@ export default function Hosts() {
   return (
     <div className="flex flex-col gap-24 md:gap-32">
       <header className="stagger flex max-w-[68ch] flex-col gap-4">
-        <p className="w-fit rounded-pill border border-line px-3.5 py-1 text-sm font-medium text-sky-soft">For hosts</p>
+        <p className="w-fit rounded-full border border-line px-3.5 py-1 text-sm font-medium text-sky-soft">For hosts</p>
         <h1 className="text-3xl sm:text-5xl">Earn from what you know about your city</h1>
         <p className="text-lg text-fg-muted">Go live from your phone. Earn from the audience you build.</p>
         <div className="flex flex-wrap gap-3"><Button to="/signin?mode=signup" variant="sun">Create an account to host</Button><Button to="/signin" variant="ghost">I already have one</Button></div>

@@ -7,6 +7,7 @@ import App from './App'
 import MobileApp from './mobile/MobileApp'
 import { loadLibrary } from './video/library'
 import { initTheme } from './theme'
+import './pro.css'
 
 initTheme()
 // Test hook: only when a tester sets localStorage valmart-test = 1 in the browser.

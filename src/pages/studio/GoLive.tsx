@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Eye } from '@phosphor-icons/react'
 import { CATEGORIES, CITIES, STREAMS, type Category, type Stream } from '../../data/mock'
 import { useLiveSim } from '../../hooks/useLiveSim'
 import { Link } from 'react-router-dom'
@@ -46,7 +47,7 @@ function BecomeHost() {
   return (
     <div className="flex max-w-[620px] flex-col gap-6">
       <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-extrabold sm:text-4xl">Set up your host profile</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Set up your host profile</h1>
         <p className="text-fg-muted">Choose where you stream and the languages you speak. Then you can go live.</p>
       </header>
       <form className="flex flex-col gap-5 rounded-card border border-line bg-ink-800 p-5 sm:p-6" onSubmit={(e) => { e.preventDefault(); becomeHost(city, langs.length ? langs : ['English']) }}>
@@ -62,7 +63,7 @@ function BecomeHost() {
             {ALL.map((l) => <Chip key={l} active={langs.includes(l)} onClick={() => setLangs((x) => (x.includes(l) ? x.filter((y) => y !== l) : [...x, l]))}>{l}</Chip>)}
           </div>
         </fieldset>
-        <button type="submit" className="rounded-pill bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft">Become a host</button>
+        <button type="submit" className="rounded-full bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft">Become a host</button>
         <p className="text-sm text-fg-muted">Free to join. All you need is a camera.</p>
       </form>
     </div>
@@ -96,7 +97,7 @@ function Setup({ defaultCity }: { defaultCity: string }) {
   if (phase === 'real' && real) {
     return (
       <div className="flex flex-col gap-4">
-        <header className="flex flex-col gap-1"><h1 className="text-2xl font-extrabold sm:text-3xl">{cfg.title}</h1><p className="text-fg-muted">{cfg.place}, {CITIES.find((c) => c.id === cfg.cityId)?.name} · you are live in “Live now”.</p></header>
+        <header className="flex flex-col gap-1"><h1 className="text-xl font-bold sm:text-2xl">{cfg.title}</h1><p className="text-fg-muted">{cfg.place}, {CITIES.find((c) => c.id === cfg.cityId)?.name} · you are live in “Live now”.</p></header>
         <HostRoom room={real.room} role={real.team ? 'control' : 'host'} hostKey={real.key} hostMode={cfg.hostMode} category={cfg.category} autoStart={!real.team} surface="web" onLeave={() => { setReal(null); setPhase('setup') }} />
       </div>
     )
@@ -108,7 +109,7 @@ function Setup({ defaultCity }: { defaultCity: string }) {
     return (
       <div className="flex max-w-[640px] flex-col gap-6">
         <header className="flex flex-col gap-2">
-          <h1 className="text-4xl font-extrabold sm:text-5xl">Session complete</h1>
+          <h1 className="text-2xl font-bold sm:text-[28px]">Session complete</h1>
           <p className="text-fg-muted">Here is how your walk went.</p>
         </header>
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -141,7 +142,7 @@ function Setup({ defaultCity }: { defaultCity: string }) {
   return (
     <div className="flex flex-col gap-10">
       <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-extrabold sm:text-4xl">Go live</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Go live</h1>
         <p className="max-w-[60ch] text-fg-muted">Set up your walk, check your camera and start.</p>
       </header>
 
@@ -164,7 +165,7 @@ function Setup({ defaultCity }: { defaultCity: string }) {
             <label htmlFor="host-place" className="text-sm font-medium">Starting point</label>
             <input id="host-place" className={field} value={cfg.place} maxLength={60} onChange={(e) => setCfg({ ...cfg, place: e.target.value })} placeholder="A landmark or street" required />
             <p className="flex items-start gap-2 rounded-xl bg-ink-700/60 px-3 py-2 text-sm" data-testid="place-preview">
-              <span aria-hidden="true">👁</span>
+              <Eye size={14} aria-hidden="true" />
               <span><b>Viewers will see:</b> {policy === 'exact' ? `${cfg.place || 'your starting point'}, ${city.name}` : policy === 'area' ? `${city.name}, ${city.country}` : city.country}. <span className="text-fg-muted">{policy === 'exact' ? 'This type shows the place and a map.' : policy === 'area' ? 'This type shows only the area, never the exact spot.' : 'This type never shows the place. Only the country.'}</span></span>
             </p>
           </div>
@@ -178,20 +179,20 @@ function Setup({ defaultCity }: { defaultCity: string }) {
           </fieldset>
           <div className="flex flex-col gap-2 rounded-xl border border-line px-3.5 py-3" data-testid="kit-preview">
             <p className="text-sm"><b>Tools for this type</b> <span className="text-fg-muted">· {KITS.find((k) => k.id === kit)?.label}</span></p>
-            <div className="flex flex-wrap gap-1.5">{TOOLS.filter((t) => t.kit === 'base' || t.kit === kit).map((t) => <span key={t.id} className="rounded-pill bg-ink-700 px-2.5 py-1 text-xs font-semibold">{t.name}</span>)}</div>
+            <div className="flex flex-wrap gap-1.5">{TOOLS.filter((t) => t.kit === 'base' || t.kit === kit).map((t) => <span key={t.id} className="rounded-full bg-ink-700 px-2.5 py-1 text-xs font-semibold">{t.name}</span>)}</div>
             <p className="text-xs text-fg-muted">{POLICY[kit === 'hidden' ? 'secret' : kit === 'fear' || kit === 'adventure' || kit === 'nature' ? 'area' : 'exact'].note} <Link to="/studio/tools" className="font-semibold text-sky hover:underline">Choose your tools</Link></p>
           </div>
           <fieldset className="flex flex-col gap-2">
             <legend className="mb-1 text-sm font-medium">How do you run this live?</legend>
             <HostModePicker value={cfg.hostMode} onChange={(m) => setCfg({ ...cfg, hostMode: m })} />
           </fieldset>
-          <button type="submit" disabled={busy} className="mt-1 inline-flex items-center justify-center rounded-pill bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft disabled:opacity-60">
+          <button type="submit" disabled={busy} className="mt-1 inline-flex items-center justify-center rounded-full bg-sun px-6 py-3 font-display text-base font-bold text-ink-950 hover:bg-sun-soft disabled:opacity-60">
             {busy ? 'Starting…' : <>{cfg.hostMode === 'team' ? 'Open the control room in ' : 'Start session in '}{city.name}</>}
           </button>
           {err && (
             <div role="alert" className="flex flex-col gap-2 rounded-xl border border-sun px-3.5 py-3 text-sm" data-testid="golive-error">
               <span>{err}</span>
-              <button type="button" onClick={() => { setErr(''); setPhase('live') }} className="self-start rounded-pill border border-line px-3.5 py-1.5 font-semibold hover:border-sky">Start the demo session instead</button>
+              <button type="button" onClick={() => { setErr(''); setPhase('live') }} className="self-start rounded-full border border-line px-3.5 py-1.5 font-semibold hover:border-sky">Start the demo session instead</button>
             </div>
           )}
         </form>
@@ -210,7 +211,7 @@ function Setup({ defaultCity }: { defaultCity: string }) {
 
       <section className="flex flex-col gap-4">
         <div className="flex items-end justify-between gap-3">
-          <h2 className="text-2xl font-bold">Recent sessions</h2>
+          <h2 className="text-xl font-semibold">Recent sessions</h2>
           <Link to="/studio/earnings" className="text-sm text-sky hover:underline">All earnings</Link>
         </div>
         {sessions.length ? (
@@ -270,19 +271,19 @@ function Studio({ cfg, onEnd }: { cfg: Config; onEnd: (s: Summary) => void }) {
         <VideoSlot stream={previewStream(cfg)} label={hostMode === 'team' ? (camera ? 'Camera feed: Sam’s phone' : 'No camera yet') : 'Your camera'} className="rounded-[20px] ring-1 ring-line">
           <div className="absolute left-4 top-4 z-10 flex items-center gap-2">
             <LiveBadge viewers={String(viewers)} />
-            <span className="rounded-pill bg-ink-950/75 px-3 py-1 text-xs font-semibold tabular-nums backdrop-blur">{clock(seconds)}</span>
+            <span className="rounded-full bg-ink-950/75 px-3 py-1 text-xs font-semibold tabular-nums backdrop-blur">{clock(seconds)}</span>
           </div>
           <GiftToast bursts={sim.bursts} />
           <VideoEffects e={eng} />
           <PinLayer e={eng} armed={false} />
-          <span className="absolute right-4 top-4 z-10 rounded-pill bg-ink-950/75 px-3 py-1 text-xs font-semibold backdrop-blur">Viewers see this 4 s later</span>
+          <span className="absolute right-4 top-4 z-10 rounded-full bg-ink-950/75 px-3 py-1 text-xs font-semibold backdrop-blur">Viewers see this 4 s later</span>
           <VoiceBadge className="absolute bottom-4 left-4 z-10" />
         </VideoSlot>
 
         <div className="flex flex-wrap items-center gap-2.5">
           <span className="text-sm text-fg-muted">Mode</span>
           {(['auto', 'manual', 'team'] as const).map((m) => (
-            <button key={m} type="button" aria-pressed={hostMode === m} onClick={() => setHostMode(m)} className={`rounded-pill border px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${hostMode === m ? 'border-sun bg-sun text-ink-950' : 'border-line hover:border-sky'}`}>{m === 'auto' ? 'Solo, automatic' : m === 'manual' ? 'Solo, manual' : 'Team'}</button>
+            <button key={m} type="button" aria-pressed={hostMode === m} onClick={() => setHostMode(m)} className={`rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${hostMode === m ? 'border-sun bg-sun text-ink-950' : 'border-line hover:border-sky'}`}>{m === 'auto' ? 'Solo, automatic' : m === 'manual' ? 'Solo, manual' : 'Team'}</button>
           ))}
           <VoiceToggle who="host" label="Voice for results" className="ml-auto" />
         </div>
@@ -293,7 +294,7 @@ function Studio({ cfg, onEnd }: { cfg: Config; onEnd: (s: Summary) => void }) {
             <OneButton s={sug} e={eng} />
             <div className="flex flex-wrap items-center gap-2.5">
               <WalkingSwitch on={walking} onChange={setWalking} />
-              <button type="button" onClick={() => setMore((v) => !v)} aria-expanded={more} className="rounded-pill border border-line px-3.5 py-1.5 text-[13px] font-semibold hover:border-sky">{more ? 'Hide' : 'More'} tools</button>
+              <button type="button" onClick={() => setMore((v) => !v)} aria-expanded={more} className="rounded-full border border-line px-3.5 py-1.5 text-[13px] font-semibold hover:border-sky">{more ? 'Hide' : 'More'} tools</button>
             </div>
           </section>
         )}
@@ -306,7 +307,7 @@ function Studio({ cfg, onEnd }: { cfg: Config; onEnd: (s: Summary) => void }) {
           <button
             type="button"
             onClick={() => onEnd({ seconds, peak, gifts: sim.giftCount, coins: sim.giftCoins })}
-            className="rounded-pill border border-sun px-5 py-2.5 font-display text-sm font-bold text-sun-soft hover:bg-sun hover:text-ink-950"
+            className="rounded-full border border-sun px-5 py-2.5 font-display text-sm font-bold text-sun-soft hover:bg-sun hover:text-ink-950"
           >
             End session
           </button>
@@ -356,7 +357,7 @@ function Studio({ cfg, onEnd }: { cfg: Config; onEnd: (s: Summary) => void }) {
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink-950/70 p-4 sm:p-8" role="dialog" aria-label="Tool builder" aria-modal="true">
           <button type="button" aria-label="Close" onClick={() => setBuilding(false)} className="fixed inset-0 cursor-default" />
           <div className="pop-in relative my-auto w-full max-w-[560px] rounded-card border border-line bg-ink-800 p-5 sm:p-6">
-            <div className="mb-4 flex items-center justify-between"><h2 className="font-display text-xl font-bold">Tool builder</h2><button type="button" onClick={() => setBuilding(false)} className="rounded-pill border border-line px-3 py-1 text-sm hover:border-sky">Close</button></div>
+            <div className="mb-4 flex items-center justify-between"><h2 className="font-display text-xl font-bold">Tool builder</h2><button type="button" onClick={() => setBuilding(false)} className="rounded-full border border-line px-3 py-1 text-sm hover:border-sky">Close</button></div>
             <ToolBuilder category={cfg.category} onDone={() => setBuilding(false)} onLaunch={eng.launch} />
           </div>
         </div>

@@ -10,22 +10,22 @@ export default function Wallet() {
   return (
     <div className="flex flex-col gap-9">
       <header className="flex flex-col gap-1">
-        <h1 className="text-3xl font-extrabold sm:text-4xl">Wallet</h1>
+        <h1 className="text-2xl font-bold sm:text-[28px]">Wallet</h1>
         <p className="text-fg-muted">Coins are used for gifts in live rooms.</p>
       </header>
 
       <div className="rounded-card border border-line bg-ink-800 p-6">
         <p className="text-sm text-fg-muted">Balance</p>
-        <p className="mt-1 font-display text-5xl font-extrabold tabular-nums">{coins.toLocaleString('en-US')}<span className="ml-2 text-lg font-medium text-fg-muted">coins</span></p>
+        <p className="mt-1 font-display text-4xl font-bold tabular-nums">{coins.toLocaleString('en-US')}<span className="ml-2 text-lg font-medium text-fg-muted">coins</span></p>
       </div>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-2xl font-bold">Add coins</h2>
+        <h2 className="text-xl font-semibold">Add coins</h2>
         <ul className="grid gap-4 sm:grid-cols-3">
           {PACKS.map((p) => (
             <li key={p.coins} className="flex min-w-0 flex-col gap-2 rounded-card border border-line bg-ink-800 p-5">
               <h3 className="font-display text-lg font-bold">{p.label}</h3>
-              <p className="font-display text-2xl font-extrabold tabular-nums">{p.coins.toLocaleString('en-US')}</p>
+              <p className="font-display text-2xl font-bold tabular-nums">{p.coins.toLocaleString('en-US')}</p>
               <p className="text-sm text-fg-muted">${(p.coins / COINS_PER_USD).toFixed(0)} sample price</p>
               <Button variant="ghost" onClick={() => topUp(p.coins)} className="mt-1">Add free demo coins</Button>
             </li>
@@ -35,7 +35,7 @@ export default function Wallet() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-2xl font-bold">Gifts sent</h2>
+        <h2 className="text-xl font-semibold">Gifts sent</h2>
         {gifts.length ? (
           <ul className="flex flex-col gap-2.5">
             {gifts.map((g) => (

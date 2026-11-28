@@ -4,7 +4,7 @@ import { clockTime, isUnread } from './requestHelpers'
 import { $day, $usd } from './format'
 
 const field = 'w-full rounded-xl border border-line bg-ink-900 px-4 py-2.5 text-[15px] placeholder:text-fg-muted focus:border-sky focus:outline-none'
-const ghost = 'inline-flex items-center justify-center rounded-pill border border-line px-4 py-2 text-sm font-semibold hover:border-sky'
+const ghost = 'inline-flex items-center justify-center rounded-full border border-line px-4 py-2 text-sm font-semibold hover:border-sky'
 
 /** Private chat between the viewer who asked and the host (target or chosen one). */
 export const RequestThread = ({ r }: { r: TripRequest }) => {
@@ -27,9 +27,9 @@ export const RequestThread = ({ r }: { r: TripRequest }) => {
   const go = (e: React.FormEvent) => { e.preventDefault(); if (text.trim()) { send(r.id, text); setText('') } }
   return (
     <div className="flex flex-col gap-2" data-testid="req-thread">
-      <button type="button" onClick={() => setOpen((v) => !v)} data-testid="thread-toggle" aria-expanded={open} className="inline-flex w-fit items-center gap-2 rounded-pill border border-line px-3.5 py-1.5 text-sm font-semibold hover:border-sky">
+      <button type="button" onClick={() => setOpen((v) => !v)} data-testid="thread-toggle" aria-expanded={open} className="inline-flex w-fit items-center gap-2 rounded-full border border-line px-3.5 py-1.5 text-sm font-semibold hover:border-sky">
         Private chat with {other}
-        {unread && <span className="rounded-pill bg-sun px-2 text-xs font-bold text-ink-950" data-testid="thread-unread">New</span>}
+        {unread && <span className="rounded-full bg-sun px-2 text-xs font-bold text-ink-950" data-testid="thread-unread">New</span>}
       </button>
       {open && (
         <div className="flex flex-col gap-2 rounded-xl border border-line p-3">
@@ -65,7 +65,7 @@ export const RequestResponses = ({ r }: { r: TripRequest }) => {
       {list.map((x) => (
         <div key={x.host} className="flex flex-wrap items-center justify-between gap-2 text-sm" data-testid="response-row">
           <span><b>{x.host}</b> · {$usd(x.usd)} · {$day(x.date)}</span>
-          <button type="button" onClick={() => choose(r.id, x.host)} className="rounded-pill bg-sun px-3 py-1 text-xs font-bold text-ink-950" data-testid="choose-response">Choose {x.host}</button>
+          <button type="button" onClick={() => choose(r.id, x.host)} className="rounded-full bg-sun px-3 py-1 text-xs font-bold text-ink-950" data-testid="choose-response">Choose {x.host}</button>
         </div>
       ))}
     </div>
